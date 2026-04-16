@@ -2,236 +2,257 @@
 <html lang="zh-TW">
 <head>
     <meta charset="utf-8">
-    <title>AETHER 10D - MULTI-SELECT ENGINE</title>
+    <title>AETHER 10D - LOGIC ISOLATION</title>
     <style>
         :root {
             --accent: #1a73e8;
-            --accent-soft: rgba(26, 115, 232, 0.1);
-            --text-main: #1f1f1f;
-            --text-sub: #5f6368;
             --bg-side: #f8f9fa;
-            --border: rgba(0,0,0,0.06);
+            --text-main: #202124;
+            --text-sub: #5f6368;
+            --border: #dadce0;
+            --sel-blue: #e8f0fe;
             --danger: #d93025;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12);
         }
 
-        body { margin: 0; font-family: 'SF Pro Display', system-ui, sans-serif; display: flex; height: 100vh; background: #fff; overflow: hidden; }
+        body { margin: 0; font-family: 'Segoe UI', system-ui; display: flex; height: 100vh; background: #fff; color: var(--text-main); overflow: hidden; }
 
-        /* 側邊欄 */
-        #sidebar { width: 260px; background: var(--bg-side); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; }
-        #sidebar.collapsed { width: 80px; }
-        .brand { height: 90px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-        .avatar { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        /* --- 側邊欄 --- */
+        #sidebar { 
+            width: 260px; background: var(--bg-side); border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; transition: 0.25s; flex-shrink: 0; 
+        }
+        #sidebar.collapsed { width: 72px; }
+        
+        .logo-box { height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .logo-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; box-shadow: var(--shadow); }
 
-        .side-ops { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .btn-action { height: 48px; border: none; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; display: flex; align-items: center; padding: 0 16px; transition: 0.2s; width: 100%; box-sizing: border-box; }
-        #sidebar.collapsed .btn-action { padding: 0; justify-content: center; }
-        .btn-action svg { min-width: 24px; height: 24px; }
-        .btn-action span { margin-left: 12px; font-weight: 600; font-size: 14px; white-space: nowrap; }
-        #sidebar.collapsed .btn-action span { display: none; }
-
-        .nav-group { flex: 1; margin-top: 20px; }
-        .nav-link { height: 44px; display: flex; align-items: center; border-radius: 12px; margin: 4px 12px; cursor: pointer; color: var(--text-sub); transition: 0.2s; padding: 0 14px; }
-        .nav-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-        #sidebar.collapsed .nav-link { justify-content: center; padding: 0; }
-        .nav-link svg { min-width: 24px; height: 24px; }
-        .nav-txt { margin-left: 14px; font-size: 14px; white-space: nowrap; }
+        .nav-link { 
+            height: 44px; display: flex; align-items: center; border-radius: 0 22px 22px 0; 
+            margin-right: 8px; cursor: pointer; color: var(--text-sub); transition: 0.2s; padding-left: 24px;
+        }
+        .nav-link.active { background: var(--sel-blue); color: var(--accent); font-weight: 600; }
+        #sidebar.collapsed .nav-link { padding-left: 0; justify-content: center; border-radius: 12px; margin: 4px 8px; }
+        .nav-txt { margin-left: 16px; font-size: 14px; white-space: nowrap; }
         #sidebar.collapsed .nav-txt { display: none; }
 
-        /* 底部登出 */
-        .side-footer { padding: 12px; border-top: 1px solid var(--border); }
-        .btn-logout { height: 44px; width: 100%; border: none; background: transparent; border-radius: 10px; display: flex; align-items: center; cursor: pointer; color: var(--text-sub); padding: 0 14px; box-sizing: border-box; }
-        .btn-logout:hover { color: var(--danger); background: rgba(217, 48, 37, 0.05); }
-        #sidebar.collapsed .btn-logout { justify-content: center; padding: 0; }
-        #sidebar.collapsed .btn-logout span { display: none; }
-
-        /* 主區域 */
+        /* --- 主視圖 --- */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        header { height: 70px; padding: 0 32px; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
-        .breadcrumb { display: flex; align-items: center; font-size: 19px; font-weight: 700; color: var(--text-main); }
-        
-        .toolbar { height: 60px; padding: 0 32px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
-        .t-btn { background: #fff; border: 1px solid #ddd; padding: 8px 16px; border-radius: 12px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .t-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-        .t-btn.primary { background: var(--accent); color: white; border: none; }
-        .t-btn.danger { color: var(--danger); }
+        header { 
+            height: 64px; border-bottom: 1px solid var(--border); 
+            display: flex; align-items: center; padding: 0 24px; justify-content: space-between;
+        }
+        .path { font-size: 18px; font-weight: 500; display: flex; gap: 8px; }
 
-        /* 文件列表選取樣式 */
-        .viewport { flex: 1; overflow-y: auto; padding: 10px 32px; }
-        .row { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 0 20px; height: 56px; align-items: center; border-radius: 14px; margin-bottom: 4px; cursor: pointer; user-select: none; transition: 0.15s; }
-        .row:hover { background: #f5f5f7; }
-        .row.sel { background: #e8f0fe; border-left: 4px solid var(--accent); }
-        
-        /* 彈窗 */
-        #modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); backdrop-filter:blur(5px); display:none; align-items:center; justify-content:center; z-index:2000; }
-        .modal { background:#fff; padding:24px; border-radius:24px; width:300px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .modal input { width:100%; padding:12px; border:2px solid #eee; border-radius:12px; box-sizing:border-box; outline:none; margin-top:15px; }
+        .toolbar { display: flex; gap: 8px; }
+        .btn-t { 
+            padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); 
+            background: #fff; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px;
+        }
+        .btn-t:hover:not(:disabled) { background: #f1f3f4; border-color: var(--accent); }
+        .btn-t.primary { background: var(--accent); color: #fff; border: none; }
+        .btn-t:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .viewport { flex: 1; overflow-y: auto; padding: 20px 24px; }
+
+        /* 卡片佈局 (最近項目 - 唯讀) */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+        .card { 
+            background: #fff; border: 1px solid var(--border); border-radius: 12px; 
+            padding: 16px; display: flex; flex-direction: column; align-items: center; 
+            transition: 0.2s; user-select: none;
+        }
+        .card .icon { margin-bottom: 12px; }
+        .card .name { font-size: 13px; width: 100%; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        /* 列表佈局 (我的硬碟 & 垃圾桶) */
+        .list-row { 
+            display: grid; grid-template-columns: 2fr 1fr 100px; padding: 0 16px; 
+            height: 52px; align-items: center; border-radius: 8px; cursor: pointer; 
+            margin-bottom: 2px; transition: 0.1s;
+        }
+        .list-row:hover { background: #f8f9fa; }
+        .list-row.selected { background: var(--sel-blue); }
     </style>
 </head>
 <body>
 
-<div id="modal-overlay">
-    <div class="modal">
-        <h3 style="margin:0">建立新資料夾</h3>
-        <input type="text" id="modal-input" placeholder="名稱...">
-        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
-            <button class="t-btn" onclick="closeModal()">取消</button>
-            <button class="t-btn primary" onclick="confirmModal()">建立</button>
-        </div>
-    </div>
-</div>
-
 <aside id="sidebar">
-    <div class="brand" onclick="toggleSide()"><img src="IMG_1978.jpeg" class="avatar"></div>
-    <div class="side-ops">
-        <button class="btn-action" onclick="upTrigger()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.5"><path d="M12 5v14M8 9l4-4 4 4"/></svg>
-            <span>上傳文件</span>
-        </button>
-        <button class="btn-action" onclick="openModal()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.5"><path d="M4 9h16v10H4V9zM12 11.5v5M9.5 14h5"/></svg>
-            <span>新建資料夾</span>
-        </button>
-        <input type="file" id="up-hidden" style="display:none" onchange="onUp(this)">
+    <div class="logo-box" onclick="toggleSidebar()">
+        <img src="IMG_1978.jpeg" class="logo-img">
     </div>
-    <div class="nav-group">
-        <div class="nav-link active" id="nav-drive" onclick="setTab('drive')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="7" width="16" height="10" rx="2"/><path d="M4 12h16"/></svg>
+    <div style="padding: 12px">
+        <button id="btn-up-main" class="btn-t primary" style="width:100%; height:44px; border-radius:22px" onclick="doUpload()">+ 上傳文件</button>
+        <input type="file" id="up-ctrl" style="display:none" onchange="onFileUp(this)">
+    </div>
+    <nav style="flex:1">
+        <div class="nav-link active" id="n-drive" onclick="setTab('drive')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
             <span class="nav-txt">我的硬碟</span>
         </div>
-        <div class="nav-link" id="nav-recent" onclick="setTab('recent')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <div class="nav-link" id="n-recent" onclick="setTab('recent')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
             <span class="nav-txt">最近項目</span>
         </div>
-        <div class="nav-link" id="nav-trash" onclick="setTab('trash')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        <div class="nav-link" id="n-trash" onclick="setTab('trash')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
             <span class="nav-txt">垃圾桶</span>
         </div>
-    </div>
-    <div class="side-footer">
-        <button class="btn-logout" onclick="alert('已登出')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-            <span class="nav-txt">登出 AETHER</span>
-        </button>
-    </div>
+    </nav>
 </aside>
 
 <main>
-    <header id="path-header"></header>
-    <div class="toolbar">
-        <div id="drive-ops" style="display:none; gap:10px">
-            <button class="t-btn" id="btn-ren" onclick="startRen()">命名</button>
-            <button class="t-btn" id="btn-copy" onclick="handleBatch('copy')">批量複製 <span class="sel-tag"></span></button>
-            <button class="t-btn" id="btn-move" onclick="handleBatch('move')">批量移動 <span class="sel-tag"></span></button>
-            <button class="t-btn danger" onclick="doBatchDel()">批量刪除</button>
+    <header>
+        <div class="path" id="path-ui"></div>
+        <div class="toolbar">
+            <div id="op-drive" style="display:none; gap:8px">
+                <button class="btn-t" id="btn-rename" onclick="singleRename()">重命名</button>
+                <button class="btn-t" onclick="prepareBatch('copy')">批量複製 <span class="b-count-d"></span></button>
+                <button class="btn-t" onclick="prepareBatch('move')">批量移動 <span class="b-count-d"></span></button>
+                <button class="btn-t" style="color:var(--danger)" onclick="executeSoftDelete()">刪除</button>
+            </div>
+            <div id="op-trash" style="display:none; gap:8px">
+                <button class="btn-t primary" onclick="executeRestore()">復原項目 <span class="b-count-t"></span></button>
+                <button class="btn-t" style="color:var(--danger)" onclick="executeHardDelete()">永久刪除</button>
+            </div>
+            <div id="op-paste" style="display:none; gap:8px">
+                <button class="btn-t primary" onclick="commitBatch()">貼上在此</button>
+                <button class="btn-t" onclick="cancelBatch()">取消</button>
+            </div>
         </div>
-        <div id="paste-ops" style="display:none; gap:10px">
-            <button class="t-btn primary" onclick="executePaste()">貼上在此</button>
-            <button class="t-btn" onclick="clearClip()">取消</button>
-        </div>
-    </div>
+    </header>
     <div class="viewport" id="v-port"></div>
 </main>
 
 <script>
     let db = []; 
-    let tab = 'drive';
+    let mode = 'drive';
     let path = ["我的硬碟"];
     let sel = new Set();
     let clip = { mode: null, items: [] };
 
-    const ICON_FOLDER = `<svg viewBox="0 0 48 48" style="width:24px;height:24px"><path d="M4 10h14l4 4h22v26H4z" fill="#fbbc04"/><path d="M4 14h40v26H4z" fill="#fbc02d"/></svg>`;
-    const ICON_FILE = `<svg viewBox="0 0 48 48" style="width:24px;height:24px"><path d="M10 4h20l10 10v30H10z" fill="#e3f2fd"/><path d="M30 4l10 10H30z" fill="#bbdefb"/><path d="M10 4h20l10 10v30H10z" fill="none" stroke="#1a73e8" stroke-width="2.5"/></svg>`;
+    const SVG_DIR = `<svg width="40" height="40" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" fill="#FFC107"/></svg>`;
+    const SVG_FILE = `<svg width="40" height="40" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6z" fill="#1A73E8"/></svg>`;
 
     function render() {
-        const h = document.getElementById('path-header');
-        h.innerHTML = `<div class="breadcrumb">${path.map((p,i)=>`<span style="cursor:pointer;padding:8px" onclick="goPath(${i})">${p}</span>`).join('<span style="color:#eee">/</span>')}</div>`;
         const vp = document.getElementById('v-port');
+        document.getElementById('path-ui').innerText = path.join(' / ');
         vp.innerHTML = "";
-        
-        let items = (tab==='drive')?db.filter(x=>x.parent===path[path.length-1]&&!x.del):(tab==='recent'?db.filter(x=>!x.del&&x.type==='file').sort((a,b)=>b.time-a.time).slice(0,20):db.filter(x=>x.del));
 
-        if (items.length === 0) { vp.innerHTML = `<div style="text-align:center;margin-top:100px;color:#ccc"><h3>無內容</h3></div>`; updateTool(); return; }
+        // 權限控制：最近項目禁用上傳
+        document.getElementById('btn-up-main').disabled = (mode !== 'drive');
 
-        const container = document.createElement('div');
-        container.innerHTML = `<div style="display:grid;grid-template-columns:3fr 1fr 1fr;padding:10px 20px;color:#999;font-size:11px;font-weight:700"><span>名稱</span><span>日期</span><span>大小</span></div>`;
-        
-        items.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'row ' + (sel.has(item.id) ? 'sel' : '');
-            el.onclick = () => { toggleItem(item.id); };
-            el.ondblclick = () => { if(item.type==='dir'&&tab==='drive'){ path.push(item.name); sel.clear(); render(); } };
-            el.innerHTML = `<div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?ICON_FOLDER:ICON_FILE}<span id="t-${item.id}">${item.name}</span></div><div style="font-size:12px;color:#999">剛剛</div><div style="font-size:12px;color:#999">${item.type==='dir'?'-':'1KB'}</div>`;
-            container.appendChild(el);
-        });
-        vp.appendChild(container);
+        let data = [];
+        if(mode === 'drive') data = db.filter(x => x.parent === path[path.length-1] && !x.del);
+        else if(mode === 'recent') data = db.filter(x => !x.del).sort((a,b)=>b.time-a.time).slice(0,12);
+        else data = db.filter(x => x.del);
+
+        if(!data.length) { vp.innerHTML = `<div style="text-align:center;padding-top:100px;color:#bbb">尚無數據</div>`; updateTool(); return; }
+
+        if(mode === 'recent') {
+            const grid = document.createElement('div');
+            grid.className = 'card-grid';
+            data.forEach(item => {
+                const c = document.createElement('div');
+                c.className = 'card'; // 唯讀，不可選取
+                c.innerHTML = `<div class="icon">${item.isDir?SVG_DIR:SVG_FILE}</div><div class="name">${item.name}</div>`;
+                grid.appendChild(c);
+            });
+            vp.appendChild(grid);
+        } else {
+            data.forEach(item => {
+                const r = document.createElement('div');
+                r.className = `list-row ${sel.has(item.id)?'selected':''}`;
+                r.onclick = () => toggleSel(item.id);
+                r.ondblclick = () => { if(item.isDir && mode==='drive') { path.push(item.name); sel.clear(); render(); } };
+                r.innerHTML = `<div style="display:flex;align-items:center;gap:12px">${item.isDir?SVG_DIR.replace('40','24'):SVG_FILE.replace('40','24')} <span>${item.name}</span></div><div style="font-size:12px;color:#888">剛剛</div><div style="font-size:12px;color:#888">--</div>`;
+                vp.appendChild(r);
+            });
+        }
         updateTool();
     }
 
-    function toggleItem(id) { if (sel.has(id)) sel.delete(id); else sel.add(id); render(); }
+    function toggleSel(id) { if(sel.has(id)) sel.delete(id); else sel.add(id); render(); }
 
     function updateTool() {
         const count = sel.size;
-        document.getElementById('drive-ops').style.display = (count > 0 && tab === 'drive') ? 'flex' : 'none';
-        document.getElementById('paste-ops').style.display = (clip.items.length > 0 && tab === 'drive') ? 'flex' : 'none';
+        document.getElementById('op-drive').style.display = (count > 0 && mode === 'drive') ? 'flex' : 'none';
+        document.getElementById('op-trash').style.display = (count > 0 && mode === 'trash') ? 'flex' : 'none';
+        document.getElementById('op-paste').style.display = (clip.items.length > 0 && mode === 'drive') ? 'flex' : 'none';
         
         if(count > 0) {
-            document.querySelectorAll('.sel-tag').forEach(el => el.innerText = `(${count})`);
-            document.getElementById('btn-ren').style.display = count === 1 ? 'block' : 'none';
+            if(mode === 'drive') {
+                document.querySelectorAll('.b-count-d').forEach(e => e.innerText = `(${count})`);
+                document.getElementById('btn-rename').style.display = (count === 1) ? 'block' : 'none';
+            } else {
+                document.querySelectorAll('.b-count-t').forEach(e => e.innerText = `(${count})`);
+            }
         }
     }
 
-    // 批量核心邏輯
-    function handleBatch(mode) { 
-        clip.mode = mode; 
-        clip.items = db.filter(x => sel.has(x.id)); 
-        sel.clear(); 
-        render(); 
+    /* --- 邏輯操作 --- */
+    function prepareBatch(m) {
+        clip.mode = m;
+        clip.items = db.filter(x => sel.has(x.id));
+        sel.clear();
+        render();
     }
 
-    function executePaste() {
+    function commitBatch() {
+        const targetDir = path[path.length - 1];
         clip.items.forEach(item => {
-            if (clip.mode === 'move') {
+            if(clip.mode === 'move') {
                 const target = db.find(x => x.id === item.id);
-                if(target) target.parent = path[path.length - 1];
+                if(target) target.parent = targetDir;
             } else {
-                db.unshift({...item, id: Date.now()+Math.random(), parent: path[path.length-1], name: item.name + " (副本)"});
+                db.unshift({...item, id: Date.now()+Math.random(), parent: targetDir, name: item.name + ' (副本)', time: Date.now()});
             }
         });
-        clearClip();
+        cancelBatch();
     }
 
-    function doBatchDel() { 
-        sel.forEach(id => { const f = db.find(x=>x.id===id); if(f) f.del = true; }); 
+    function executeSoftDelete() {
+        sel.forEach(id => { const item = db.find(x => x.id === id); if(item) item.del = true; });
+        sel.clear(); render();
+    }
+
+    function executeRestore() {
+        sel.forEach(id => { const item = db.find(x => x.id === id); if(item) item.del = false; });
+        sel.clear(); render();
+    }
+
+    function executeHardDelete() {
+        if(confirm("確定要永久刪除選中項目？此操作不可逆。")) {
+            db = db.filter(x => !sel.has(x.id));
+            sel.clear(); render();
+        }
+    }
+
+    function singleRename() {
+        const id = Array.from(sel)[0];
+        const item = db.find(x => x.id === id);
+        const nn = prompt("新名稱", item.name);
+        if(nn) { item.name = nn; render(); }
+    }
+
+    function cancelBatch() { clip = { mode: null, items: [] }; sel.clear(); render(); }
+    function setTab(t) { 
+        mode = t; 
+        path = [t==='drive'?'我的硬碟':(t==='recent'?'最近項目':'垃圾桶')]; 
         sel.clear(); 
+        document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active')); 
+        document.getElementById('n-'+t).classList.add('active'); 
         render(); 
     }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+    function doUpload() { document.getElementById('up-ctrl').click(); }
+    function onFileUp(i) { if(i.files[0]) { db.unshift({id: Date.now(), name: i.files[0].name, isDir: false, parent: path[path.length-1], del: false, time: Date.now()}); render(); } }
 
-    function clearClip() { clip = { mode: null, items: [] }; render(); }
-    function openModal() { document.getElementById('modal-overlay').style.display='flex'; document.getElementById('modal-input').focus(); }
-    function closeModal() { document.getElementById('modal-overlay').style.display='none'; }
-    function confirmModal() {
-        const n = document.getElementById('modal-input').value.trim() || "新資料夾";
-        db.unshift({id: Date.now(), name: n, type: 'dir', parent: path[path.length-1], del: false});
-        closeModal(); render();
-    }
-
-    function startRen() {
-        const id = Array.from(sel)[0];
-        const item = db.find(x=>x.id===id);
-        const el = document.getElementById(`t-${id}`);
-        el.innerHTML = `<input type="text" style="border:1px solid var(--accent);outline:none;padding:2px 5px;border-radius:4px" id="eb" value="${item.name}">`;
-        const b = document.getElementById('eb'); b.focus();
-        b.onblur = () => { item.name = b.value || "未命名"; render(); };
-        b.onkeydown = (e) => { if(e.key==='Enter') b.blur(); };
-    }
-
-    function goPath(i) { path=path.slice(0,i+1); tab='drive'; sel.clear(); render(); }
-    function setTab(t) { tab = t; document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active')); document.getElementById('nav-'+t).classList.add('active'); path = [t==='drive'?'我的硬碟':(t==='recent'?'最近項目':'垃圾桶')]; sel.clear(); render(); }
-    function toggleSide() { document.getElementById('sidebar').classList.toggle('collapsed'); }
-    function upTrigger() { if(tab==='drive') document.getElementById('up-hidden').click(); }
-    function onUp(inp) { if(inp.files[0]){ db.unshift({id:Date.now(), name:inp.files[0].name, type:'file', parent:path[path.length-1], del:false}); render(); } }
-
-    window.onload = render;
+    window.onload = () => {
+        db.push({id: 1, name: 'Core_Logic.sys', isDir: false, parent: '我的硬碟', del: false, time: Date.now()});
+        db.push({id: 2, name: 'Archive', isDir: true, parent: '我的硬碟', del: false, time: Date.now()});
+        render();
+    };
 </script>
 </body>
 </html>
