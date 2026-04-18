@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="utf-8">
-    <title>AETHER 10D - AUTO RESET DRIVE</title>
+    <title>Aether 10D - Batch Commander</title>
     <link rel="icon" href="IMG_1978.jpeg" type="image/jpeg">
     <style>
         :root {
@@ -12,39 +12,35 @@
             --text-main: #202124;
             --text-sub: #5f6368;
             --radius: 12px;
+            --sel-blue: #e8f0fe;
         }
 
         body { margin: 0; font-family: 'Inter', system-ui; display: flex; height: 100vh; background: #fff; color: var(--text-main); overflow: hidden; }
 
-        /* --- 側邊欄 --- */
+        /* --- Sidebar --- */
         #sidebar { width: 260px; background: var(--bg-side); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: 0.2s; flex-shrink: 0; }
         #sidebar.collapsed { width: 72px; }
         .logo-box { height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .logo-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
 
         .action-zone { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-        #sidebar.collapsed .action-zone { align-items: center; }
-
         .btn-action { 
             height: 48px; border: none; background: #fff; border-radius: 24px; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; display: flex; 
             align-items: center; padding: 0 20px; font-weight: 600; transition: 0.2s; gap: 12px;
         }
         .btn-action.primary { background: var(--accent); color: #fff; }
-        .btn-action:disabled { background: #eee !important; color: #aaa !important; opacity: 0.5; filter: grayscale(1); cursor: not-allowed; box-shadow: none; }
-        
-        #sidebar.collapsed .btn-action { width: 48px; padding: 0; justify-content: center; border-radius: 50%; }
+        .btn-action:disabled { background: #eee !important; color: #aaa !important; opacity: 0.5; cursor: not-allowed; }
         #sidebar.collapsed .btn-txt { display: none; }
 
         .nav-link { 
             height: 48px; display: flex; align-items: center; margin: 4px 12px; padding: 0 16px;
             border-radius: var(--radius); cursor: pointer; color: var(--text-sub); transition: 0.2s; gap: 16px;
         }
-        .nav-link.active { background: #e8f0fe; color: var(--accent); font-weight: 600; }
-        #sidebar.collapsed .nav-link { justify-content: center; padding: 0; margin: 4px 8px; }
+        .nav-link.active { background: var(--sel-blue); color: var(--accent); font-weight: 600; }
         #sidebar.collapsed .nav-txt { display: none; }
 
-        /* --- 主視圖 --- */
+        /* --- Main UI --- */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         header { height: 68px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; justify-content: space-between; }
         
@@ -54,21 +50,20 @@
         .crumb.active { color: var(--text-main); cursor: default; }
 
         .toolbar { display: flex; gap: 8px; }
-        .t-btn { padding: 8px 16px; border: 1px solid var(--border); background: #fff; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+        .t-btn { padding: 8px 16px; border: 1px solid var(--border); background: #fff; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; }
         .t-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .t-btn.danger { color: #d93025; }
+        .t-btn.danger:hover { background: #fce8e6; border-color: #d93025; }
 
         .viewport { flex: 1; overflow-y: auto; padding: 24px; }
         
-        /* 列表列 */
-        .list-row { display: grid; grid-template-columns: 2fr 1fr 100px; padding: 0 16px; height: 54px; align-items: center; border-radius: 10px; cursor: pointer; }
+        .list-row { display: grid; grid-template-columns: 2fr 1fr 100px; padding: 0 16px; height: 54px; align-items: center; border-radius: 10px; cursor: pointer; border-bottom: 1px solid #f8f9fa; }
         .list-row:hover { background: #f8f9fa; }
-        .list-row.selected { background: #e8f0fe; }
+        .list-row.selected { background: var(--sel-blue); }
 
-        /* 內嵌編輯器 */
-        .inline-edit { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; }
+        .inline-edit { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; }
         .inline-input { border: none; outline: none; font-size: 14px; width: 100%; font-family: inherit; }
 
-        /* 最近項目卡片 */
         .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
         .card { border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; }
     </style>
@@ -113,7 +108,7 @@
 </main>
 
 <script>
-    let db = [{id:1, name:'Core_Library.sys', isDir:false, parent:'我的硬碟', del:false, time:Date.now()}];
+    let db = [{id:1, name:'專案報告.pdf', isDir:false, parent:'我的硬碟', del:false, time:Date.now()}];
     
     let currentMode = 'drive';
     let drivePath = ["我的硬碟"]; 
@@ -127,18 +122,22 @@
         const vp = document.getElementById('v-port'), tb = document.getElementById('toolbar'), bc = document.getElementById('bc-ui');
         vp.innerHTML = ""; tb.innerHTML = ""; bc.innerHTML = "";
 
-        // 麵包屑顯示與導航點擊
+        // --- 麵包屑導航實現 ---
         const pRef = (currentMode === 'drive') ? drivePath : [(currentMode === 'recent' ? "最近項目" : "垃圾桶")];
         pRef.forEach((p, i) => {
             const span = document.createElement('span');
             span.className = `crumb ${i === pRef.length-1 ? 'active' : ''}`;
             span.innerText = p;
-            span.onclick = () => { if(currentMode === 'drive' && i < drivePath.length-1) { drivePath = drivePath.slice(0, i+1); sel.clear(); render(); } };
+            span.onclick = () => { 
+                if(currentMode === 'drive' && i < drivePath.length-1) {
+                    drivePath = drivePath.slice(0, i+1);
+                    sel.clear(); render();
+                }
+            };
             bc.appendChild(span);
             if(i < pRef.length-1) bc.innerHTML += `<span style="color:#ccc">/</span>`;
         });
 
-        // 凍結側邊欄按鈕
         const isDrive = (currentMode === 'drive');
         document.getElementById('btn-up').disabled = document.getElementById('btn-new').disabled = !isDrive;
 
@@ -152,16 +151,16 @@
             });
             vp.appendChild(grid);
         } else {
-            const currentDir = isDrive ? drivePath[drivePath.length-1] : null;
-            const data = isDrive ? db.filter(x => x.parent === currentDir && !x.del) : db.filter(x => x.del);
+            const curDir = isDrive ? drivePath[drivePath.length-1] : null;
+            const data = isDrive ? db.filter(x => x.parent === curDir && !x.del) : db.filter(x => x.del);
             
             if(creating && isDrive) {
-                vp.appendChild(createInput("", true, n => { db.unshift({id:Date.now(), name:n, isDir:true, parent:currentDir, del:false, time:Date.now()}); creating=false; render(); }));
+                vp.appendChild(createEditRow("", true, n => { db.unshift({id:Date.now(), name:n, isDir:true, parent:curDir, del:false, time:Date.now()}); creating=false; render(); }));
             }
 
             data.forEach(i => {
                 if(renamingId === i.id) {
-                    vp.appendChild(createInput(i.name, i.isDir, n => { i.name = n; renamingId = null; render(); }));
+                    vp.appendChild(createEditRow(i.name, i.isDir, n => { i.name = n; renamingId = null; render(); }));
                 } else {
                     const r = document.createElement('div');
                     r.className = `list-row ${sel.has(i.id)?'selected':''}`;
@@ -173,32 +172,33 @@
             });
         }
 
-        // 批量工具欄邏輯
+        // --- 工具欄動態感應邏輯 ---
         if(sel.size > 0) {
             if(isDrive) {
-                if(sel.size === 1) tb.innerHTML += `<button class="t-btn" onclick="startRename()">重新命名</button>`;
-                tb.innerHTML += `<button class="t-btn" onclick="op('move')">移動</button><button class="t-btn" onclick="op('copy')">複製</button><button class="t-btn" style="color:red" onclick="del()">刪除</button>`;
+                const prefix = sel.size > 1 ? "批量" : "";
+                if(sel.size === 1) {
+                    tb.innerHTML += `<button class="t-btn" onclick="startRename()">重新命名</button>`;
+                }
+                tb.innerHTML += `<button class="t-btn" onclick="alert('已加入待處理隊列')">${prefix}移動</button>`;
+                tb.innerHTML += `<button class="t-btn" onclick="alert('已複製到剪貼簿')">${prefix}複製</button>`;
+                tb.innerHTML += `<button class="t-btn danger" onclick="delItems('soft')">${prefix}刪除</button>`;
             } else if(currentMode === 'trash') {
-                tb.innerHTML = `<button class="t-btn primary" onclick="restore()">復原項目</button><button class="t-btn" style="color:red" onclick="hardDel()">永久刪除</button>`;
+                tb.innerHTML = `<button class="t-btn" onclick="restore()">復原項目</button><button class="t-btn danger" onclick="delItems('hard')">永久刪除</button>`;
             }
         }
     }
 
-    function createInput(val, isDir, done) {
+    function createEditRow(val, isDir, done) {
         const div = document.createElement('div'); div.className = 'inline-edit';
-        div.innerHTML = `${isDir?ICON_DIR:ICON_FILE}<input class="inline-input" value="${val}" autofocus>`;
+        div.innerHTML = `${isDir?ICON_DIR:ICON_FILE}<input class="inline-input" value="${val}" autofocus onfocus="this.select()">`;
         const input = div.querySelector('input');
         input.onkeydown = e => { if(e.key==='Enter' && input.value) done(input.value); if(e.key==='Escape') { creating=false; renamingId=null; render(); } };
         return div;
     }
 
-    // --- 核心邏輯：切換分頁時，如果切換到硬碟，強制重置為根目錄 ---
     function switchTab(m) { 
-        if(m === 'drive') {
-            drivePath = ["我的硬碟"]; // 強制重置路徑
-        }
-        currentMode = m; 
-        sel.clear(); renamingId = null; creating = false;
+        if(m === 'drive') drivePath = ["我的硬碟"]; // 切換回硬碟時強制重置為根目錄
+        currentMode = m; sel.clear(); renamingId = null; creating = false;
         document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
         document.getElementById('n-'+m).classList.add('active'); 
         render(); 
@@ -206,8 +206,12 @@
     
     function startRename() { renamingId = Array.from(sel)[0]; render(); }
     function startCreate() { creating = true; render(); }
-    function del() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); render(); }
-    function restore() { sel.forEach(id => db.find(x=>x.id===id).del = false); sel.clear(); render(); }
+    function delItems(type) { 
+        if(type==='soft') sel.forEach(id => { const i = db.find(x=>x.id===id); if(i) i.del = true; }); 
+        else db = db.filter(x => !sel.has(x.id));
+        sel.clear(); render(); 
+    }
+    function restore() { sel.forEach(id => { const i = db.find(x=>x.id===id); if(i) i.del = false; }); sel.clear(); render(); }
     function handleUp(el) { if(el.files[0]) { db.unshift({id:Date.now(), name:el.files[0].name, isDir:false, parent:drivePath[drivePath.length-1], del:false, time:Date.now()}); render(); } }
     function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
