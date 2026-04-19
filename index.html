@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="utf-8">
-    <title>AETHER 10D - Enterprise File System</title>
+    <title>AETHER 10D - ULTIMATE</title>
     <style>
         :root {
             --accent: #1a73e8;
@@ -11,78 +11,74 @@
             --text-sub: #5f6368;
             --bg-side: #f8f9fa;
             --border: #e8eaed;
-            --danger: #d93025;
             --side-w: 72px;
             --side-w-exp: 260px;
         }
 
         body { margin: 0; font-family: 'SF Pro Display', system-ui, sans-serif; display: flex; height: 100vh; background: #fff; overflow: hidden; }
 
-        /* Sidebar 抽屜設計 */
+        /* 側邊欄：支持手動鎖定與懸停展開 */
         #sidebar { 
             width: var(--side-w); background: var(--bg-side); border-right: 1px solid var(--border); 
             display: flex; flex-direction: column; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             flex-shrink: 0; overflow: hidden; z-index: 100;
         }
-        #sidebar:hover { width: var(--side-w-exp); box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
+        #sidebar:hover, #sidebar.locked { width: var(--side-w-exp); box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
 
-        .brand { height: 80px; display: flex; align-items: center; justify-content: center; }
-        .avatar { width: 42px; height: 42px; border-radius: 12px; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); object-fit: cover; }
+        .brand { height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .avatar { width: 42px; height: 42px; border-radius: 12px; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         
         .side-ops { padding: 10px 12px; display: flex; flex-direction: column; gap: 12px; }
         .btn-action { 
             height: 48px; border: none; background: #fff; border-radius: 24px; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer; 
-            display: flex; align-items: center; padding: 0 12px; transition: 0.2s;
-            width: 48px; margin: 0 auto;
+            display: flex; align-items: center; padding: 0 12px; width: 48px; margin: 0 auto; transition: 0.2s;
         }
-        #sidebar:hover .btn-action { width: 100%; padding: 0 16px; margin: 0; }
-        .btn-action span { margin-left: 14px; font-weight: 600; font-size: 14px; white-space: nowrap; opacity: 0; transition: 0.2s; }
-        #sidebar:hover .btn-action span { opacity: 1; }
+        #sidebar:hover .btn-action, #sidebar.locked .btn-action { width: 100%; margin: 0; }
+        .btn-action span { margin-left: 14px; font-weight: 600; opacity: 0; white-space: nowrap; transition: 0.2s; }
+        #sidebar:hover .btn-action span, #sidebar.locked .btn-action span { opacity: 1; }
         
-        /* 禁用狀態：最近項目/垃圾桶模式 */
-        .btn-action.disabled { opacity: 0.3 !important; pointer-events: none !important; filter: grayscale(1); }
+        /* 禁用狀態：灰化且不可點擊 */
+        .btn-action.disabled { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 
         .nav-link { height: 50px; display: flex; align-items: center; border-radius: 0 25px 25px 0; margin-right: 8px; cursor: pointer; color: var(--text-sub); }
-        .nav-link.active { background: var(--accent-soft) !important; color: var(--accent) !important; font-weight: 600; }
-        .nav-icon { width: 72px; height: 50px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .nav-txt { font-size: 14px; white-space: nowrap; opacity: 0; transition: 0.2s; }
-        #sidebar:hover .nav-txt { opacity: 1; }
+        .nav-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+        .nav-icon { width: 72px; height: 50px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .nav-txt { white-space: nowrap; opacity: 0; transition: 0.2s; }
+        #sidebar:hover .nav-txt, #sidebar.locked .nav-txt { opacity: 1; }
 
         /* 主區域 */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
         header { height: 72px; padding: 0 32px; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
-        .breadcrumb { display: flex; align-items: center; font-size: 18px; }
-        .crumb { cursor: pointer; padding: 4px 8px; border-radius: 4px; color: var(--text-sub); }
-        .crumb.active { color: var(--text-main); font-weight: 700; cursor: default; }
+        .breadcrumb { display: flex; align-items: center; font-size: 18px; gap: 8px; }
+        .crumb { cursor: pointer; color: var(--text-sub); padding: 4px 8px; border-radius: 4px; }
+        .crumb:hover { background: #eee; }
+        .crumb.active { color: var(--text-main); font-weight: 700; cursor: default; background: none; }
 
-        .toolbar { height: 56px; padding: 0 32px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: #fdfdfd; }
+        .toolbar { height: 56px; padding: 0 32px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
         .t-btn { background: #fff; border: 1px solid var(--border); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 500; }
         .t-btn.primary { background: var(--accent); color: #fff; border: none; }
 
         .viewport { flex: 1; overflow-y: auto; padding: 20px 32px; }
-        .list-h { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 12px 20px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); }
         
-        .row { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 0 20px; height: 56px; align-items: center; border-radius: 10px; cursor: pointer; margin-top: 2px; }
+        /* 列表樣式 */
+        .list-h { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 12px 20px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); }
+        .row { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 0 20px; height: 56px; align-items: center; border-radius: 10px; cursor: pointer; }
         .row:hover { background: #f8f9fa; }
         .row.sel { background: var(--accent-soft); }
-        
-        /* 核心需求：移動中的項目本身禁用 */
-        .row.moving { 
-            opacity: 0.3; 
-            filter: grayscale(1); 
-            cursor: not-allowed !important; 
-            pointer-events: none !important; /* 徹底攔截點擊 */
-        }
+        /* 移動中狀態鎖定 */
+        .row.moving { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 
-        .svg-icon { width: 24px; height: 24px; flex-shrink: 0; }
-        .rename-input { border: 2px solid var(--accent); padding: 4px 8px; border-radius: 4px; outline: none; width: 80%; }
+        /* 最近項目：卡片佈局 */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+        .card { border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .card:hover { border-color: var(--accent); background: #fdfdfd; transform: translateY(-2px); }
+        .card.sel { background: var(--accent-soft); border-color: var(--accent); }
+        .card .icon { font-size: 40px; margin-bottom: 10px; }
+        .card .name { font-size: 14px; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* 通知系統 */
-        #msg-box { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { background: #323232; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s; pointer-events: auto; }
-        .toast.error { background: var(--danger); }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        #msg-box { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .toast { background: #323232; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -90,239 +86,190 @@
 <div id="msg-box"></div>
 
 <aside id="sidebar">
-    <div class="brand"><img src="IMG_1978.jpeg" class="avatar"></div>
+    <div class="brand" onclick="toggleLock()"><img src="IMG_1978.jpeg" class="avatar"></div>
     <div class="side-ops">
-        <button class="btn-action" id="btn-up" onclick="upTrigger()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 5v14M8 9l4-4 4 4" fill="none" stroke="#1a73e8" stroke-width="2" stroke-linecap="round"/></svg>
-            <span>上傳</span>
-        </button>
-        <button class="btn-action" id="btn-new" onclick="makeFolder()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 9h16v10H4V9zM12 11.5v5M9.5 14h5" fill="none" stroke="#1a73e8" stroke-width="2" stroke-linecap="round"/></svg>
-            <span>新建資料夾</span>
-        </button>
+        <button class="btn-action" id="btn-up" onclick="upTrigger()"><span>上傳文件</span></button>
+        <button class="btn-action" id="btn-new" onclick="makeFolder()"><span>新建資料夾</span></button>
         <input type="file" id="up-hidden" style="display:none" onchange="onUp(this)">
     </div>
     <div style="margin-top:20px">
         <div class="nav-link active" id="nav-drive" onclick="setTab('drive')">
-            <div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 12h16" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
-            <span class="nav-txt">我的硬碟</span>
+            <div class="nav-icon">📁</div><span class="nav-txt">我的硬碟</span>
         </div>
         <div class="nav-link" id="nav-recent" onclick="setTab('recent')">
-            <div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v4l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-            <span class="nav-txt">最近項目</span>
+            <div class="nav-icon">🕒</div><span class="nav-txt">最近項目</span>
         </div>
         <div class="nav-link" id="nav-trash" onclick="setTab('trash')">
-            <div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M7 10h10v10H7zM5 10h14M10 7h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-            <span class="nav-txt">垃圾桶</span>
+            <div class="nav-icon">🗑️</div><span class="nav-txt">垃圾桶</span>
         </div>
     </div>
 </aside>
 
 <main>
     <header id="path-header"></header>
-    <div class="toolbar">
-        <div id="single-ops" style="display:none; gap:10px">
-            <button class="t-btn" onclick="startRen()">重命名</button>
-            <button class="t-btn" onclick="handleClip('move')">移動</button>
-            <button class="t-btn" onclick="handleClip('copy')">複製</button>
-            <button class="t-btn" style="color:var(--danger)" onclick="doSoftDel()">刪除</button>
-        </div>
-        <div id="multi-ops" style="display:none; gap:10px">
-            <button class="t-btn" onclick="handleClip('move')">批量移動</button>
-            <button class="t-btn" onclick="handleClip('copy')">批量複製</button>
-            <button class="t-btn" style="color:var(--danger)" onclick="doSoftDel()">批量刪除</button>
-        </div>
-        <div id="paste-ops" style="display:none; gap:10px">
-            <button class="t-btn primary" onclick="doPaste()">貼上至此</button>
-            <button class="t-btn" onclick="cancelClip()">取消</button>
-        </div>
-        <div id="trash-ops" style="display:none; gap:10px">
-            <button class="t-btn primary" onclick="doRestore()">復原</button>
-            <button class="t-btn" style="color:var(--danger)" onclick="doHardDel()">永久刪除</button>
-        </div>
-    </div>
+    <div class="toolbar" id="toolbar"></div>
     <div class="viewport" id="v-port"></div>
 </main>
 
 <script>
-    // 初始模擬數據
+    // 模擬 10D 數據庫
     let db = [
-        {id: 1, name: "測試文檔.txt", type: 'file', parent: "我的硬碟", del: false, time: Date.now()},
-        {id: 2, name: "核心代碼", type: 'dir', parent: "我的硬碟", del: false, time: Date.now()}
-    ]; 
-    let tab = 'drive', path = ["我的硬碟"], sel = new Set();
-    let clip = { type: null, ids: [] }; 
+        {id: 1, name: "說明文檔.txt", type: 'file', parentId: 0, del: false, time: Date.now()},
+        {id: 2, name: "核心代碼", type: 'dir', parentId: 0, del: false, time: Date.now()},
+        {id: 3, name: "main.js", type: 'file', parentId: 2, del: false, time: Date.now()}
+    ];
 
-    const ICON_FOLDER = `<svg viewBox="0 0 48 48" class="svg-icon"><path d="M4 10h14l4 4h22v26H4z" fill="#fbbc04"/><path d="M4 14h40v26H4z" fill="#fbc02d"/></svg>`;
-    const ICON_FILE = `<svg viewBox="0 0 48 48" class="svg-icon"><path d="M10 4h20l10 10v30H10z" fill="#e3f2fd"/><path d="M30 4l10 10H30z" fill="#bbdefb"/><path d="M10 4h20l10 10v30H10z" fill="none" stroke="#1a73e8" stroke-width="2.5"/></svg>`;
+    // path 數組現在存儲對象，確保面包屑點擊精準跳轉
+    let tab = 'drive', path = [{id: 0, name: "我的硬碟"}], sel = new Set(), clip = {type: null, ids: []};
 
-    function showMsg(txt, isError = false) {
+    function showMsg(txt) {
         const box = document.getElementById('msg-box');
-        const t = document.createElement('div');
-        t.className = `toast ${isError ? 'error' : ''}`;
-        t.innerText = txt;
-        box.appendChild(t);
-        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+        box.innerHTML = `<div class="toast">${txt}</div>`;
+        setTimeout(() => box.innerHTML = "", 2500);
     }
 
+    function toggleLock() { document.getElementById('sidebar').classList.toggle('locked'); }
+
     function render() {
+        // 1. 渲染面包屑
         const h = document.getElementById('path-header');
-        h.innerHTML = `<div class="breadcrumb">${path.map((p,i)=>`<span class="crumb ${i===path.length-1?'active':''}" onclick="goPath(${i})">${p}</span>`).join(' <span style="color:#ccc">></span> ')}</div>`;
+        h.innerHTML = `<div class="breadcrumb">${path.map((p, i) => 
+            `<span class="crumb ${i===path.length-1?'active':''}" onclick="goPath(${i})">${p.name}</span>`
+        ).join(' <span>/</span> ')}</div>`;
+
         const vp = document.getElementById('v-port');
         vp.innerHTML = "";
         
-        // 核心邏輯：最近項目/垃圾桶禁用按鈕
+        // 2. 側邊欄按鈕禁用邏輯
         const isRestricted = (tab !== 'drive');
         document.getElementById('btn-up').classList.toggle('disabled', isRestricted);
         document.getElementById('btn-new').classList.toggle('disabled', isRestricted);
 
         let items = [];
-        if (tab === 'drive') {
-            items = db.filter(x => x.parent === path[path.length-1] && !x.del);
-        } else if (tab === 'recent') {
-            items = db.filter(x => !x.del && x.type === 'file').sort((a,b)=>b.time-a.time);
+        const curId = path[path.length - 1].id;
+
+        if (tab === 'drive') items = db.filter(x => x.parentId === curId && !x.del);
+        else if (tab === 'recent') items = db.filter(x => !x.del).sort((a,b) => b.time - a.time);
+        else items = db.filter(x => x.del);
+
+        // 3. 最近項目：卡片視圖渲染
+        if (tab === 'recent' && items.length > 0) {
+            const grid = document.createElement('div');
+            grid.className = 'card-grid';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `card ${sel.has(item.id)?'sel':''}`;
+                card.onclick = () => toggleSel(item.id);
+                card.innerHTML = `<div class="icon">${item.type==='dir'?'📁':'📄'}</div><div class="name">${item.name}</div>`;
+                grid.appendChild(card);
+            });
+            vp.appendChild(grid);
         } else {
-            items = db.filter(x => x.del);
-        }
-
-        if (items.length === 0) {
-            vp.innerHTML = `<div style="text-align:center;padding-top:100px;color:#999">資料夾為空</div>`;
-            updateTool(); return;
-        }
-
-        const list = document.createElement('div');
-        list.innerHTML = `<div class="list-h"><span>名稱</span><span>修改時間</span><span>大小</span></div>`;
-        items.forEach(item => {
-            // 判斷該項目是否正在被移動
-            const isMoving = clip.type === 'move' && clip.ids.includes(item.id);
-            const row = document.createElement('div');
-            row.className = `row ${sel.has(item.id)?'sel':''} ${isMoving ? 'moving' : ''}`;
-            
-            // 如果是正在移動的項目，不綁定事件
-            if (!isMoving) {
-                row.onclick = () => toggleSel(item.id);
+            // 列表視圖渲染
+            const list = document.createElement('div');
+            list.innerHTML = `<div class="list-h"><span>名稱</span><span>時間</span><span>大小</span></div>`;
+            items.forEach(item => {
+                const isMoving = clip.type === 'move' && clip.ids.includes(item.id);
+                const row = document.createElement('div');
+                row.className = `row ${sel.has(item.id)?'sel':''} ${isMoving?'moving':''}`;
+                
+                // 移動時禁止交互
+                row.onclick = () => { if(!isMoving) toggleSel(item.id); };
                 row.ondblclick = () => { 
-                    if(item.type==='dir' && tab==='drive'){ 
-                        path.push(item.name); sel.clear(); render(); 
-                    } 
+                    if(!isMoving && item.type === 'dir' && tab === 'drive') {
+                        path.push({id: item.id, name: item.name});
+                        sel.clear(); render();
+                    }
                 };
-            }
+                row.innerHTML = `<span>${item.type==='dir'?'📁':'📄'} ${item.name}</span><span>今天</span><span>-</span>`;
+                list.appendChild(row);
+            });
+            vp.appendChild(list);
+        }
+        updateToolbar();
+    }
 
-            row.innerHTML = `
-                <div style="display:flex;align-items:center;gap:15px">
-                    ${item.type==='dir'?ICON_FOLDER:ICON_FILE}
-                    <span id="t-${item.id}">${item.name || "未命名資料夾"}</span>
-                </div>
-                <div style="font-size:13px;color:#999">${new Date(item.time).toLocaleDateString()}</div>
-                <div style="font-size:13px;color:#999">${item.type==='dir'?'-':'2KB'}</div>`;
-            list.appendChild(row);
-        });
-        vp.appendChild(list);
-        updateTool();
+    // 4. 精準遞歸複製邏輯：修復文件變兩份的問題
+    function copyRecursive(oldId, newParentId, isRoot = false) {
+        const original = db.find(x => x.id === oldId);
+        if (!original) return;
+
+        let newName = original.name;
+        if (isRoot) newName += "_副本";
+
+        const newId = Date.now() + Math.random();
+        const copy = { ...original, id: newId, parentId: newParentId, name: newName, time: Date.now() };
+        db.push(copy);
+
+        // 僅處理「直接下級」，確保無限嵌套不重複
+        if (original.type === 'dir') {
+            const children = db.filter(x => x.parentId === oldId && !x.del);
+            children.forEach(child => {
+                copyRecursive(child.id, newId, false);
+            });
+        }
+    }
+
+    function goPath(index) {
+        path = path.slice(0, index + 1); // 截取路徑
+        tab = 'drive';
+        updateNavUI();
+        sel.clear(); render();
+    }
+
+    function setTab(t) {
+        tab = t;
+        path = [{id: 0, name: t==='drive'?"我的硬碟":(t==='recent'?"最近項目":"垃圾桶")}];
+        updateNavUI();
+        sel.clear(); render();
+    }
+
+    function updateNavUI() {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.id === 'nav-'+tab));
     }
 
     function toggleSel(id) { if(sel.has(id)) sel.delete(id); else sel.add(id); render(); }
 
-    function updateTool() {
+    function updateToolbar() {
+        const tb = document.getElementById('toolbar');
         const count = sel.size, hasClip = clip.ids.length > 0;
-        const isDrive = (tab === 'drive'), isTrash = (tab === 'trash');
-        document.getElementById('single-ops').style.display = (count === 1 && isDrive && !hasClip) ? 'flex' : 'none';
-        document.getElementById('multi-ops').style.display = (count > 1 && isDrive && !hasClip) ? 'flex' : 'none';
-        document.getElementById('paste-ops').style.display = (hasClip && isDrive) ? 'flex' : 'none';
-        document.getElementById('trash-ops').style.display = (count > 0 && isTrash) ? 'flex' : 'none';
-    }
-
-    function handleClip(type) { 
-        clip = { type, ids: Array.from(sel) }; 
-        sel.clear(); 
-        showMsg(type==='move'?'已剪切項目，請進入目標資料夾貼上':'已複製項目'); 
-        render(); 
-    }
-    
-    function cancelClip() { clip = { type: null, ids: [] }; render(); }
-
-    function doPaste() {
-        const targetParent = path[path.length - 1];
-        clip.ids.forEach(id => {
-            const item = db.find(x => x.id === id);
-            if (!item) return;
-            if (clip.type === 'move') {
-                // 防止資料夾移入自身
-                if (item.type === 'dir' && (item.name === targetParent || path.includes(item.name))) {
-                    showMsg("錯誤：不能將資料夾移入自身或其子目錄", true); return;
-                }
-                if (!isDuplicate(item.name)) item.parent = targetParent;
-                else showMsg(`名稱重複：${item.name}`, true);
-            } else { 
-                copyRecursive(item, targetParent, true); 
-            }
-        });
-        cancelClip(); showMsg("操作完成");
-    }
-
-    // 修復後的遞歸複製邏輯
-    function copyRecursive(originalItem, newParent, isRoot = true) {
-        let newName = originalItem.name;
-        if (isRoot && isDuplicate(newName, newParent)) {
-            newName += "_副本";
-            while (isDuplicate(newName, newParent)) { newName += "_副本"; }
+        tb.innerHTML = "";
+        if (count > 0 && !hasClip && tab === 'drive') {
+            const mBtn = document.createElement('button'); mBtn.className="t-btn"; mBtn.innerText="移動";
+            mBtn.onclick=()=>{ clip={type:'move', ids:Array.from(sel)}; sel.clear(); render(); };
+            const cBtn = document.createElement('button'); cBtn.className="t-btn"; cBtn.innerText="複製";
+            cBtn.onclick=()=>{ clip={type:'copy', ids:Array.from(sel)}; sel.clear(); render(); };
+            tb.append(mBtn, cBtn);
         }
-        const newId = Date.now() + Math.random();
-        const newItem = { ...originalItem, id: newId, name: newName, parent: newParent, time: Date.now() };
-        db.unshift(newItem);
-        
-        if (originalItem.type === 'dir') {
-            const children = db.filter(x => x.parent === originalItem.name && !x.del);
-            children.forEach(child => copyRecursive(child, newName, false));
+        if (hasClip && tab === 'drive') {
+            const pBtn = document.createElement('button'); pBtn.className="t-btn primary"; pBtn.innerText="貼上至此";
+            pBtn.onclick=()=>{
+                const tid = path[path.length-1].id;
+                clip.ids.forEach(id => {
+                    if(clip.type==='move') { let item = db.find(x=>x.id===id); if(item) item.parentId = tid; }
+                    else { copyRecursive(id, tid, true); }
+                });
+                clip={type:null, ids:[]}; showMsg("操作完成"); render();
+            };
+            tb.appendChild(pBtn);
         }
     }
 
-    function isDuplicate(name, target = path[path.length-1]) { return db.some(x => x.parent === target && x.name === name && !x.del); }
-
-    function startRen() {
-        const id = Array.from(sel)[0];
-        const item = db.find(x=>x.id===id);
-        const el = document.getElementById(`t-${id}`);
-        if(!el) return;
-        el.innerHTML = `<input type="text" class="rename-input" id="eb" value="${item.name}">`;
-        const b = document.getElementById('eb');
-        b.focus(); b.select();
-        b.onblur = () => {
-            const val = b.value.trim();
-            if(val && val !== item.name && isDuplicate(val)) { showMsg("名稱重複", true); setTimeout(startRen, 10); return; }
-            if(val) { item.name = val; showMsg("重命名成功"); }
-            render();
-        };
-        b.onkeydown = (e) => { if(e.key==='Enter') b.blur(); };
-    }
-
-    function doSoftDel() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); showMsg("已移至垃圾桶"); render(); }
-    function doRestore() { sel.forEach(id => db.find(x=>x.id===id).del = false); sel.clear(); showMsg("已還原項目"); render(); }
-    function doHardDel() { db = db.filter(x => !sel.has(x.id)); sel.clear(); showMsg("永久刪除成功"); render(); }
-
-    function setTab(t) {
-        tab = t;
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.id === 'nav-'+t));
-        path = [t==='drive'?'我的硬碟':(t==='recent'?'最近項目':'垃圾桶')];
-        sel.clear(); render();
-    }
-    
-    function goPath(i) { path=path.slice(0,i+1); setTab('drive'); }
-    function upTrigger() { if(tab==='drive') document.getElementById('up-hidden').click(); }
-    function makeFolder() {
-        if(tab !== 'drive') return;
-        const nid = Date.now();
-        db.unshift({ id:nid, name:"", type:'dir', parent:path[path.length-1], del:false, time:nid });
-        render(); sel.clear(); sel.add(nid); startRen();
-    }
+    function upTrigger() { document.getElementById('up-hidden').click(); }
     function onUp(inp) {
-        if(inp.files[0]){
-            const name = inp.files[0].name;
-            if(isDuplicate(name)) return showMsg("文件已存在", true);
-            db.unshift({id:Date.now(), name, type:'file', parent:path[path.length-1], del:false, time:Date.now()});
+        if(inp.files[0]) {
+            db.push({id: Date.now(), name: inp.files[0].name, type:'file', parentId: path[path.length-1].id, del:false, time:Date.now()});
             showMsg("上傳成功"); render();
         }
     }
+    function makeFolder() {
+        const n = prompt("資料夾名稱:");
+        if(n) {
+            db.push({id: Date.now(), name: n, type:'dir', parentId: path[path.length-1].id, del:false, time:Date.now()});
+            render();
+        }
+    }
+
     window.onload = render;
 </script>
 </body>
