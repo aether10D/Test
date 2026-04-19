@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="utf-8">
-    <title>AETHER 10D - PERFECT CLONE</title>
+    <title>AETHER 10D - PRO FILE SYSTEM</title>
     <style>
         :root {
             --accent: #1a73e8;
@@ -11,11 +11,12 @@
             --text-sub: #5f6368;
             --bg-side: #f8f9fa;
             --border: #e8eaed;
+            --danger: #d93025;
         }
 
         body { margin: 0; font-family: 'SF Pro Display', system-ui, sans-serif; display: flex; height: 100vh; background: #fff; overflow: hidden; }
 
-        /* Sidebar Styles */
+        /* Sidebar */
         #sidebar { width: 260px; background: var(--bg-side); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: 0.3s; flex-shrink: 0; }
         #sidebar.collapsed { width: 72px; }
         .brand { height: 80px; display: flex; align-items: center; justify-content: center; }
@@ -25,47 +26,56 @@
         .btn-action { height: 48px; border: none; background: #fff; border-radius: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer; display: flex; align-items: center; padding: 0 16px; transition: 0.2s; }
         #sidebar.collapsed .btn-action { padding: 0; justify-content: center; width: 48px; margin: 0 auto; }
         .btn-action span { margin-left: 14px; font-weight: 600; font-size: 14px; white-space: nowrap; }
-        #sidebar.collapsed .btn-action span { display: none; }
-        .btn-action.disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* 禁用狀態樣式 */
+        .btn-action.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; filter: grayscale(1); }
 
         .nav-link { height: 50px; display: flex; align-items: center; border-radius: 0 25px 25px 0; margin-right: 8px; cursor: pointer; color: var(--text-sub); }
         .nav-link.active { background: var(--accent-soft) !important; color: var(--accent) !important; font-weight: 600; }
         .nav-icon { width: 24px; height: 24px; margin-left: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .nav-txt { margin-left: 16px; font-size: 14px; white-space: nowrap; }
-        #sidebar.collapsed .nav-txt { display: none; }
-        #sidebar.collapsed .nav-icon { margin-left: 0; }
-        #sidebar.collapsed .nav-link { justify-content: center; margin-right: 0; border-radius: 0; }
+        .nav-txt { margin-left: 16px; font-size: 14px; }
 
         /* Main View */
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
         header { height: 72px; padding: 0 32px; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
-        .breadcrumb { display: flex; align-items: center; font-size: 18px; font-weight: 500; }
+        .breadcrumb { display: flex; align-items: center; font-size: 18px; }
         .crumb { cursor: pointer; padding: 4px 8px; border-radius: 4px; color: var(--text-sub); }
         .crumb.active { color: var(--text-main); font-weight: 700; cursor: default; }
 
         .toolbar { height: 56px; padding: 0 32px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: #fdfdfd; }
-        .t-btn { background: #fff; border: 1px solid var(--border); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 500; }
+        .t-btn { background: #fff; border: 1px solid var(--border); padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
         .t-btn:hover { border-color: var(--accent); color: var(--accent); }
         .t-btn.primary { background: var(--accent); color: #fff; border: none; }
 
         .viewport { flex: 1; overflow-y: auto; padding: 20px 32px; }
         
+        /* List */
         .list-h { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 12px 20px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); }
         .row { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 0 20px; height: 56px; align-items: center; border-radius: 10px; cursor: pointer; margin-top: 2px; }
         .row:hover { background: #f8f9fa; }
         .row.sel { background: var(--accent-soft); }
-
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .card { border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; cursor: pointer; background: #fff; }
-        .card.sel { background: var(--accent-soft); border-color: var(--accent); }
-        .card .f-name { margin-top: 12px; font-size: 14px; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .row.moving { opacity: 0.3; filter: grayscale(1); } /* 移動中的視覺隱藏效果 */
 
         .svg-icon { width: 24px; height: 24px; flex-shrink: 0; }
-        .svg-icon-lg { width: 60px; height: 60px; }
         .rename-input { border: 2px solid var(--accent); padding: 4px 8px; border-radius: 4px; outline: none; width: 80%; }
+
+        /* 自定義通知消息 (Custom Toast) */
+        #msg-box { 
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%); 
+            z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; 
+        }
+        .toast { 
+            background: #323232; color: #fff; padding: 12px 24px; border-radius: 8px; 
+            font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out; transition: 0.3s; pointer-events: auto;
+        }
+        .toast.error { background: var(--danger); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
+
+<div id="msg-box"></div>
 
 <aside id="sidebar">
     <div class="brand"><img src="IMG_1978.jpeg" class="avatar" onclick="toggleSide()"></div>
@@ -103,12 +113,12 @@
             <button class="t-btn" onclick="startRen()">重命名</button>
             <button class="t-btn" onclick="handleClip('move')">移動</button>
             <button class="t-btn" onclick="handleClip('copy')">複製</button>
-            <button class="t-btn" style="color:red" onclick="doSoftDel()">刪除</button>
+            <button class="t-btn" style="color:var(--danger)" onclick="doSoftDel()">刪除</button>
         </div>
         <div id="multi-ops" style="display:none; gap:10px">
             <button class="t-btn" onclick="handleClip('move')">批量移動</button>
             <button class="t-btn" onclick="handleClip('copy')">批量複製</button>
-            <button class="t-btn" style="color:red" onclick="doSoftDel()">批量刪除</button>
+            <button class="t-btn" style="color:var(--danger)" onclick="doSoftDel()">批量刪除</button>
         </div>
         <div id="paste-ops" style="display:none; gap:10px">
             <button class="t-btn primary" onclick="doPaste()">貼上至此</button>
@@ -116,7 +126,7 @@
         </div>
         <div id="trash-ops" style="display:none; gap:10px">
             <button class="t-btn primary" onclick="doRestore()">復原</button>
-            <button class="t-btn" style="color:red" onclick="doHardDel()">永久刪除</button>
+            <button class="t-btn" style="color:var(--danger)" onclick="doHardDel()">永久刪除</button>
         </div>
     </div>
     <div class="viewport" id="v-port"></div>
@@ -134,46 +144,57 @@
     const ICON_FOLDER = `<svg viewBox="0 0 48 48" class="svg-icon"><path d="M4 10h14l4 4h22v26H4z" fill="#fbbc04"/><path d="M4 14h40v26H4z" fill="#fbc02d"/></svg>`;
     const ICON_FILE = `<svg viewBox="0 0 48 48" class="svg-icon"><path d="M10 4h20l10 10v30H10z" fill="#e3f2fd"/><path d="M30 4l10 10H30z" fill="#bbdefb"/><path d="M10 4h20l10 10v30H10z" fill="none" stroke="#1a73e8" stroke-width="2.5"/></svg>`;
 
+    // 自定義消息通知
+    function showMsg(txt, isError = false) {
+        const box = document.getElementById('msg-box');
+        const t = document.createElement('div');
+        t.className = `toast ${isError ? 'error' : ''}`;
+        t.innerText = txt;
+        box.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+    }
+
     function render() {
         const h = document.getElementById('path-header');
         h.innerHTML = `<div class="breadcrumb">${path.map((p,i)=>`<span class="crumb ${i===path.length-1?'active':''}" onclick="goPath(${i})">${p}</span>`).join(' <span style="color:#ccc">></span> ')}</div>`;
+        
         const vp = document.getElementById('v-port');
         vp.innerHTML = "";
         
-        const items = (tab === 'drive') ? db.filter(x => x.parent === path[path.length-1] && !x.del) 
-                  : (tab === 'recent' ? db.filter(x => !x.del && x.type === 'file') : db.filter(x => x.del));
+        // 垃圾桶狀態下禁用按鈕
+        const isTrash = (tab === 'trash');
+        document.getElementById('btn-up').classList.toggle('disabled', isTrash);
+        document.getElementById('btn-new').classList.toggle('disabled', isTrash);
+
+        let items = [];
+        if (tab === 'drive') {
+            items = db.filter(x => x.parent === path[path.length-1] && !x.del);
+        } else if (tab === 'recent') {
+            items = db.filter(x => !x.del && x.type === 'file').sort((a,b)=>b.time - a.time);
+        } else {
+            items = db.filter(x => x.del);
+        }
 
         if (items.length === 0) {
-            vp.innerHTML = `<div style="text-align:center;padding-top:100px;color:#999">資料夾為空</div>`;
+            vp.innerHTML = `<div style="text-align:center;padding-top:100px;color:#999">空空如也</div>`;
             updateTool(); return;
         }
 
-        if (tab === 'recent') {
-            const grid = document.createElement('div'); grid.className = 'card-grid';
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = `card ${sel.has(item.id)?'sel':''}`;
-                card.onclick = () => toggleSel(item.id);
-                card.innerHTML = `${ICON_FILE.replace('svg-icon','svg-icon-lg')}<div class="f-name">${item.name}</div>`;
-                grid.appendChild(card);
-            });
-            vp.appendChild(grid);
-        } else {
-            const list = document.createElement('div');
-            list.innerHTML = `<div class="list-h"><span>名稱</span><span>修改時間</span><span>大小</span></div>`;
-            items.forEach(item => {
-                const row = document.createElement('div');
-                row.className = `row ${sel.has(item.id)?'sel':''}`;
-                row.onclick = () => toggleSel(item.id);
-                row.ondblclick = () => { if(item.type==='dir' && tab==='drive'){ path.push(item.name); sel.clear(); render(); } };
-                row.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:15px">${item.type==='dir'?ICON_FOLDER:ICON_FILE}<span id="t-${item.id}">${item.name}</span></div>
-                    <div style="font-size:13px;color:#999">${new Date(item.time).toLocaleDateString()}</div>
-                    <div style="font-size:13px;color:#999">${item.type==='dir'?'-':'2KB'}</div>`;
-                list.appendChild(row);
-            });
-            vp.appendChild(list);
-        }
+        const list = document.createElement('div');
+        list.innerHTML = `<div class="list-h"><span>名稱</span><span>修改時間</span><span>大小</span></div>`;
+        items.forEach(item => {
+            const isMoving = clip.type === 'move' && clip.ids.includes(item.id);
+            const row = document.createElement('div');
+            row.className = `row ${sel.has(item.id)?'sel':''} ${isMoving ? 'moving' : ''}`;
+            row.onclick = () => toggleSel(item.id);
+            row.ondblclick = () => { if(item.type==='dir' && tab==='drive'){ path.push(item.name); sel.clear(); render(); } };
+            row.innerHTML = `
+                <div style="display:flex;align-items:center;gap:15px">${item.type==='dir'?ICON_FOLDER:ICON_FILE}<span id="t-${item.id}">${item.name}</span></div>
+                <div style="font-size:13px;color:#999">${new Date(item.time).toLocaleDateString()}</div>
+                <div style="font-size:13px;color:#999">${item.type==='dir'?'-':'2KB'}</div>`;
+            list.appendChild(row);
+        });
+        vp.appendChild(list);
         updateTool();
     }
 
@@ -188,7 +209,13 @@
         document.getElementById('trash-ops').style.display = (count > 0 && isTrash) ? 'flex' : 'none';
     }
 
-    function handleClip(type) { clip = { type, ids: Array.from(sel) }; sel.clear(); render(); }
+    function handleClip(type) { 
+        clip = { type, ids: Array.from(sel) }; 
+        sel.clear(); 
+        showMsg(type === 'move' ? "已剪切項目，請選擇目的地貼上" : "已複製項目");
+        render(); 
+    }
+    
     function cancelClip() { clip = { type: null, ids: [] }; render(); }
 
     function doPaste() {
@@ -196,48 +223,31 @@
         clip.ids.forEach(id => {
             const item = db.find(x => x.id === id);
             if (!item) return;
-
             if (clip.type === 'move') {
                 if (item.type === 'dir' && (item.name === targetParent || path.includes(item.name))) {
-                    alert(`錯誤：不能移動到自身或其子目錄。`);
+                    showMsg("錯誤：不能移動到自身或其子目錄", true);
                     return;
                 }
                 if (!isDuplicate(item.name)) item.parent = targetParent;
-                else alert(`名稱重複：${item.name}`);
+                else showMsg(`名稱重複：${item.name}`, true);
             } else {
-                // 執行強化後的複製
-                copyRecursive(item, targetParent);
+                copyRecursive(item, targetParent, true);
             }
         });
         cancelClip();
+        showMsg("操作成功");
     }
 
-    // --- 強化版複製邏輯 ---
-    function copyRecursive(originalItem, newParent) {
+    function copyRecursive(originalItem, newParent, isRoot = true) {
         let newName = originalItem.name;
-        // 如果是在同一個資料夾複製，加上副本字樣；如果是跨資料夾且重名，也要處理
-        if (isDuplicate(newName, newParent)) {
+        if (isRoot && isDuplicate(newName, newParent)) {
             newName += "_副本";
             while (isDuplicate(newName, newParent)) { newName += "_副本"; }
         }
-
-        const newId = Date.now() + Math.random(); // 生成唯一 ID
-        const newItem = { 
-            ...originalItem, 
-            id: newId, 
-            name: newName, 
-            parent: newParent, 
-            time: Date.now() 
-        };
-        db.unshift(newItem);
-
-        // 如果是資料夾，尋找所有原資料夾下的子項並遞歸複製
+        const newId = Date.now() + Math.random();
+        db.unshift({ ...originalItem, id: newId, name: newName, parent: newParent, time: Date.now() });
         if (originalItem.type === 'dir') {
-            const children = db.filter(x => x.parent === originalItem.name && !x.del);
-            children.forEach(child => {
-                // 子項的 parent 必須指向新生成的資料夾名稱
-                copyRecursive(child, newName);
-            });
+            db.filter(x => x.parent === originalItem.name && !x.del).forEach(child => copyRecursive(child, newName, false));
         }
     }
 
@@ -255,36 +265,60 @@
         b.focus(); b.select();
         b.onblur = () => {
             const val = b.value.trim();
-            if(val && val !== item.name && isDuplicate(val)) { alert("名稱重複"); setTimeout(startRen, 10); return; }
-            if(val) item.name = val;
+            if(val && val !== item.name && isDuplicate(val)) { 
+                showMsg("該名稱已存在！", true); 
+                setTimeout(startRen, 10); 
+                return; 
+            }
+            if(val) { item.name = val; showMsg("重命名成功"); }
             render();
         };
         b.onkeydown = (e) => { if(e.key==='Enter') b.blur(); };
     }
 
-    function doSoftDel() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); render(); }
-    function doRestore() { sel.forEach(id => db.find(x=>x.id===id).del = false); sel.clear(); render(); }
-    function doHardDel() { db = db.filter(x => !sel.has(x.id)); sel.clear(); render(); }
+    function doSoftDel() { 
+        sel.forEach(id => db.find(x=>x.id===id).del = true); 
+        sel.clear(); 
+        showMsg("已移至垃圾桶");
+        render(); 
+    }
+    function doRestore() { 
+        sel.forEach(id => db.find(x=>x.id===id).del = false); 
+        sel.clear(); 
+        showMsg("項目已還原");
+        render(); 
+    }
+    function doHardDel() { 
+        db = db.filter(x => !sel.has(x.id)); 
+        sel.clear(); 
+        showMsg("項目已永久刪除");
+        render(); 
+    }
+
     function setTab(t) {
         tab = t;
         document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.id === 'nav-'+t));
         path = [t==='drive'?'我的硬碟':(t==='recent'?'最近項目':'垃圾桶')];
         sel.clear(); render();
     }
+    
     function goPath(i) { path=path.slice(0,i+1); setTab('drive'); }
     function toggleSide() { document.getElementById('sidebar').classList.toggle('collapsed'); }
     function upTrigger() { if(tab==='drive') document.getElementById('up-hidden').click(); }
+    
     function makeFolder() {
         if(tab !== 'drive') return;
         const nid = Date.now();
         db.unshift({ id:nid, name:"", type:'dir', parent:path[path.length-1], del:false, time:nid });
         render(); sel.clear(); sel.add(nid); startRen();
     }
+    
     function onUp(inp) {
         if(inp.files[0]){
             const name = inp.files[0].name;
-            if(isDuplicate(name)) return alert("文件已存在");
+            if(isDuplicate(name)) return showMsg("文件已存在", true);
             db.unshift({id:Date.now(), name, type:'file', parent:path[path.length-1], del:false, time:Date.now()});
+            showMsg("上傳成功");
             render();
         }
     }
