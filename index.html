@@ -2,63 +2,63 @@
 <html lang="zh-TW">
 <head>
     <meta charset="utf-8">
-    <title>Aether 10D - Final Refined</title>
+    <title>Aether 10D - Navigation Fix</title>
     <style>
-        :root { --accent: #1a73e8; --border: #dadce0; --text-sub: #5f6368; }
-        * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        :root { --accent: #1a73e8; --border: #dadce0; --bg: #f8f9fa; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui; }
         body { margin: 0; display: flex; height: 100vh; overflow: hidden; background: #fff; }
 
-        /* 側邊欄 */
-        #sidebar { width: 260px; background: #f8f9fa; border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo { padding: 24px; font-weight: 800; font-size: 22px; color: var(--accent); }
-        .nav-link { padding: 12px 24px; cursor: pointer; color: var(--text-sub); border-radius: 0 24px 24px 0; margin-right: 12px; }
+        /* Sidebar */
+        #sidebar { width: 260px; background: var(--bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        .logo-area { padding: 24px; display: flex; align-items: center; gap: 12px; }
+        .logo-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
+        .logo-txt { font-weight: 800; font-size: 22px; color: var(--accent); }
+        
+        .nav-link { padding: 12px 24px; cursor: pointer; color: #5f6368; border-radius: 0 24px 24px 0; margin-right: 12px; transition: 0.2s; }
         .nav-link.active { background: #e8f0fe; color: var(--accent); font-weight: 600; }
 
-        /* 主導航與工具欄 */
+        /* Main */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        header { height: 64px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; }
+        header { height: 64px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; background: #fff; z-index: 10; }
         
-        /* 麵包屑區域：支持滑動 */
-        .bc-container { 
-            flex: 1; display: flex; align-items: center; 
-            overflow-x: auto; white-space: nowrap; scrollbar-width: none; 
-        }
-        .bc-container::-webkit-scrollbar { display: none; }
-        
-        .crumb-item { 
-            cursor: pointer; color: var(--text-sub); padding: 6px 8px; border-radius: 4px; transition: 0.2s;
-        }
-        .crumb-item:hover { background: #f1f3f4; color: var(--accent); }
-        .crumb-item.active { color: #202124; font-weight: 700; cursor: default; }
+        /* 麵包屑：強制可點擊 */
+        .bc-container { flex: 1; display: flex; align-items: center; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+        .crumb { cursor: pointer; color: var(--accent); padding: 6px 10px; border-radius: 6px; font-weight: 500; }
+        .crumb:hover { background: #e8f0fe; text-decoration: underline; }
+        .crumb.active { color: #000; font-weight: 700; cursor: default; text-decoration: none; }
+        .crumb.active:hover { background: none; }
 
-        .toolbar { display: flex; gap: 8px; align-items: center; }
-        .t-btn { 
-            height: 36px; padding: 0 16px; border: 1px solid var(--border); 
-            background: #fff; border-radius: 18px; cursor: pointer; 
-            font-size: 13px; font-weight: 600; display: flex; align-items: center;
-        }
+        .toolbar { display: flex; gap: 8px; }
+        .t-btn { height: 36px; padding: 0 16px; border: 1px solid var(--border); background: #fff; border-radius: 18px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; }
         .t-btn:hover { background: #f8f9fa; border-color: var(--accent); }
         .t-btn.primary { background: var(--accent); color: #fff; border: none; }
         .t-btn.danger { color: #d93025; }
 
-        /* 內容區 */
-        .viewport { flex: 1; overflow-y: auto; padding: 20px; }
-        .list-row { 
-            display: grid; grid-template-columns: 2fr 1fr 120px; 
-            align-items: center; padding: 0 16px; height: 52px; 
-            border-bottom: 1px solid #f1f3f4; cursor: pointer; border-radius: 8px;
+        /* Viewport - Card Layout */
+        .viewport { flex: 1; overflow-y: auto; padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; align-content: start; }
+        
+        .card { 
+            border: 1px solid var(--border); border-radius: 12px; padding: 16px; 
+            display: flex; flex-direction: column; align-items: center; 
+            cursor: pointer; transition: 0.2s; background: #fff;
         }
-        .list-row.selected { background: #e8f0fe; }
-        .list-row svg { width: 24px; height: 24px; margin-right: 12px; vertical-align: middle; }
+        .card:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .card.selected { background: #e8f0fe; border-color: var(--accent); }
+        .card svg { width: 56px; height: 56px; margin-bottom: 12px; flex-shrink: 0; }
+        .card-name { font-size: 14px; color: #202124; text-align: center; word-break: break-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-        .edit-box { display: flex; gap: 10px; padding: 10px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; margin-bottom: 12px; }
-        .edit-box input { flex: 1; border: none; outline: none; font-size: 15px; }
+        /* 新建/重命名 編輯框 */
+        .edit-card { grid-column: 1 / -1; background: #fff; padding: 16px; border: 2px solid var(--accent); border-radius: 12px; display: flex; gap: 12px; }
+        .edit-card input { flex: 1; border: none; outline: none; font-size: 16px; font-weight: 600; }
     </style>
 </head>
 <body>
 
 <aside id="sidebar">
-    <div class="logo">Aether 10D</div>
+    <div class="logo-area">
+        <img src="IMG_1978.jpeg" class="logo-img" onerror="this.src='https://via.placeholder.com/44?text=10D'">
+        <span class="logo-txt">Aether 10D</span>
+    </div>
     <div style="padding: 0 16px 20px;">
         <button class="t-btn primary" style="width:100%; height:44px; justify-content:center;" onclick="document.getElementById('f-up').click()">上傳文件</button>
         <button class="t-btn" style="width:100%; height:44px; justify-content:center; margin-top:10px;" onclick="startCreate()">新建資料夾</button>
@@ -79,8 +79,8 @@
 
 <script>
     let db = [
-        {id: 1, name: '10D_Algorithm.bin', isDir: false, parent: '我的硬碟', del: false},
-        {id: 2, name: '開發文檔', isDir: true, parent: '我的硬碟', del: false}
+        {id: 1, name: '核心算法架構.pdf', isDir: false, parent: '我的硬碟', del: false},
+        {id: 2, name: '10D數據倉', isDir: true, parent: '我的硬碟', del: false}
     ];
     let currentMode = 'drive', drivePath = ["我的硬碟"];
     let sel = new Set(), creating = false, renamingId = null, clip = { type: null, ids: [] };
@@ -92,101 +92,96 @@
         const vp = document.getElementById('v-port'), tb = document.getElementById('toolbar'), bc = document.getElementById('bc-ui');
         vp.innerHTML = ""; tb.innerHTML = ""; bc.innerHTML = "";
 
-        // --- 1. 麵包屑導航 (點擊傳送 & 滑動) ---
-        const activePath = (currentMode === 'drive') ? drivePath : [currentMode==='recent'?'最近項目':'垃圾桶'];
-        activePath.forEach((name, idx) => {
-            const item = document.createElement('div');
-            item.className = `crumb-item ${idx === activePath.length - 1 ? 'active' : ''}`;
-            item.innerText = name;
-            item.onclick = (e) => {
+        // 1. 麵包屑傳送邏輯 (核心修正)
+        const pathData = (currentMode === 'drive') ? drivePath : [currentMode === 'recent' ? '最近項目' : '垃圾桶'];
+        pathData.forEach((name, idx) => {
+            const span = document.createElement('div');
+            span.className = `crumb ${idx === pathData.length - 1 ? 'active' : ''}`;
+            span.innerText = name;
+            // 點擊傳送：截斷數組並重繪
+            span.onclick = () => {
                 if (currentMode === 'drive' && idx < drivePath.length - 1) {
-                    drivePath = drivePath.slice(0, idx + 1); // 傳送回指定路徑
+                    drivePath = drivePath.slice(0, idx + 1); 
                     sel.clear(); render();
                 }
             };
-            bc.appendChild(item);
-            if (idx < activePath.length - 1) {
+            bc.appendChild(span);
+            if (idx < pathData.length - 1) {
                 const sep = document.createElement('span');
-                sep.innerText = " / "; sep.style.color = "#ccc";
+                sep.innerText = "/"; sep.style.color = "#ccc";
                 bc.appendChild(sep);
             }
         });
-        setTimeout(() => bc.scrollLeft = bc.scrollWidth, 50);
 
-        // --- 2. 列表渲染邏輯 ---
-        const parentName = drivePath[drivePath.length-1];
-        let items = (currentMode === 'drive') ? db.filter(x => x.parent === parentName && !x.del) 
+        // 2. 內容渲染 (卡片模式)
+        const curLevel = drivePath[drivePath.length-1];
+        let items = (currentMode === 'drive') ? db.filter(x => x.parent === curLevel && !x.del) 
                   : (currentMode === 'recent' ? db.filter(x => !x.del && !x.isDir) : db.filter(x => x.del));
 
-        if (creating) vp.appendChild(createEditRow("", true, n => {
-            if(!checkName(n)) return alert("此名稱已存在！");
-            db.unshift({id:Date.now(), name:n, isDir:true, parent:parentName, del:false});
+        if (creating) vp.appendChild(createEditUI("", true, n => {
+            if(!checkName(n)) return alert("同級目錄下名稱重複");
+            db.unshift({id:Date.now(), name:n, isDir:true, parent:curLevel, del:false});
             creating = false; render();
         }, () => { creating=false; render(); }));
 
         items.forEach(i => {
             if (renamingId === i.id) {
-                vp.appendChild(createEditRow(i.name, i.isDir, n => {
-                    if(i.name !== n && !checkName(n)) return alert("名稱重複！");
+                vp.appendChild(createEditUI(i.name, i.isDir, n => {
+                    if(i.name !== n && !checkName(n)) return alert("名稱已存在");
                     i.name = n; renamingId = null; render();
                 }, () => { renamingId = null; render(); }));
             } else {
-                const r = document.createElement('div');
-                r.className = `list-row ${sel.has(i.id)?'selected':''}`;
-                r.onclick = () => { sel.has(i.id) ? sel.delete(i.id) : sel.add(i.id); render(); };
-                r.ondblclick = () => { if(i.isDir && currentMode==='drive') { drivePath.push(i.name); sel.clear(); render(); } };
-                r.innerHTML = `<div>${i.isDir?SVG_DIR:SVG_FILE} ${i.name}</div><div>剛剛</div><div>--</div>`;
-                vp.appendChild(r);
+                const card = document.createElement('div');
+                card.className = `card ${sel.has(i.id)?'selected':''}`;
+                card.onclick = () => { sel.has(i.id) ? sel.delete(i.id) : sel.add(i.id); render(); };
+                card.ondblclick = () => { if(i.isDir && currentMode==='drive') { drivePath.push(i.name); sel.clear(); render(); } };
+                card.innerHTML = `${i.isDir?SVG_DIR:SVG_FILE}<div class="card-name">${i.name}</div>`;
+                vp.appendChild(card);
             }
         });
 
-        // --- 3. 工具欄：根據單選/多選精確切換 ---
+        // 3. 工具欄：精確按鈕顯示
         if (sel.size > 0) {
             const multi = sel.size > 1;
             if (currentMode === 'drive') {
                 if (!multi) {
-                    // 單選：重命名, 移動, 複製, 刪除
                     tb.innerHTML += `<button class="t-btn" onclick="startRename()">重命名</button>`;
                     tb.innerHTML += `<button class="t-btn" onclick="setClip('move')">移動</button>`;
                     tb.innerHTML += `<button class="t-btn" onclick="setClip('copy')">複製</button>`;
                 } else {
-                    // 多選：批量移動, 批量複製, 批量刪除
                     tb.innerHTML += `<button class="t-btn" onclick="setClip('move')">批量移動</button>`;
                     tb.innerHTML += `<button class="t-btn" onclick="setClip('copy')">批量複製</button>`;
                 }
-                tb.innerHTML += `<button class="t-btn danger" onclick="batchDel()">${multi?'批量':''}刪除</button>`;
-                tb.innerHTML += `<button class="t-btn" onclick="sel.clear(); render()">取消選中</button>`;
+                tb.innerHTML += `<button class="t-btn danger" onclick="batchDel()">刪除</button>`;
             } else if (currentMode === 'trash') {
-                tb.innerHTML += `<button class="t-btn primary" onclick="batchRestore()">復原項</button>`;
+                tb.innerHTML += `<button class="t-btn primary" onclick="batchRestore()">復原項目</button>`;
+                tb.innerHTML += `<button class="t-btn danger" onclick="purge()">永久刪除</button>`;
             }
         }
 
+        // 只有「建立、移動、複製」時才顯示取消
         if (clip.ids.length > 0 && currentMode === 'drive') {
-            tb.innerHTML += `<button class="t-btn primary" onclick="pasteItems()">貼上到此處 (${clip.ids.length})</button>`;
-            tb.innerHTML += `<button class="t-btn" onclick="cancelClip()">取消操作</button>`;
+            tb.innerHTML += `<button class="t-btn primary" onclick="pasteItems()">貼上在此 (${clip.ids.length})</button>`;
+            tb.innerHTML += `<button class="t-btn" onclick="cancelClip()">取消</button>`;
         }
     }
 
-    // --- 功能函式 ---
-    function checkName(name) { return !db.some(x => x.parent === drivePath[drivePath.length-1] && x.name === name && !x.del); }
+    // --- 邏輯函數 ---
+    function checkName(n) { return !db.some(x => x.parent === drivePath[drivePath.length-1] && x.name === n && !x.del); }
     function startCreate() { creating = true; render(); }
     function startRename() { renamingId = Array.from(sel)[0]; render(); }
     function setClip(t) { clip = { type: t, ids: Array.from(sel) }; sel.clear(); render(); }
     function cancelClip() { clip = { type: null, ids: [] }; render(); }
     function batchDel() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); render(); }
     function batchRestore() { sel.forEach(id => db.find(x=>x.id===id).del = false); sel.clear(); render(); }
+    function purge() { sel.forEach(id => { let idx = db.findIndex(x=>x.id===id); if(idx>-1) db.splice(idx,1); }); sel.clear(); render(); }
 
     function pasteItems() {
         const cur = drivePath[drivePath.length-1];
         clip.ids.forEach(id => {
             let item = db.find(x => x.id === id);
-            if(clip.type === 'move') {
-                if(checkName(item.name)) item.parent = cur;
-                else alert(`名稱 [${item.name}] 已存在，跳過移動`);
-            } else {
-                let name = item.name + "_副本";
-                db.unshift({...item, id: Date.now()+Math.random(), name, parent: cur});
-            }
+            if(clip.type === 'move') { if(checkName(item.name)) item.parent = cur; }
+            else { db.unshift({...item, id: Date.now()+Math.random(), name: item.name + '_副本', parent: cur}); }
         });
         cancelClip();
     }
@@ -203,11 +198,11 @@
         render();
     }
 
-    function createEditRow(val, isDir, done, cancel) {
-        const div = document.createElement('div'); div.className = 'edit-box';
-        div.innerHTML = `${isDir?SVG_DIR:SVG_FILE}<input value="${val}" autofocus onfocus="this.select()">`;
+    function createEditUI(val, isDir, done, cancel) {
+        const div = document.createElement('div'); div.className = 'edit-card';
+        div.innerHTML = `<input value="${val}" autofocus onfocus="this.select()">`;
         const b1 = document.createElement('button'); b1.className = 't-btn primary'; b1.innerText = '儲存';
-        b1.onclick = () => done(div.querySelector('input').value);
+        b1.onclick = () => { if(div.querySelector('input').value) done(div.querySelector('input').value); };
         const b2 = document.createElement('button'); b2.className = 't-btn'; b2.innerText = '取消';
         b2.onclick = cancel;
         div.append(b1, b2);
@@ -218,4 +213,4 @@
     window.onload = render;
 </script>
 </body>
-</html>    
+</html>
