@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="utf-8">
-    <title>AETHER 10D - ARCHITECT SYSTEM</title>
+    <title>AETHER 10D - PRO ARCHITECT</title>
     <style>
         :root {
             --accent: #1a73e8;
@@ -19,79 +19,75 @@
         * { box-sizing: border-box; }
         body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; background: #fff; overflow: hidden; color: var(--text-main); }
 
-        /* --- 側邊欄 (Sidebar) --- */
+        /* --- 側邊欄 --- */
         #sidebar { 
             width: var(--side-w); background: var(--bg-side); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            flex-shrink: 0; overflow: hidden; z-index: 100;
+            display: flex; flex-direction: column; transition: 0.25s ease-in-out; 
+            flex-shrink: 0; z-index: 100;
         }
-        /* 懸停或鎖定時展開 */
-        #sidebar:hover, #sidebar.locked { width: var(--side-w-exp); box-shadow: 4px 0 15px rgba(0,0,0,0.05); }
+        #sidebar:hover, #sidebar.locked { width: var(--side-w-exp); box-shadow: 4px 0 12px rgba(0,0,0,0.05); }
 
-        .brand { height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-        .avatar { width: 42px; height: 42px; border-radius: 12px; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); object-fit: cover; }
+        .brand { height: 72px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .avatar { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         
-        .side-ops { padding: 10px 12px; display: flex; flex-direction: column; gap: 12px; }
+        .side-ops { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
         .btn-action { 
             height: 48px; border: none; background: #fff; border-radius: 24px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer; 
-            display: flex; align-items: center; padding: 0 12px; transition: 0.2s;
-            width: 48px; margin: 0 auto; overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; 
+            display: flex; align-items: center; padding: 0 12px; width: 48px; margin: 0 auto; overflow: hidden; transition: 0.2s;
         }
         #sidebar:hover .btn-action, #sidebar.locked .btn-action { width: 100%; margin: 0; padding: 0 16px; }
-        .btn-action span { margin-left: 14px; font-weight: 600; font-size: 14px; white-space: nowrap; opacity: 0; transition: 0.2s; color: var(--accent); }
+        .btn-action span { margin-left: 12px; font-weight: 600; font-size: 14px; white-space: nowrap; opacity: 0; color: var(--accent); }
         #sidebar:hover .btn-action span, #sidebar.locked .btn-action span { opacity: 1; }
-        
-        /* 禁用狀態 */
-        .btn-action.disabled { opacity: 0.3 !important; pointer-events: none !important; filter: grayscale(1); }
+        .btn-action.disabled { opacity: 0.3 !important; pointer-events: none; filter: grayscale(1); }
 
-        .nav-link { height: 50px; display: flex; align-items: center; border-radius: 0 25px 25px 0; margin-right: 8px; cursor: pointer; color: var(--text-sub); transition: 0.2s; }
-        .nav-link.active { background: var(--accent-soft) !important; color: var(--accent) !important; font-weight: 600; }
-        .nav-icon { width: 72px; height: 50px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .nav-txt { font-size: 14px; white-space: nowrap; opacity: 0; transition: 0.2s; }
+        .nav-link { height: 48px; display: flex; align-items: center; border-radius: 0 24px 24px 0; margin-right: 8px; cursor: pointer; color: var(--text-sub); }
+        .nav-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+        .nav-icon { width: 72px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .nav-txt { font-size: 14px; opacity: 0; transition: 0.2s; white-space: nowrap; }
         #sidebar:hover .nav-txt, #sidebar.locked .nav-txt { opacity: 1; }
 
-        /* --- 主視圖 (Main) --- */
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
-        header { height: 72px; padding: 0 32px; display: flex; align-items: center; border-bottom: 1px solid var(--border); background: #fff; }
-        .breadcrumb { display: flex; align-items: center; font-size: 18px; color: var(--text-sub); gap: 4px; }
-        .crumb { cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: 0.2s; }
-        .crumb:hover { background: var(--border); color: var(--text-main); }
-        .crumb.active { color: var(--text-main); font-weight: 700; cursor: default; }
-        .crumb-sep { color: #ccc; font-size: 14px; }
+        /* --- 主視圖 --- */
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #fff; }
+        header { height: 72px; padding: 0 32px; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
+        .breadcrumb { display: flex; align-items: center; font-size: 16px; color: var(--text-sub); gap: 4px; }
+        .crumb { cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+        .crumb:hover { background: #f1f3f4; }
+        .crumb.active { color: var(--text-main); font-weight: 600; cursor: default; }
 
-        .toolbar { height: 56px; padding: 0 32px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: #fafafa; border-bottom: 1px solid var(--border); }
-        .t-btn { background: #fff; border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .toolbar { height: 56px; padding: 0 32px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; border-bottom: 1px solid var(--border); background: #fafafa; }
+        .t-btn { background: #fff; border: 1px solid var(--border); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
         .t-btn:hover { border-color: var(--accent); color: var(--accent); }
         .t-btn.primary { background: var(--accent); color: #fff; border: none; }
+        .t-btn.danger { color: var(--danger); border-color: #fad2cf; }
+        .t-btn.danger:hover { background: #fef1f0; border-color: var(--danger); }
 
-        .viewport { flex: 1; overflow-y: auto; padding: 24px 32px; }
+        .viewport { flex: 1; overflow-y: auto; padding: 16px 32px; }
 
-        /* 列表模式 */
-        .list-h { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 12px 20px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); }
-        .row { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 0 20px; height: 56px; align-items: center; border-radius: 10px; cursor: pointer; margin-top: 2px; }
-        .row:hover { background: #f1f3f4; }
+        /* 列表樣式 */
+        .list-h { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 12px 20px; font-size: 12px; color: var(--text-sub); font-weight: 600; }
+        .row { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 0 20px; height: 52px; align-items: center; border-radius: 8px; cursor: pointer; margin-bottom: 2px; }
+        .row:hover { background: #f8f9fa; }
         .row.sel { background: var(--accent-soft); }
-        .row.moving { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
+        .row.moving { opacity: 0.3; pointer-events: none; }
 
         /* 最近項目：卡片佈局 */
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 24px; }
-        .card { border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; position: relative; }
-        .card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-color: var(--accent); }
-        .card.sel { border-color: var(--accent); background: var(--accent-soft); }
-        .card-icon { width: 56px; height: 56px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; }
-        .card-name { font-size: 14px; font-weight: 500; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
+        .card { border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .card:hover { border-color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .card.sel { background: var(--accent-soft); border-color: var(--accent); }
+        .card-icon { margin-bottom: 12px; }
+        .card-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* 系統圖標 (SVG) */
-        .svg-icon { width: 24px; height: 24px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .svg-file { stroke: #5f6368; }
+        /* SVG 圖標固定顏色 */
+        .svg-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .svg-folder { stroke: #fbbc04; fill: rgba(251, 188, 4, 0.1); }
-        
-        #msg-box { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; pointer-events: none; }
-        .toast { background: #323232; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideUp 0.3s; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .svg-file { stroke: #5f6368; }
 
-        .rename-input { border: 2px solid var(--accent); padding: 4px 8px; border-radius: 4px; outline: none; width: 90%; font-size: 14px; }
+        #msg-box { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .toast { background: #323232; color: #fff; padding: 10px 20px; border-radius: 6px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+        .rename-box { border: 2px solid var(--accent); outline: none; padding: 4px 8px; border-radius: 4px; width: 80%; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -99,31 +95,29 @@
 <div id="msg-box"></div>
 
 <aside id="sidebar">
-    <div class="brand" onclick="toggleSidebarLock()">
-        <img src="IMG_1978.jpeg" class="avatar">
-    </div>
+    <div class="brand" onclick="toggleSidebarLock()"><img src="IMG_1978.jpeg" class="avatar"></div>
     <div class="side-ops">
         <button class="btn-action" id="btn-up" onclick="upTrigger()">
-            <svg class="svg-icon" style="stroke: var(--accent)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-            <span>上傳文件</span>
+            <svg class="svg-icon" style="stroke:var(--accent)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span>上傳</span>
         </button>
         <button class="btn-action" id="btn-new" onclick="makeFolder()">
-            <svg class="svg-icon" style="stroke: var(--accent)"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2zM12 11v6M9 14h6"/></svg>
-            <span>新建資料夾</span>
+            <svg class="svg-icon" style="stroke:var(--accent)"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2zM12 11v6M9 14h6"/></svg>
+            <span>新建</span>
         </button>
         <input type="file" id="up-hidden" style="display:none" onchange="onUp(this)">
     </div>
     <div style="margin-top:20px">
         <div class="nav-link active" id="nav-drive" onclick="setTab('drive')">
-            <div class="nav-icon"><svg class="svg-icon"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+            <div class="nav-icon"><svg class="svg-icon"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
             <span class="nav-txt">我的硬碟</span>
         </div>
         <div class="nav-link" id="nav-recent" onclick="setTab('recent')">
-            <div class="nav-icon"><svg class="svg-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="nav-icon"><svg class="svg-icon"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
             <span class="nav-txt">最近項目</span>
         </div>
         <div class="nav-link" id="nav-trash" onclick="setTab('trash')">
-            <div class="nav-icon"><svg class="svg-icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
+            <div class="nav-icon"><svg class="svg-icon"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
             <span class="nav-txt">垃圾桶</span>
         </div>
     </div>
@@ -136,247 +130,206 @@
 </main>
 
 <script>
-    // --- 核心數據結構 ---
-    // 使用 parentId 進行 10D 邏輯關聯，而非名稱，防止複製出錯
+    // 核心數據
     let db = [
-        {id: 101, name: "系統架構.txt", type: 'file', parentId: 0, del: false, time: Date.now()},
-        {id: 102, name: "核心工程", type: 'dir', parentId: 0, del: false, time: Date.now()},
-        {id: 103, name: "index.js", type: 'file', parentId: 102, del: false, time: Date.now()}
+        {id: 1, name: "系統指南.pdf", type: 'file', parentId: 0, del: false, time: Date.now()},
+        {id: 2, name: "工作資料", type: 'dir', parentId: 0, del: false, time: Date.now()}
     ];
     
     let tab = 'drive', path = [{id: 0, name: "我的硬碟"}], sel = new Set(), clip = { type: null, ids: [] };
+    let tempFolderId = null; // 用於標記正在「新建中」的資料夾
 
-    // --- 圖標模板 ---
-    const ICON_FOLDER = `<svg class="svg-icon svg-folder" style="width:32px;height:32px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
-    const ICON_FILE = `<svg class="svg-icon svg-file" style="width:32px;height:32px"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+    const SVG_FOLDER = `<svg class="svg-icon svg-folder"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
+    const SVG_FILE = `<svg class="svg-icon svg-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg>`;
 
-    function showMsg(txt) {
-        const box = document.getElementById('msg-box');
-        box.innerHTML = `<div class="toast">${txt}</div>`;
-        setTimeout(() => box.innerHTML = "", 2500);
+    function showMsg(t) {
+        const b = document.getElementById('msg-box');
+        b.innerHTML = `<div class="toast">${t}</div>`;
+        setTimeout(() => b.innerHTML="", 2000);
     }
 
+    // --- 1. 修復側邊欄收合 ---
     function toggleSidebarLock() {
-        document.getElementById('sidebar').classList.toggle('locked');
-    }
-
-    // --- 1. 面包屑跳轉修復 ---
-    function goPath(idx) {
-        if (idx === path.length - 1 && tab === 'drive') return;
-        path = path.slice(0, idx + 1); // 截取路徑數組
-        tab = 'drive';
-        updateNavUI();
-        sel.clear();
-        render();
+        const sb = document.getElementById('sidebar');
+        sb.classList.toggle('locked');
     }
 
     function setTab(t) {
-        if (tab === t) return;
+        if(tab === t) return;
         tab = t;
-        updateNavUI();
-        const rootNames = { drive: "我的硬碟", recent: "最近項目", trash: "垃圾桶" };
-        path = [{id: 0, name: rootNames[t]}];
+        const names = { drive: "我的硬碟", recent: "最近項目", trash: "垃圾桶" };
+        path = [{id: 0, name: names[t]}];
         sel.clear();
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.id === `nav-${t}`));
         render();
     }
 
-    function updateNavUI() {
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.id === `nav-${tab}`));
+    function goPath(i) {
+        if(i === path.length - 1 && tab === 'drive') return;
+        path = path.slice(0, i + 1);
+        tab = 'drive';
+        sel.clear();
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.id === 'nav-drive'));
+        render();
     }
 
-    // --- 2. 核心遞歸複製邏輯 (支援無限嵌套，無重複 BUG) ---
+    // --- 2. 核心遞歸複製 (無 BUG 版本) ---
     function copyRecursive(oldId, newParentId, isRoot = false) {
-        const original = db.find(x => x.id === oldId);
-        if (!original) return;
-
-        let newName = original.name;
-        if (isRoot) {
-            newName += "_副本";
-            // 名稱去重
-            while (db.some(x => x.parentId === newParentId && x.name === newName && !x.del)) {
-                newName += "_副本";
-            }
-        }
-
-        const newId = Date.now() + Math.random(); // 生成全新唯一 ID
-        const copy = { ...original, id: newId, parentId: newParentId, name: newName, time: Date.now() };
-        db.push(copy);
-
-        if (original.type === 'dir') {
-            // 精準查找原目錄下的直接子項
-            const children = db.filter(x => x.parentId === oldId && !x.del);
-            children.forEach(child => {
-                // 子項目的新父級必須是剛生成的副本 ID
-                copyRecursive(child.id, newId, false);
-            });
+        const ori = db.find(x => x.id === oldId);
+        if(!ori) return;
+        let newName = ori.name;
+        if(isRoot) newName += "_副本";
+        const newId = Date.now() + Math.random();
+        db.push({...ori, id: newId, parentId: newParentId, name: newName, time: Date.now()});
+        if(ori.type === 'dir') {
+            db.filter(x => x.parentId === oldId && !x.del).forEach(c => copyRecursive(c.id, newId, false));
         }
     }
 
     function render() {
-        // 渲染面包屑
+        // 面包屑
         const h = document.getElementById('path-header');
         h.innerHTML = `<div class="breadcrumb">${path.map((p, i) => 
             `<span class="crumb ${i===path.length-1?'active':''}" onclick="goPath(${i})">${p.name}</span>`
-        ).join('<span class="crumb-sep">/</span>')}</div>`;
+        ).join('<span style="color:#ccc">/</span>')}</div>`;
 
         const vp = document.getElementById('v-port');
         vp.innerHTML = "";
-        
-        // 3. 禁用按鈕邏輯 (最近項目/垃圾桶不允許新建)
-        const isDrive = (tab === 'drive');
-        document.getElementById('btn-up').classList.toggle('disabled', !isDrive);
-        document.getElementById('btn-new').classList.toggle('disabled', !isDrive);
+
+        // 按鈕禁用
+        document.getElementById('btn-up').classList.toggle('disabled', tab !== 'drive');
+        document.getElementById('btn-new').classList.toggle('disabled', tab !== 'drive');
 
         let items = [];
-        const curParentId = path[path.length - 1].id;
+        const pid = path[path.length - 1].id;
+        if(tab==='drive') items = db.filter(x => x.parentId === pid && !x.del);
+        else if(tab==='recent') items = db.filter(x => !x.del && x.type==='file').sort((a,b)=>b.time-a.time).slice(0, 12);
+        else items = db.filter(x => x.del);
 
-        if (tab === 'drive') {
-            items = db.filter(x => x.parentId === curParentId && !x.del);
-        } else if (tab === 'recent') {
-            items = db.filter(x => !x.del && x.type === 'file').sort((a,b) => b.time - a.time).slice(0, 15);
-        } else {
-            items = db.filter(x => x.del);
-        }
-
-        if (items.length === 0) {
-            vp.innerHTML = `<div style="text-align:center;padding-top:100px;color:#ccc;font-size:14px">此處尚無資料</div>`;
-        } else if (tab === 'recent') {
-            // 4. 最近項目卡片化
+        if(tab==='recent') {
             const grid = document.createElement('div');
             grid.className = 'card-grid';
             items.forEach(item => {
                 const card = document.createElement('div');
                 card.className = `card ${sel.has(item.id)?'sel':''}`;
                 card.onclick = () => toggleSel(item.id);
-                card.innerHTML = `<div class="card-icon">${ICON_FILE}</div><div class="card-name">${item.name}</div>`;
+                card.innerHTML = `<div class="card-icon">${SVG_FILE}</div><div class="card-name">${item.name}</div>`;
                 grid.appendChild(card);
             });
             vp.appendChild(grid);
         } else {
-            // 列表模式
             const list = document.createElement('div');
             list.innerHTML = `<div class="list-h"><span>名稱</span><span>修改日期</span><span>大小</span></div>`;
             items.forEach(item => {
                 const isMoving = clip.type === 'move' && clip.ids.includes(item.id);
                 const row = document.createElement('div');
                 row.className = `row ${sel.has(item.id)?'sel':''} ${isMoving?'moving':''}`;
-                
-                // 5. 移動中狀態鎖定 (不可點擊)
                 row.onclick = () => { if(!isMoving) toggleSel(item.id); };
-                row.ondblclick = () => { 
-                    if(item.type === 'dir' && !isMoving) {
-                        path.push({id: item.id, name: item.name});
-                        sel.clear(); render();
-                    }
-                };
+                row.ondblclick = () => { if(item.type==='dir' && !isMoving) { path.push({id:item.id, name:item.name}); sel.clear(); render(); } };
                 
+                // 處理新建或重命名的內聯輸入
+                let nameHtml = `<span id="n-${item.id}">${item.name}</span>`;
+                if(item.id === tempFolderId) {
+                    nameHtml = `<input type="text" class="rename-box" id="temp-in" value="${item.name}">`;
+                }
+
                 row.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:12px">
-                        ${item.type==='dir'?ICON_FOLDER:ICON_FILE}
-                        <span id="t-${item.id}">${item.name}</span>
-                    </div>
-                    <div style="font-size:13px;color:#999">${new Date(item.time).toLocaleDateString()}</div>
-                    <div style="font-size:13px;color:#999">${item.type==='dir'?'-':'2 KB'}</div>`;
+                    <div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?SVG_FOLDER:SVG_FILE} ${nameHtml}</div>
+                    <div style="font-size:12px;color:#999">${new Date(item.time).toLocaleDateString()}</div>
+                    <div style="font-size:12px;color:#999">-</div>`;
                 list.appendChild(row);
             });
             vp.appendChild(list);
+
+            // 自動聚焦新建輸入框
+            if(tempFolderId) {
+                const input = document.getElementById('temp-in');
+                input.focus(); input.select();
+                input.onblur = () => finishNaming(input.value);
+                input.onkeydown = (e) => { if(e.key==='Enter') input.blur(); };
+            }
         }
         updateToolbar();
     }
 
     function toggleSel(id) { if(sel.has(id)) sel.delete(id); else sel.add(id); render(); }
 
+    // --- 3. 工具欄邏輯：單選 vs 多選 ---
     function updateToolbar() {
         const tb = document.getElementById('toolbar');
-        const count = sel.size;
-        const hasClip = clip.ids.length > 0;
-        const isTrash = (tab === 'trash');
         tb.innerHTML = "";
+        const count = sel.size;
+        const isTrash = (tab === 'trash');
 
-        if (count > 0 && !hasClip && !isTrash) {
-            const moveBtn = createTBtn("移動", () => { clip={type:'move', ids:Array.from(sel)}; sel.clear(); render(); });
-            const copyBtn = createTBtn("複製", () => { clip={type:'copy', ids:Array.from(sel)}; sel.clear(); render(); });
-            const renBtn = (count===1) ? createTBtn("重命名", startRename) : null;
-            const delBtn = createTBtn("刪除", doSoftDelete);
-            tb.append(moveBtn, copyBtn);
-            if(renBtn) tb.append(renBtn);
-            tb.append(delBtn);
+        if(count === 0 && clip.ids.length > 0 && tab === 'drive') {
+            tb.append(createTBtn("貼上至此", doPaste, true), createTBtn("取消", () => { clip={type:null, ids:[]}; render(); }));
+            return;
         }
 
-        if (hasClip && tab === 'drive') {
-            const pasteBtn = createTBtn("貼上至此", doPaste, true);
-            const cancelBtn = createTBtn("取消", () => { clip={type:null, ids:[]}; render(); });
-            tb.append(pasteBtn, cancelBtn);
+        if(count === 1 && !isTrash) {
+            // 單選：重命名、移動、複製、刪除(紅)
+            tb.append(createTBtn("重命名", startRename), createTBtn("移動", doMove), createTBtn("複製", doCopy), createTBtn("刪除", doDel, false, true));
+        } else if(count > 1 && !isTrash) {
+            // 多選：批量移動、批量複製、批量刪除(紅)
+            tb.append(createTBtn("批量移動", doMove), createTBtn("批量複製", doCopy), createTBtn("批量刪除", doDel, false, true));
         }
 
-        if (isTrash && count > 0) {
-            const resBtn = createTBtn("還原", doRestore, true);
-            const hDelBtn = createTBtn("永久刪除", doHardDelete);
-            tb.append(resBtn, hDelBtn);
+        if(isTrash && count > 0) {
+            tb.append(createTBtn("還原項目", doRestore, true), createTBtn("永久刪除", doHardDelete, false, true));
         }
     }
 
-    function createTBtn(text, fn, primary=false) {
+    function createTBtn(txt, fn, pri=false, dan=false) {
         const b = document.createElement('button');
-        b.className = `t-btn ${primary?'primary':''}`;
-        b.innerText = text;
+        b.className = `t-btn ${pri?'primary':''} ${dan?'danger':''}`;
+        b.innerText = txt;
         b.onclick = fn;
         return b;
     }
 
-    function doPaste() {
-        const targetId = path[path.length - 1].id;
-        clip.ids.forEach(id => {
-            if (clip.type === 'move') {
-                const item = db.find(x => x.id === id);
-                // 防止移動到自身
-                if (item && item.id !== targetId) item.parentId = targetId;
-            } else {
-                copyRecursive(id, targetId, true);
-            }
-        });
-        clip = { type: null, ids: [] };
-        showMsg("操作完成");
+    // --- 4. 新建資料夾 (免 Prompt) ---
+    function makeFolder() {
+        if(tab !== 'drive') return;
+        const nid = "temp-" + Date.now();
+        db.push({id: nid, name: "新建資料夾", type: 'dir', parentId: path[path.length-1].id, del: false, time: Date.now()});
+        tempFolderId = nid;
+        render();
+    }
+
+    function finishNaming(val) {
+        const item = db.find(x => x.id === tempFolderId);
+        if(item) {
+            item.name = val.trim() || "未命名項目";
+            if(tempFolderId.toString().startsWith("temp-")) item.id = Date.now(); // 正式分配 ID
+        }
+        tempFolderId = null;
         render();
     }
 
     function startRename() {
-        const id = Array.from(sel)[0];
-        const item = db.find(x => x.id === id);
-        const el = document.getElementById(`t-${id}`);
-        if (!el) return;
-        const oldName = item.name;
-        el.innerHTML = `<input type="text" class="rename-input" id="rename-box" value="${oldName}">`;
-        const input = document.getElementById('rename-box');
-        input.focus(); input.select();
-        input.onblur = () => {
-            const newName = input.value.trim();
-            if (newName && newName !== oldName) {
-                item.name = newName;
-                showMsg("重命名成功");
-            }
-            render();
-        };
-        input.onkeydown = (e) => { if(e.key==='Enter') input.blur(); };
+        tempFolderId = Array.from(sel)[0];
+        render();
     }
 
-    function doSoftDelete() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); showMsg("已移至垃圾桶"); render(); }
-    function doRestore() { sel.forEach(id => db.find(x=>x.id===id).del = false); sel.clear(); showMsg("項目已還原"); render(); }
-    function doHardDelete() { db = db.filter(x => !sel.has(x.id)); sel.clear(); showMsg("永久刪除成功"); render(); }
-
+    // 基礎操作
+    function doMove() { clip = {type:'move', ids:Array.from(sel)}; sel.clear(); showMsg("請選擇目的地後貼上"); render(); }
+    function doCopy() { clip = {type:'copy', ids:Array.from(sel)}; sel.clear(); showMsg("已複製，請貼上"); render(); }
+    function doPaste() {
+        const pid = path[path.length-1].id;
+        clip.ids.forEach(id => {
+            if(clip.type==='move') { const item=db.find(x=>x.id===id); if(item) item.parentId=pid; }
+            else copyRecursive(id, pid, true);
+        });
+        clip={type:null, ids:[]}; showMsg("操作完成"); render();
+    }
+    function doDel() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); showMsg("已移至垃圾桶"); render(); }
+    function doRestore() { sel.forEach(id => db.find(x=>x.id===id).del = false); sel.clear(); render(); }
+    function doHardDelete() { db = db.filter(x => !sel.has(x.id)); sel.clear(); showMsg("項目已永久刪除"); render(); }
+    
     function upTrigger() { if(tab==='drive') document.getElementById('up-hidden').click(); }
     function onUp(inp) {
         if(inp.files[0]) {
-            const name = inp.files[0].name;
-            db.push({id: Date.now(), name, type: 'file', parentId: path[path.length-1].id, del: false, time: Date.now()});
-            showMsg("上傳成功"); render();
-        }
-    }
-
-    function makeFolder() {
-        const name = prompt("請輸入資料夾名稱:");
-        if (name) {
-            db.push({id: Date.now(), name, type: 'dir', parentId: path[path.length-1].id, del: false, time: Date.now()});
+            db.push({id:Date.now(), name:inp.files[0].name, type:'file', parentId:path[path.length-1].id, del:false, time:Date.now()});
             render();
         }
     }
