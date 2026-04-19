@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="utf-8">
-    <title>Aether 10D - Navigation Pro</title>
+    <title>Aether 10D - Selection Logic Pro</title>
     <style>
         :root { --accent: #1a73e8; --border: #dadce0; --text-sub: #5f6368; }
         * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -10,29 +10,22 @@
 
         /* Sidebar */
         #sidebar { width: 260px; background: #f8f9fa; border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-        .logo { padding: 24px; font-weight: 800; font-size: 22px; color: var(--accent); letter-spacing: -0.5px; }
+        .logo { padding: 24px; font-weight: 800; font-size: 22px; color: var(--accent); }
         .nav-link { padding: 12px 24px; cursor: pointer; color: var(--text-sub); transition: 0.2s; border-radius: 0 24px 24px 0; margin-right: 12px; }
         .nav-link.active { background: #e8f0fe; color: var(--accent); font-weight: 600; }
-        .nav-link:hover:not(.active) { background: #f1f3f4; }
 
         /* Main View */
         main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        header { 
-            height: 64px; border-bottom: 1px solid var(--border); 
-            display: flex; align-items: center; padding: 0 24px; gap: 16px;
-        }
+        header { height: 64px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 16px; }
         
-        /* 麵包屑：支持橫向滑動 */
+        /* 麵包屑：滑動容器 */
         .breadcrumbs-container { 
             flex: 1; display: flex; align-items: center; 
-            overflow-x: auto; white-space: nowrap; scrollbar-width: none; /* Firefox */
+            overflow-x: auto; white-space: nowrap; scrollbar-width: none; 
         }
-        .breadcrumbs-container::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+        .breadcrumbs-container::-webkit-scrollbar { display: none; }
         
-        .crumb { 
-            cursor: pointer; color: var(--text-sub); padding: 6px 10px; 
-            border-radius: 6px; transition: 0.2s; font-size: 15px;
-        }
+        .crumb { cursor: pointer; color: var(--text-sub); padding: 6px 10px; border-radius: 6px; }
         .crumb:hover { background: #e8f0fe; color: var(--accent); }
         .crumb.active { color: #202124; font-weight: 600; cursor: default; }
 
@@ -40,27 +33,25 @@
         .t-btn { 
             height: 36px; padding: 0 14px; border: 1px solid var(--border); 
             background: #fff; border-radius: 18px; cursor: pointer; 
-            font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 600; display: flex; align-items: center;
         }
         .t-btn:hover { background: #f8f9fa; border-color: var(--accent); }
         .t-btn.primary { background: var(--accent); color: #fff; border: none; }
+        .t-btn.danger { color: #d93025; }
 
         .viewport { flex: 1; overflow-y: auto; padding: 20px; }
         
-        /* 列表樣式 */
         .list-row { 
             display: grid; grid-template-columns: 2fr 1fr 120px; 
             align-items: center; padding: 0 16px; height: 52px; 
             border-bottom: 1px solid #f1f3f4; cursor: pointer; border-radius: 8px;
-            transition: 0.1s;
         }
-        .list-row.selected { background: #e8f0fe; border-bottom-color: transparent; }
-        .list-row:hover:not(.selected) { background: #f8f9fa; }
+        .list-row.selected { background: #e8f0fe; }
         .list-row svg { width: 24px; height: 24px; margin-right: 12px; flex-shrink: 0; }
-        .item-info { display: flex; align-items: center; overflow: hidden; text-overflow: ellipsis; }
+        .item-info { display: flex; align-items: center; overflow: hidden; }
 
         .edit-box { display: flex; gap: 8px; padding: 10px; border: 2px solid var(--accent); border-radius: 10px; background: #fff; margin-bottom: 12px; }
-        .edit-box input { flex: 1; border: none; outline: none; font-size: 15px; }
+        .edit-box input { flex: 1; border: none; outline: none; }
     </style>
 </head>
 <body>
@@ -87,11 +78,11 @@
 
 <script>
     let db = [
-        {id: 1, name: '核心算法_v1.bin', isDir: false, parent: '我的硬碟', del: false},
-        {id: 2, name: '研究資料', isDir: true, parent: '我的硬碟', del: false}
+        {id: 1, name: '10D_Logic_Core.bin', isDir: false, parent: '我的硬碟', del: false},
+        {id: 2, name: '系統備份', isDir: true, parent: '我的硬碟', del: false}
     ];
     let currentMode = 'drive', drivePath = ["我的硬碟"];
-    let sel = new Set(), creating = false, renamingId = null;
+    let sel = new Set(), creating = false, renamingId = null, clip = { type: null, ids: [] };
 
     const SVG_DIR = `<svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" fill="#FFC107"/></svg>`;
     const SVG_FILE = `<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6z" fill="#1A73E8"/></svg>`;
@@ -100,25 +91,24 @@
         const vp = document.getElementById('v-port'), tb = document.getElementById('toolbar'), bc = document.getElementById('bc-ui');
         vp.innerHTML = ""; tb.innerHTML = ""; bc.innerHTML = "";
 
-        // 1. 麵包屑傳送門：支持點擊傳送與橫向滑動
+        // 1. 麵包屑傳送門
         const curPath = (currentMode === 'drive') ? drivePath : [currentMode==='recent'?'最近項目':'垃圾桶'];
-        curPath.forEach((name, index) => {
+        curPath.forEach((name, idx) => {
             const btn = document.createElement('div');
-            btn.className = `crumb ${index === curPath.length - 1 ? 'active' : ''}`;
+            btn.className = `crumb ${idx === curPath.length - 1 ? 'active' : ''}`;
             btn.innerText = name;
             btn.onclick = () => {
-                if (currentMode === 'drive' && index < drivePath.length - 1) {
-                    drivePath = drivePath.slice(0, index + 1); // 核心：截斷路徑實現跳轉
+                if (currentMode === 'drive' && idx < drivePath.length - 1) {
+                    drivePath = drivePath.slice(0, idx + 1); // 傳送跳轉
                     sel.clear(); render();
                 }
             };
             bc.appendChild(btn);
-            if (index < curPath.length - 1) bc.innerHTML += `<span style="color:#ccc; padding:0 4px;">/</span>`;
+            if (idx < curPath.length - 1) bc.innerHTML += `<span style="color:#ccc; padding:0 4px;">/</span>`;
         });
-        // 自動滾動到麵包屑最右端
         setTimeout(() => bc.scrollLeft = bc.scrollWidth, 10);
 
-        // 2. 列表渲染
+        // 2. 數據過濾渲染
         const parentName = drivePath[drivePath.length-1];
         let items = (currentMode === 'drive') ? db.filter(x => x.parent === parentName && !x.del) 
                   : (currentMode === 'recent' ? db.filter(x => !x.del && !x.isDir) : db.filter(x => x.del));
@@ -138,49 +128,76 @@
             } else {
                 const r = document.createElement('div');
                 r.className = `list-row ${sel.has(i.id)?'selected':''}`;
-                // 改進：直接點擊即可切換多選
-                r.onclick = () => {
-                    sel.has(i.id) ? sel.delete(i.id) : sel.add(i.id);
-                    render();
-                };
-                r.ondblclick = () => { 
-                    if(i.isDir && currentMode==='drive') { drivePath.push(i.name); sel.clear(); render(); }
-                };
+                r.onclick = () => { sel.has(i.id) ? sel.delete(i.id) : sel.add(i.id); render(); };
+                r.ondblclick = () => { if(i.isDir && currentMode==='drive') { drivePath.push(i.name); sel.clear(); render(); } };
                 r.innerHTML = `<div class="item-info">${i.isDir?SVG_DIR:SVG_FILE} <span>${i.name}</span></div><div>剛剛</div><div>--</div>`;
                 vp.appendChild(r);
             }
         });
 
-        // 3. 工具欄
+        // 3. 工具欄：根據單選/多選切換功能 (核心邏輯)
         if (sel.size > 0) {
             const multi = sel.size > 1;
+            const ids = Array.from(sel);
+            
             if (currentMode === 'drive') {
-                if (!multi) tb.innerHTML += `<button class="t-btn" onclick="startRename()">重命名</button>`;
-                tb.innerHTML += `<button class="t-btn" onclick="batchDel()">${multi?'批量':''}刪除</button>`;
-                tb.innerHTML += `<button class="t-btn" onclick="sel.clear(); render()">取消選中</button>`;
+                if (!multi) {
+                    // 單選模式
+                    tb.innerHTML += `<button class="t-btn" onclick="startRename()">重命名</button>`;
+                    tb.innerHTML += `<button class="t-btn" onclick="setClip('move')">移動</button>`;
+                    tb.innerHTML += `<button class="t-btn" onclick="setClip('copy')">複製</button>`;
+                    tb.innerHTML += `<button class="t-btn danger" onclick="batchDel()">刪除</button>`;
+                } else {
+                    // 多選模式
+                    tb.innerHTML += `<button class="t-btn" onclick="setClip('move')">批量移動 (${sel.size})</button>`;
+                    tb.innerHTML += `<button class="t-btn" onclick="setClip('copy')">批量複製 (${sel.size})</button>`;
+                    tb.innerHTML += `<button class="t-btn danger" onclick="batchDel()">批量刪除</button>`;
+                }
+                tb.innerHTML += `<button class="t-btn" onclick="sel.clear(); render()">取消</button>`;
             } else if (currentMode === 'trash') {
-                tb.innerHTML += `<button class="t-btn" onclick="batchRestore()">復原項</button>`;
+                tb.innerHTML += `<button class="t-btn primary" onclick="batchRestore()">復原選中項</button>`;
             }
+        }
+
+        // 粘貼按鈕
+        if (clip.ids.length > 0 && currentMode === 'drive') {
+            tb.innerHTML += `<button class="t-btn primary" onclick="pasteItems()">貼上到這裡 (${clip.ids.length})</button>`;
+            tb.innerHTML += `<button class="t-btn" onclick="cancelClip()">取消操作</button>`;
         }
     }
 
-    function checkName(name) {
-        return !db.some(x => x.parent === drivePath[drivePath.length-1] && x.name === name && !x.del);
+    // 功能函數
+    function checkName(name) { return !db.some(x => x.parent === drivePath[drivePath.length-1] && x.name === name && !x.del); }
+    function startCreate() { creating = true; render(); }
+    function startRename() { renamingId = Array.from(sel)[0]; render(); }
+    function setClip(t) { clip = { type: t, ids: Array.from(sel) }; sel.clear(); render(); }
+    function cancelClip() { clip = { type: null, ids: [] }; render(); }
+    function batchDel() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); render(); }
+    function batchRestore() { sel.forEach(id => db.find(x=>x.id===id).del = false); sel.clear(); render(); }
+
+    function pasteItems() {
+        const cur = drivePath[drivePath.length-1];
+        clip.ids.forEach(id => {
+            let item = db.find(x => x.id === id);
+            if(clip.type === 'move') {
+                if(checkName(item.name)) item.parent = cur;
+                else alert(item.name + " 已存在，跳過移動");
+            } else {
+                let newName = item.name + "_副本";
+                db.unshift({...item, id: Date.now()+Math.random(), name: newName, parent: cur});
+            }
+        });
+        cancelClip();
     }
 
     function handleUpload(el) {
         if (!el.files[0]) return;
         let name = el.files[0].name;
-        let finalName = name;
-        let count = 1;
+        let finalName = name, count = 1;
         while (!checkName(finalName)) {
             let pts = name.split('.');
-            if (pts.length > 1) {
-                let ext = pts.pop();
-                finalName = `${pts.join('.')}(${count++}).${ext}`;
-            } else {
-                finalName = `${name}(${count++})`;
-            }
+            if (pts.length > 1) { let ext = pts.pop(); finalName = `${pts.join('.')}(${count++}).${ext}`; }
+            else { finalName = `${name}(${count++})`; }
         }
         db.unshift({id: Date.now(), name: finalName, isDir: false, parent: drivePath[drivePath.length-1], del: false});
         render();
@@ -198,11 +215,6 @@
     }
 
     function switchTab(m) { currentMode = m; if(m==='drive') drivePath=["我的硬碟"]; sel.clear(); render(); document.querySelectorAll('.nav-link').forEach(l=>l.classList.toggle('active', l.id==='n-'+m)); }
-    function startCreate() { creating = true; render(); }
-    function startRename() { renamingId = Array.from(sel)[0]; render(); }
-    function batchDel() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); render(); }
-    function batchRestore() { sel.forEach(id => db.find(x=>x.id===id).del = false); sel.clear(); render(); }
-
     window.onload = render;
 </script>
 </body>
