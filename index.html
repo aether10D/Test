@@ -12,82 +12,72 @@
             --bg-side: #f8f9fa;
             --border: #e8eaed;
             --danger: #d93025;
-            --side-w: 72px;
-            --side-w-exp: 260px;
+            --side-w: 260px;
+            --side-w-min: 72px;
         }
 
         * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; height: 100vh; background: #fff; overflow: hidden; }
+        body { margin: 0; font-family: "Segoe UI", "PingFang TC", sans-serif; display: flex; height: 100vh; background: #fff; overflow: hidden; color: var(--text-main); }
 
-        /* --- 側邊欄：支援鎖定與收合 --- */
+        /* --- 側邊欄 --- */
         #sidebar { 
             width: var(--side-w); background: var(--bg-side); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex; flex-direction: column; transition: width 0.2s ease-in-out; 
             flex-shrink: 0; z-index: 100;
         }
-        /* 懸停或鎖定時展開 */
-        #sidebar:hover, #sidebar.locked { width: var(--side-w-exp); box-shadow: 4px 0 12px rgba(0,0,0,0.05); }
+        #sidebar.collapsed { width: var(--side-w-min); }
 
-        .brand { height: 72px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .avatar { width: 40px; height: 40px; border-radius: 10px; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .brand { height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .avatar { width: 44px; height: 44px; border-radius: 12px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         
-        .side-ops { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+        .side-ops { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
         .btn-action { 
             height: 48px; border: none; background: #fff; border-radius: 24px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: pointer; 
-            display: flex; align-items: center; padding: 0 12px; width: 48px; margin: 0 auto; overflow: hidden; transition: 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); cursor: pointer; 
+            display: flex; align-items: center; padding: 0 16px; width: 100%; overflow: hidden;
         }
-        #sidebar:hover .btn-action, #sidebar.locked .btn-action { width: 100%; margin: 0; padding: 0 16px; }
-        .btn-action span { margin-left: 12px; font-weight: 600; font-size: 14px; white-space: nowrap; opacity: 0; color: var(--accent); }
-        #sidebar:hover .btn-action span, #sidebar.locked .btn-action span { opacity: 1; }
+        #sidebar.collapsed .btn-action { width: 48px; padding: 0 12px; margin: 0 auto; }
+        .btn-action span { margin-left: 12px; font-weight: 600; font-size: 14px; white-space: nowrap; color: var(--accent); }
+        #sidebar.collapsed .btn-action span { display: none; }
+        
         .btn-action.disabled { opacity: 0.3 !important; pointer-events: none; filter: grayscale(1); }
 
-        .nav-link { height: 48px; display: flex; align-items: center; border-radius: 0 24px 24px 0; margin-right: 8px; cursor: pointer; color: var(--text-sub); }
+        .nav-link { height: 50px; display: flex; align-items: center; border-radius: 0 25px 25px 0; margin-right: 8px; cursor: pointer; color: var(--text-sub); transition: 0.2s; }
         .nav-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-        .nav-icon { width: 72px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .nav-txt { font-size: 14px; opacity: 0; transition: 0.2s; white-space: nowrap; }
-        #sidebar:hover .nav-txt, #sidebar.locked .nav-txt { opacity: 1; }
+        .nav-icon { width: 72px; height: 50px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .nav-txt { font-size: 14px; white-space: nowrap; }
+        #sidebar.collapsed .nav-txt { display: none; }
 
         /* --- 主畫面 --- */
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #fff; }
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         header { height: 72px; padding: 0 32px; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
-        .breadcrumb { display: flex; align-items: center; font-size: 16px; color: var(--text-sub); gap: 4px; }
+        .breadcrumb { display: flex; align-items: center; font-size: 18px; color: var(--text-sub); gap: 4px; }
         .crumb { cursor: pointer; padding: 4px 8px; border-radius: 4px; }
-        .crumb:hover { background: #f1f3f4; }
-        .crumb.active { color: var(--text-main); font-weight: 600; cursor: default; }
+        .crumb.active { color: var(--text-main); font-weight: 700; cursor: default; }
 
-        .toolbar { height: 56px; padding: 0 32px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; border-bottom: 1px solid var(--border); background: #fafafa; }
-        .t-btn { background: #fff; border: 1px solid var(--border); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .toolbar { height: 56px; padding: 0 32px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; border-bottom: 1px solid var(--border); background: #fafafa; }
+        .t-btn { background: #fff; border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; display: flex; align-items: center; transition: 0.2s; }
         .t-btn:hover { border-color: var(--accent); color: var(--accent); }
         .t-btn.primary { background: var(--accent); color: #fff; border: none; }
         .t-btn.danger { color: var(--danger); border-color: #fad2cf; }
         .t-btn.danger:hover { background: #fef1f0; border-color: var(--danger); }
 
-        .viewport { flex: 1; overflow-y: auto; padding: 16px 32px; }
+        .viewport { flex: 1; overflow-y: auto; padding: 20px 32px; }
 
-        /* 列表 */
-        .list-h { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 12px 20px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); }
-        .row { display: grid; grid-template-columns: 3fr 1fr 1fr; padding: 0 20px; height: 52px; align-items: center; border-radius: 8px; cursor: pointer; margin-bottom: 2px; }
+        /* 列表表格 */
+        .list-h { display: grid; grid-template-columns: 4fr 1.5fr 1fr; padding: 12px 20px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); font-weight: 600; }
+        .row { display: grid; grid-template-columns: 4fr 1.5fr 1fr; padding: 0 20px; height: 56px; align-items: center; border-radius: 10px; cursor: pointer; margin-bottom: 2px; }
         .row:hover { background: #f8f9fa; }
         .row.sel { background: var(--accent-soft); }
-        .row.moving { opacity: 0.4; pointer-events: none; }
 
-        /* 最近項目：卡片佈局 */
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
-        .card { border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .card:hover { border-color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .card.sel { background: var(--accent-soft); border-color: var(--accent); }
-        .card-icon { margin-bottom: 12px; display: flex; justify-content: center; }
-
-        /* SVG 圖標 */
-        .svg-icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .svg-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .svg-folder { stroke: #fbbc04; fill: rgba(251, 188, 4, 0.1); }
         .svg-file { stroke: #5f6368; }
 
-        #msg-box { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; }
-        .toast { background: #323232; color: #fff; padding: 10px 20px; border-radius: 6px; font-size: 13px; }
+        #msg-box { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        .toast { background: #323232; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
-        .rename-box { border: 2px solid var(--accent); outline: none; padding: 4px 8px; border-radius: 4px; width: 80%; font-size: 14px; }
+        .inline-editor { border: 2px solid var(--accent); outline: none; padding: 6px 10px; border-radius: 6px; width: 90%; font-size: 14px; background: #fff; }
     </style>
 </head>
 <body>
@@ -95,7 +85,7 @@
 <div id="msg-box"></div>
 
 <aside id="sidebar">
-    <div class="brand" onclick="toggleSidebarLock()"><img src="IMG_1978.jpeg" class="avatar"></div>
+    <div class="brand" onclick="toggleSidebar()"><img src="IMG_1978.jpeg" class="avatar"></div>
     <div class="side-ops">
         <button class="btn-action" id="btn-up" onclick="upTrigger()">
             <svg class="svg-icon" style="stroke:var(--accent)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
@@ -112,10 +102,6 @@
             <div class="nav-icon"><svg class="svg-icon"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
             <span class="nav-txt">我的硬碟</span>
         </div>
-        <div class="nav-link" id="nav-recent" onclick="setTab('recent')">
-            <div class="nav-icon"><svg class="svg-icon"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-            <span class="nav-txt">最近項目</span>
-        </div>
         <div class="nav-link" id="nav-trash" onclick="setTab('trash')">
             <div class="nav-icon"><svg class="svg-icon"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
             <span class="nav-txt">垃圾桶</span>
@@ -130,13 +116,14 @@
 </main>
 
 <script>
+    // --- 數據狀態 ---
     let db = [
-        {id: 1, name: "測試文檔.txt", type: 'file', parentId: 0, del: false, time: Date.now()},
-        {id: 2, name: "核心工程", type: 'dir', parentId: 0, del: false, time: Date.now()}
+        {id: 1, name: "系統核心架構.config", type: 'file', parentId: 0, del: false, time: Date.now()},
+        {id: 2, name: "UI 設計稿", type: 'dir', parentId: 0, del: false, time: Date.now()}
     ];
     
-    let tab = 'drive', path = [{id: 0, name: "我的硬碟"}], sel = new Set(), clip = { type: null, ids: [] };
-    let editingId = null; // 正在編輯名稱的 ID
+    let tab = 'drive', path = [{id: 0, name: "我的硬碟"}], sel = new Set();
+    let editingId = null; 
 
     const SVG_FOLDER = `<svg class="svg-icon svg-folder"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
     const SVG_FILE = `<svg class="svg-icon svg-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M13 2v7h7"/></svg>`;
@@ -147,41 +134,24 @@
         setTimeout(() => b.innerHTML="", 2000);
     }
 
-    // --- 選單收合鎖定修復 ---
-    function toggleSidebarLock() {
-        document.getElementById('sidebar').classList.toggle('locked');
-    }
+    // --- 側邊欄控制 ---
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
 
     function setTab(t) {
         tab = t;
-        const names = { drive: "我的硬碟", recent: "最近項目", trash: "垃圾桶" };
-        path = [{id: 0, name: names[t]}];
+        path = [{id: 0, name: t==='drive'?'我的硬碟':'垃圾桶'}];
         sel.clear(); editingId = null;
         document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.id === `nav-${t}`));
         render();
     }
 
     function goPath(i) {
-        if(i === path.length - 1 && tab === 'drive') return;
+        if(tab === 'trash') return; 
         path = path.slice(0, i + 1);
-        tab = 'drive'; sel.clear(); editingId = null;
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.id === 'nav-drive'));
-        render();
-    }
-
-    // --- 遞歸複製 ---
-    function copyRecursive(oldId, newParentId, isRoot = false) {
-        const ori = db.find(x => x.id === oldId);
-        if(!ori) return;
-        const newId = Date.now() + Math.random();
-        db.push({...ori, id: newId, parentId: newParentId, name: isRoot ? ori.name + "_副本" : ori.name, time: Date.now()});
-        if(ori.type === 'dir') {
-            db.filter(x => x.parentId === oldId && !x.del).forEach(c => copyRecursive(c.id, newId, false));
-        }
+        sel.clear(); render();
     }
 
     function render() {
-        // 麵包屑修復
         const h = document.getElementById('path-header');
         h.innerHTML = `<div class="breadcrumb">${path.map((p, i) => 
             `<span class="crumb ${i===path.length-1?'active':''}" onclick="goPath(${i})">${p.name}</span>`
@@ -190,129 +160,110 @@
         const vp = document.getElementById('v-port');
         vp.innerHTML = "";
 
-        // 按鈕狀態
-        document.getElementById('btn-up').classList.toggle('disabled', tab !== 'drive');
-        document.getElementById('btn-new').classList.toggle('disabled', tab !== 'drive');
+        const isDrive = (tab === 'drive');
+        document.getElementById('btn-up').classList.toggle('disabled', !isDrive);
+        document.getElementById('btn-new').classList.toggle('disabled', !isDrive);
 
-        let items = [];
         const pid = path[path.length - 1].id;
-        if(tab === 'drive') items = db.filter(x => x.parentId === pid && !x.del);
-        else if(tab === 'recent') items = db.filter(x => !x.del && x.type === 'file').sort((a,b)=>b.time-a.time).slice(0, 15);
-        else items = db.filter(x => x.del);
+        const items = tab === 'drive' ? db.filter(x => x.parentId === pid && !x.del) : db.filter(x => x.del);
 
-        if(tab === 'recent') {
-            const grid = document.createElement('div');
-            grid.className = 'card-grid';
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = `card ${sel.has(item.id)?'sel':''}`;
-                card.onclick = () => toggleSel(item.id);
-                card.innerHTML = `<div class="card-icon">${SVG_FILE}</div><div class="card-name">${item.name}</div>`;
-                grid.appendChild(card);
-            });
-            vp.appendChild(grid);
-        } else {
-            const list = document.createElement('div');
-            list.innerHTML = `<div class="list-h"><span>名稱</span><span>修改日期</span><span>大小</span></div>`;
-            items.forEach(item => {
-                const isMoving = clip.type === 'move' && clip.ids.includes(item.id);
-                const row = document.createElement('div');
-                row.className = `row ${sel.has(item.id)?'sel':''} ${isMoving?'moving':''}`;
-                row.onclick = () => { if(!isMoving) toggleSel(item.id); };
-                row.ondblclick = () => { if(item.type==='dir' && !isMoving && !item.del) { path.push({id:item.id, name:item.name}); sel.clear(); render(); } };
-                
-                let nameContent = `<span>${item.name}</span>`;
-                if(item.id === editingId) {
-                    nameContent = `<input type="text" class="rename-box" id="editor-in" value="${item.name}">`;
+        const list = document.createElement('div');
+        list.innerHTML = `<div class="list-h"><span>名稱</span><span>修改日期</span><span>大小</span></div>`;
+        
+        items.forEach(item => {
+            const row = document.createElement('div');
+            row.className = `row ${sel.has(item.id)?'sel':''}`;
+            row.onclick = () => { if(sel.has(item.id)) sel.delete(item.id); else sel.add(item.id); render(); };
+            
+            // --- 垃圾桶「禁止進入」邏輯 ---
+            row.ondblclick = (e) => {
+                e.stopPropagation();
+                if(tab === 'trash') {
+                    showMsg("⚠️ 垃圾桶內的項目不可開啟，請先還原");
+                    return;
                 }
-
-                row.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?SVG_FOLDER:SVG_FILE} ${nameContent}</div>
-                    <div style="font-size:12px;color:#999">${new Date(item.time).toLocaleDateString()}</div>
-                    <div style="font-size:12px;color:#999">${item.type==='dir'?'-':'2 KB'}</div>`;
-                list.appendChild(row);
-            });
-            vp.appendChild(list);
-
-            if(editingId) {
-                const input = document.getElementById('editor-in');
-                input.focus(); input.select();
-                input.onblur = () => { 
-                    const target = db.find(x=>x.id===editingId);
-                    if(target) target.name = input.value.trim() || target.name;
-                    editingId = null; render();
-                };
-                input.onkeydown = (e) => { if(e.key==='Enter') input.blur(); };
+                if(item.type === 'dir') {
+                    path.push({id: item.id, name: item.name});
+                    sel.clear(); render();
+                }
+            };
+            
+            let nameDisplay = `<span>${item.name}</span>`;
+            if(item.id === editingId) {
+                nameDisplay = `<input type="text" class="inline-editor" id="editor-in" value="${item.name}">`;
             }
+
+            row.innerHTML = `
+                <div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?SVG_FOLDER:SVG_FILE} ${nameDisplay}</div>
+                <div style="font-size:12px;color:#999">${new Date(item.time).toLocaleDateString()}</div>
+                <div style="font-size:12px;color:#999">${item.type==='dir'?'-':'2 KB'}</div>`;
+            list.appendChild(row);
+        });
+        vp.appendChild(list);
+
+        // 處理內聯編輯器對焦
+        if(editingId) {
+            const input = document.getElementById('editor-in');
+            input.focus(); input.select();
+            input.onblur = () => {
+                const target = db.find(x => x.id === editingId);
+                if(target) target.name = input.value.trim() || target.name;
+                editingId = null; render();
+            };
+            input.onkeydown = (e) => { if(e.key==='Enter') input.blur(); };
         }
         updateToolbar();
     }
 
-    function toggleSel(id) { if(sel.has(id)) sel.delete(id); else sel.add(id); render(); }
-
+    // --- 工具列：單選/批量/紅標 ---
     function updateToolbar() {
         const tb = document.getElementById('toolbar');
         tb.innerHTML = "";
         const count = sel.size;
-        const isTrash = (tab === 'trash');
 
-        // 剪貼簿模式
-        if(count === 0 && clip.ids.length > 0 && tab === 'drive') {
-            tb.append(createTBtn("貼上至此", doPaste, true), createTBtn("取消", () => { clip={type:null, ids:[]}; render(); }));
-            return;
-        }
-
-        if(count === 1 && !isTrash) {
-            tb.append(createTBtn("重命名", () => { editingId = Array.from(sel)[0]; render(); }));
-            tb.append(createTBtn("移動", doMove), createTBtn("複製", doCopy));
-            tb.append(createTBtn("刪除", doDel, false, true));
-        } else if(count > 1 && !isTrash) {
-            tb.append(createTBtn("批量移動", doMove), createTBtn("批量複製", doCopy));
-            tb.append(createTBtn("批量刪除", doDel, false, true));
-        }
-
-        if(isTrash && count > 0) {
-            tb.append(createTBtn("還原項目", doRestore, true), createTBtn("永久刪除", doHardDelete, false, true));
+        if(tab === 'trash') {
+            if(count > 0) {
+                tb.append(createTBtn(count > 1 ? "批量還原" : "還原項目", doRestore, true));
+                tb.append(createTBtn(count > 1 ? "批量永久刪除" : "永久刪除", doHardDelete, false, true)); // 紅標
+            }
+        } else {
+            if(count === 1) {
+                tb.append(createTBtn("重命名", () => { editingId = Array.from(sel)[0]; render(); }));
+                tb.append(createTBtn("刪除", doDel, false, true)); // 紅標
+            } else if(count > 1) {
+                tb.append(createTBtn("批量刪除", doDel, false, true)); // 紅標
+            }
         }
     }
 
     function createTBtn(txt, fn, pri=false, dan=false) {
         const b = document.createElement('button');
         b.className = `t-btn ${pri?'primary':''} ${dan?'danger':''}`;
-        b.innerText = txt; b.onclick = fn; return b;
+        b.innerText = txt; b.onclick = (e) => { e.stopPropagation(); fn(); }; 
+        return b;
     }
 
-    // --- 動作處理 ---
+    // --- 功能動作 ---
     function makeFolder() {
-        const nid = "new-" + Date.now();
-        db.push({id: nid, name: "新建資料夾", type: 'dir', parentId: path[path.length-1].id, del: false, time: Date.now()});
+        const nid = Date.now();
+        db.push({id: nid, name: "新資料夾", type: 'dir', parentId: path[path.length-1].id, del: false, time: Date.now()});
         editingId = nid; render();
     }
 
-    function doMove() { clip = {type:'move', ids:Array.from(sel)}; sel.clear(); showMsg("已選中項目，請進入目標資料夾貼上"); render(); }
-    function doCopy() { clip = {type:'copy', ids:Array.from(sel)}; sel.clear(); showMsg("已複製，請進入目標資料夾貼上"); render(); }
-    function doPaste() {
-        const pid = path[path.length-1].id;
-        clip.ids.forEach(id => {
-            if(clip.type==='move') { const item=db.find(x=>x.id===id); if(item) item.parentId=pid; }
-            else copyRecursive(id, pid, true);
-        });
-        clip={type:null, ids:[]}; showMsg("操作完成"); render();
+    function doDel() { 
+        sel.forEach(id => { const item = db.find(x => x.id === id); if(item) item.del = true; });
+        sel.clear(); showMsg("已移至垃圾桶"); render(); 
     }
-    function doDel() { sel.forEach(id => db.find(x=>x.id===id).del = true); sel.clear(); showMsg("已移至垃圾桶"); render(); }
     
-    // --- 垃圾桶 Bug 修復核心 ---
     function doRestore() { 
-        sel.forEach(id => {
-            const item = db.find(x => x.id === id);
-            if(item) item.del = false; 
-        });
-        sel.clear();
-        showMsg("項目已還原至硬碟"); 
-        render(); // 重新渲染會自動根據 del 狀態過濾掉垃圾桶清單中的項目
+        sel.forEach(id => { const item = db.find(x => x.id === id); if(item) item.del = false; });
+        sel.clear(); showMsg("項目已還原至原位置"); render(); 
     }
 
-    function doHardDelete() { db = db.filter(x => !sel.has(x.id)); sel.clear(); showMsg("已永久刪除"); render(); }
+    function doHardDelete() { 
+        db = db.filter(x => !sel.has(x.id)); 
+        sel.clear(); showMsg("項目已永久刪除"); render(); 
+    }
 
     function upTrigger() { if(tab==='drive') document.getElementById('up-hidden').click(); }
     function onUp(inp) {
