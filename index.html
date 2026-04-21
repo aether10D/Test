@@ -76,8 +76,9 @@
         .card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .card-info { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .list-header { display: grid; grid-template-columns: 1fr 80px; padding: 12px 16px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border-light); font-weight: 500; letter-spacing: 0.3px; }
-        .row { display: grid; grid-template-columns: 1fr 80px; padding: 0 16px; height: 48px; align-items: center; border-radius: 12px; cursor: pointer; margin-bottom: 2px; transition: background 0.1s; }
+        /* 三列布局：名稱 建立時間 大小 */
+        .list-header { display: grid; grid-template-columns: 1fr 200px 100px; padding: 12px 16px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border-light); font-weight: 500; letter-spacing: 0.3px; }
+        .row { display: grid; grid-template-columns: 1fr 200px 100px; padding: 0 16px; height: 48px; align-items: center; border-radius: 12px; cursor: pointer; margin-bottom: 2px; transition: background 0.1s; }
         .row:hover:not(.locked) { background: #f1f3f4; }
         .row.selected { background: #c2dbff; }
         .row.locked { opacity: 0.5; pointer-events: none; }
@@ -140,11 +141,21 @@
         const ICON_FOLDER = `<svg class="svg-icon folder-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
         const ICON_FILE = `<svg class="svg-icon file-icon" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
 
+        // 辅助函数：格式化文件大小
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 初始化数据库，加入 size 字段
         let db = [
-            {id: '1', name: "座標算法核心", type: 'dir', pid: '0', del: false, time: Date.now() - 1000000},
-            {id: '2', name: "10D_Storage_v1.bin", type: 'file', pid: '1', del: false, time: Date.now() - 800000},
-            {id: '3', name: "開發筆記", type: 'dir', pid: '0', del: false, time: Date.now() - 500000},
-            {id: '4', name: "License.txt", type: 'file', pid: '0', del: false, time: Date.now()}
+            {id: '1', name: "座標算法核心", type: 'dir', pid: '0', del: false, time: Date.now() - 1000000, size: 0},
+            {id: '2', name: "10D_Storage_v1.bin", type: 'file', pid: '1', del: false, time: Date.now() - 800000, size: 2048000},
+            {id: '3', name: "開發筆記", type: 'dir', pid: '0', del: false, time: Date.now() - 500000, size: 0},
+            {id: '4', name: "License.txt", type: 'file', pid: '0', del: false, time: Date.now(), size: 4096}
         ];
 
         let currentTab = 'drive';
@@ -291,7 +302,7 @@
                 items.sort((a, b) => a.name.localeCompare(b.name));
 
                 const list = document.createElement('div');
-                list.innerHTML = `<div class="list-header"><span>名稱</span><span>大小</span></div>`;
+                list.innerHTML = `<div class="list-header"><span>名稱</span><span>建立時間</span><span>大小</span></div>`;
 
                 items.forEach(item => {
                     const isLocked = clip.ids.includes(item.id);
@@ -318,9 +329,13 @@
                         ? `<input type="text" class="inline-input" id="inp-edit" value="${item.name.replace(/"/g, '&quot;')}">`
                         : `<span>${item.name}</span>`;
 
+                    const timeStr = new Date(item.time).toLocaleString('zh-TW', {hour12: false});
+                    const sizeStr = item.type === 'dir' ? '-' : formatSize(item.size || 0);
+
                     row.innerHTML = `
                         <div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?ICON_FOLDER:ICON_FILE}${nameBlock}</div>
-                        <div style="font-size:13px;color:var(--text-sub)">-</div>
+                        <div style="font-size:13px;color:var(--text-sub)">${timeStr}</div>
+                        <div style="font-size:13px;color:var(--text-sub)">${sizeStr}</div>
                     `;
                     list.appendChild(row);
                 });
@@ -361,7 +376,6 @@
                 right.innerHTML = `<div class="search-box"><input type="text" placeholder="搜尋..." value="${searchQuery}" id="search-inp"></div>`;
             }
 
-            // 无选中且无剪贴板内容时显示搜索框即可
             if (currentTab === 'drive' && selection.size === 0 && clip.ids.length === 0) {
                 tb.append(left, right);
                 const sinp = document.getElementById('search-inp');
@@ -369,7 +383,6 @@
                 return;
             }
 
-            // 有选中项目时
             if (selection.size > 0) {
                 if (currentTab === 'trash') {
                     left.append(btn("還原", () => {
@@ -390,7 +403,6 @@
                         selection.clear(); render();
                     }, false, true));
                 } else {
-                    // 单个选中：显示重命名、移动、复制、删除
                     if (selection.size === 1) {
                         left.append(btn("重新命名", () => { editId = Array.from(selection)[0]; render(); }, true));
                         left.append(btn("移動", () => { clip = { mode: 'move', ids: Array.from(selection) }; selection.clear(); render(); }, true));
@@ -400,7 +412,6 @@
                             selection.clear(); render();
                         }, false, true));
                     } else {
-                        // 多个选中：显示批量移动、批量复制、批量删除
                         left.append(btn("批量移動", () => { clip = { mode: 'move', ids: Array.from(selection) }; selection.clear(); render(); }, true));
                         left.append(btn("批量複製", () => { clip = { mode: 'copy', ids: Array.from(selection) }; selection.clear(); render(); }, true));
                         left.append(btn("批量刪除", () => {
@@ -413,7 +424,6 @@
                 return;
             }
 
-            // 剪贴板模式
             if (clip.ids.length > 0 && currentTab === 'drive') {
                 left.append(btn(`貼上 (${clip.ids.length})`, handlePaste, true));
                 left.append(btn("取消", () => { clip = { mode: null, ids: [] }; render(); }));
@@ -469,7 +479,7 @@
             const newId = generateId();
             const targetPid = pathStack[pathStack.length - 1].id;
             const safeName = getUniqueName("未命名資料夾", targetPid, 'dir');
-            db.push({ id: newId, name: safeName, type: 'dir', pid: targetPid, del: false, time: Date.now() });
+            db.push({ id: newId, name: safeName, type: 'dir', pid: targetPid, del: false, time: Date.now(), size: 0 });
             editId = newId;
             render();
         }
@@ -484,7 +494,15 @@
             if (file) {
                 const targetPid = pathStack[pathStack.length - 1].id;
                 const safeName = getUniqueName(file.name, targetPid, 'file');
-                db.push({ id: generateId(), name: safeName, type: 'file', pid: targetPid, del: false, time: Date.now() });
+                db.push({
+                    id: generateId(),
+                    name: safeName,
+                    type: 'file',
+                    pid: targetPid,
+                    del: false,
+                    time: Date.now(),
+                    size: file.size
+                });
                 render();
             }
             input.value = '';
