@@ -7,75 +7,79 @@
     <style>
         :root {
             --bg: #ffffff;
+            --surface: #ffffff;
             --accent: #1a73e8;
-            --accent-soft: #f1f3f4;
+            --accent-bg: #f1f3f4;
             --border: #f1f3f4;
             --text-main: #202124;
             --text-sub: #5f6368;
             --danger: #d93025;
-            --shadow: 0 1px 3px rgba(60,64,67,0.1);
+            --shadow-sm: 0 1px 2px rgba(60,64,67,0.1);
+            --shadow-md: 0 4px 6px rgba(60,64,67,0.1);
         }
 
         * { box-sizing: border-box; outline: none; }
-        body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; display: flex; height: 100vh; background: var(--bg); color: var(--text-main); overflow: hidden; }
+        body { margin: 0; font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; height: 100vh; background: var(--bg); color: var(--text-main); }
 
-        /* Sidebar Navigation */
-        #sidebar { width: 260px; background: var(--bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px; flex-shrink: 0; }
+        /* Sidebar Hierarchy */
+        #sidebar { width: 260px; background: var(--bg); display: flex; flex-direction: column; padding: 16px; flex-shrink: 0; border-right: 1px solid var(--border); }
         .brand { padding: 8px 12px 32px; display: flex; align-items: center; gap: 12px; }
         .logo-img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
-        .brand-name { font-size: 18px; font-weight: 500; color: var(--text-sub); }
+        .brand-name { font-size: 18px; font-weight: 500; letter-spacing: 0.5px; }
 
-        .action-area { padding-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
-        .btn-main-capsule { height: 48px; border-radius: 24px; border: 1px solid var(--border); background: #fff; box-shadow: var(--shadow); display: flex; align-items: center; padding: 0 24px; cursor: pointer; transition: 0.2s; font-size: 14px; font-weight: 500; gap: 12px; justify-content: center; }
-        .btn-main-capsule:hover { background: #fafafa; }
+        .action-area { padding-bottom: 24px; }
+        .btn-capsule-main { height: 48px; border-radius: 24px; border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-sm); display: flex; align-items: center; padding: 0 24px; cursor: pointer; transition: 0.2s; font-size: 14px; font-weight: 500; gap: 12px; }
+        .btn-capsule-main:hover { box-shadow: var(--shadow-md); background: #fafafa; }
 
         .nav-group { display: flex; flex-direction: column; gap: 4px; }
-        .nav-item { height: 40px; display: flex; align-items: center; padding: 0 20px; cursor: pointer; border-radius: 20px; font-size: 14px; transition: 0.2s; }
+        .nav-item { height: 40px; display: flex; align-items: center; padding: 0 20px; cursor: pointer; border-radius: 20px; font-size: 14px; color: var(--text-main); transition: 0.2s; }
         .nav-sub-item { height: 36px; display: flex; align-items: center; padding: 0 20px 0 48px; cursor: pointer; border-radius: 18px; font-size: 13px; color: var(--text-sub); transition: 0.2s; }
-        .nav-item:hover, .nav-sub-item:hover { background: var(--accent-soft); }
-        .active { background: var(--accent-soft) !important; color: var(--accent) !important; font-weight: 600; }
+        .nav-item:hover, .nav-sub-item:hover { background: #f8f9fa; }
+        .active { background: var(--accent-bg) !important; color: var(--accent) !important; font-weight: 600; }
 
-        /* Main Workspace */
-        main { flex: 1; display: flex; flex-direction: column; }
+        /* Main Layout */
+        main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         header { height: 64px; display: flex; align-items: center; padding: 0 24px; }
-        .search-capsule { background: #f1f3f4; border-radius: 22px; height: 44px; width: 100%; max-width: 600px; display: flex; align-items: center; padding: 0 16px; transition: 0.2s; border: 1px solid transparent; }
-        .search-capsule:focus-within { background: #fff; border-color: var(--accent); box-shadow: var(--shadow); }
-        .search-capsule input { background: transparent; border: none; flex: 1; font-size: 15px; margin-left: 12px; }
+        .search-wrap { background: #f1f3f4; border-radius: 24px; height: 44px; width: 100%; max-width: 600px; display: flex; align-items: center; padding: 0 16px; transition: 0.2s; }
+        .search-wrap:focus-within { background: #fff; box-shadow: 0 1px 1px rgba(65,69,73,0.3), 0 1px 3px rgba(65,69,73,0.15); }
+        .search-wrap input { background: transparent; border: none; flex: 1; font-size: 15px; margin-left: 12px; }
 
         .toolbar { height: 56px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
-        .path-text { font-size: 16px; color: var(--text-sub); }
+        .title-text { font-size: 18px; font-weight: 400; color: var(--text-sub); }
         .tool-group { display: flex; gap: 8px; }
 
-        /* Tool Buttons */
-        .btn-capsule { height: 32px; padding: 0 16px; border-radius: 16px; border: 1px solid var(--border); background: #fff; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-sub); transition: 0.2s; }
-        .btn-capsule:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-capsule.danger { color: var(--danger); }
-        .btn-capsule.danger:hover { border-color: var(--danger); background: #fff5f5; }
+        /* Capsule Buttons for Tools */
+        .btn-capsule-tool { height: 32px; padding: 0 16px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-sub); transition: 0.2s; }
+        .btn-capsule-tool:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-capsule-tool.danger { color: var(--danger); }
+        .btn-capsule-tool.danger:hover { border-color: var(--danger); background: #fff5f5; }
 
         .viewport { flex: 1; overflow-y: auto; padding: 0 24px 24px; }
 
-        /* Card/List UI */
+        /* Card Style (Recent) */
         .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
         .card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: 0.2s; background: #fff; }
-        .card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
-        .card.selected { background: var(--accent-soft); border-color: var(--accent); }
-        .card-thumb { height: 80px; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
+        .card:hover { box-shadow: var(--shadow-md); border-color: transparent; }
+        .card.selected { background: var(--accent-bg); border-color: var(--accent); }
+        .card-preview { height: 100px; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
         .card-name { font-size: 13px; font-weight: 500; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+        /* List Style (Drive) */
         .list-table { width: 100%; border-collapse: collapse; }
         .list-table th { text-align: left; padding: 12px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border); font-weight: 500; }
-        .list-row { border-bottom: 1px solid #fafafa; cursor: pointer; }
+        .list-row { border-bottom: 1px solid #fafafa; cursor: pointer; transition: 0.1s; }
         .list-row:hover { background: #f8f9fa; }
-        .list-row.selected { background: var(--accent-soft); }
+        .list-row.selected { background: var(--accent-bg); }
         .list-row td { padding: 12px; font-size: 14px; }
-        .item-box { display: flex; align-items: center; gap: 12px; }
+        .item-cell { display: flex; align-items: center; gap: 12px; }
 
-        /* Icons */
-        .svg-icon { width: 20px; height: 20px; flex-shrink: 0; }
-        .folder-color { fill: #fbbc04; }
-        .file-color { fill: var(--text-sub); }
+        /* Icons SVG */
+        .icon-box { width: 20px; height: 20px; flex-shrink: 0; }
+        .icon-folder { fill: #fbbc04; }
+        .icon-file { fill: var(--text-sub); }
 
-        #toast { position: fixed; bottom: 24px; left: 24px; background: #323232; color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 14px; display: none; z-index: 1000; }
+        #toast { position: fixed; bottom: 24px; left: 24px; background: #323232; color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 14px; display: none; z-index: 2000; box-shadow: var(--shadow-md); }
+        .rename-input { border: 1px solid var(--accent); padding: 4px 8px; border-radius: 4px; font-size: 13px; width: 90%; }
     </style>
 </head>
 <body>
@@ -87,232 +91,229 @@
         <img src="IMG_1978.jpeg" class="logo-img">
         <span class="brand-name">Architect</span>
     </div>
+
     <div class="action-area">
-        <button class="btn-main-capsule" onclick="document.getElementById('fup').click()">
-            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>上傳文件</span>
-        </button>
-        <button class="btn-main-capsule" onclick="createFolder()">
-            <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-            <span>建立資料夾</span>
+        <button class="btn-capsule-main" onclick="document.getElementById('file-up').click()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>新增檔案</span>
         </button>
     </div>
+
     <nav class="nav-group">
-        <div class="nav-item active" id="nav-drive" onclick="switchTab('drive')">我的硬碟</div>
+        <div class="nav-item active" id="nav-drive" onclick="switchTab('drive')">
+            <svg class="icon-box" style="margin-right:12px; stroke:currentColor; fill:none; stroke-width:2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            我的硬碟
+        </div>
         <div class="nav-sub-item" id="nav-recent" onclick="switchTab('recent')">最近項目</div>
-        <div style="height:12px"></div>
-        <div class="nav-item" id="nav-trash" onclick="switchTab('trash')">垃圾桶</div>
+        
+        <div style="height: 12px;"></div>
+        
+        <div class="nav-item" id="nav-trash" onclick="switchTab('trash')">
+            <svg class="icon-box" style="margin-right:12px; stroke:currentColor; fill:none; stroke-width:2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            垃圾桶
+        </div>
     </nav>
 </aside>
 
 <main>
     <header>
-        <div class="search-capsule">
+        <div class="search-wrap">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" placeholder="搜尋文件" id="sinp">
+            <input type="text" placeholder="搜尋您的數據資產" id="search-inp">
         </div>
     </header>
+
     <div class="toolbar">
-        <div class="path-text" id="path-box">我的硬碟</div>
-        <div class="tool-group" id="t-box"></div>
+        <div class="title-text" id="view-title">我的硬碟</div>
+        <div class="tool-group" id="tool-box"></div>
     </div>
+
     <div class="viewport" id="view"></div>
 </main>
 
-<input type="file" id="fup" style="display:none" multiple onchange="handleUpload(this)">
+<input type="file" id="file-up" style="display:none" multiple onchange="handleUpload(this)">
 
 <script>
+    // 數據管理
     let db = [];
+    const coreProjects = ['渲染引擎', '數據分片', '加密協定', '座標映射', 'API分發'];
+    for(let i=0; i<20; i++) {
+        db.push({
+            id: crypto.randomUUID(),
+            name: (coreProjects[i % 5]) + (i < 5 ? '' : `_v${i}.bin`),
+            type: i < 5 ? 'dir' : 'file',
+            pid: '0',
+            del: false,
+            time: Date.now() - (i * 86400000)
+        });
+    }
+
     let currentTab = 'drive', pathStack = [{id:'0', name:"我的硬碟"}], selection = new Set();
-    let clip = { mode: null, ids: [] }, searchQuery = "";
+    let searchQuery = "", clip = { mode: null, ids: [] }, editId = null;
 
-    const SVG_DIR = `<svg class="svg-icon folder-color" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
-    const SVG_FILE = `<svg class="svg-icon file-color" viewBox="0 0 24 24"><path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7z"/><path d="M13 2v7h7"/></svg>`;
-
-    // 初始化模擬數據
-    for(let i=0; i<10; i++) {
-        db.push({ id: crypto.randomUUID(), name: `項目_${i}`, type: i<3?'dir':'file', pid: '0', del: false, time: Date.now() - i*3600000 });
-    }
-
-    function getSafeName(name, pid, type) {
-        let n = name, idx = 1;
-        const parse = n.match(/^(.*?)(?:\((\d+)\))?(\.[^.]+)?$/);
-        let base = parse[1], ext = parse[3] || "";
-        while(db.some(x => x.pid === pid && x.name === n && x.type === type && !x.del)) {
-            n = `${base}(${idx++})${ext}`;
-        }
-        return n;
-    }
+    const SVG_DIR = `<svg class="icon-box icon-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`;
+    const SVG_FILE = `<svg class="icon-box icon-file" viewBox="0 0 24 24"><path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7z"/><path d="M13 2v7h7"/></svg>`;
 
     function render() {
         const view = document.getElementById('view');
-        const cur = pathStack[pathStack.length-1];
+        const curPid = pathStack[pathStack.length-1].id;
         view.innerHTML = "";
 
         let items = db.filter(x => x.del === (currentTab === 'trash'));
-        if(currentTab === 'drive' || (currentTab === 'trash' && cur.id !== '0')) {
-            items = items.filter(x => x.pid === cur.id);
-        }
-        if(searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
+        if (currentTab === 'drive') items = items.filter(x => x.pid === curPid);
+        if (searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-        if(currentTab === 'recent') {
+        if (currentTab === 'recent') {
             const grid = document.createElement('div');
             grid.className = 'card-grid';
-            items.sort((a,b)=>b.time-a.time).slice(0,12).forEach(it => {
+            [...items].sort((a,b) => b.time - a.time).slice(0, 8).forEach(item => {
                 const card = document.createElement('div');
-                card.className = `card ${selection.has(it.id)?'selected':''}`;
-                card.onclick = (e) => select(e, it.id);
-                card.ondblclick = () => openItem(it);
-                card.innerHTML = `<div class="card-thumb">${it.type==='dir'?SVG_DIR:SVG_FILE}</div><div class="card-name">${it.name}</div>`;
+                card.className = `card ${selection.has(item.id)?'selected':''}`;
+                card.onclick = (e) => toggleSelect(e, item.id);
+                card.ondblclick = () => openItem(item);
+                card.innerHTML = `
+                    <div class="card-preview">${item.type === 'dir' ? SVG_DIR : SVG_FILE}</div>
+                    <div class="card-name">${item.name}</div>
+                `;
                 grid.appendChild(card);
             });
             view.appendChild(grid);
         } else {
             const table = document.createElement('table');
             table.className = 'list-table';
-            table.innerHTML = `<tr><th>名稱</th><th>日期</th><th>大小</th></tr>`;
-            items.forEach(it => {
+            table.innerHTML = `<tr><th style="width:50%">名稱</th><th>修改日期</th><th>大小</th></tr>`;
+            items.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = `list-row ${selection.has(it.id)?'selected':''}`;
-                tr.onclick = (e) => select(e, it.id);
-                tr.ondblclick = () => openItem(it);
-                tr.innerHTML = `<td><div class="item-box">${it.type==='dir'?SVG_DIR:SVG_FILE}<span>${it.name}</span></div></td>
-                                <td style="color:var(--text-sub)">${new Date(it.time).toLocaleDateString()}</td>
-                                <td style="color:var(--text-sub)">${it.type==='dir'?'-':'<1KB'}</td>`;
+                tr.className = `list-row ${selection.has(item.id)?'selected':''}`;
+                tr.onclick = (e) => toggleSelect(e, item.id);
+                tr.ondblclick = () => openItem(item);
+
+                const nameDisplay = editId === item.id 
+                    ? `<input type="text" class="rename-input" id="eb" value="${item.name}">`
+                    : `<span>${item.name}</span>`;
+
+                tr.innerHTML = `
+                    <td><div class="item-cell">${item.type==='dir'?SVG_DIR:SVG_FILE} ${nameDisplay}</div></td>
+                    <td style="color:var(--text-sub)">${new Date(item.time).toLocaleDateString()}</td>
+                    <td style="color:var(--text-sub)">${item.type==='dir'?'-':'<1KB'}</td>
+                `;
                 table.appendChild(tr);
             });
             view.appendChild(table);
         }
+
+        if(editId) {
+            const eb = document.getElementById('eb');
+            if(eb) { eb.focus(); eb.onblur = () => {
+                const it = db.find(x => x.id === editId);
+                if(it && eb.value.trim()) it.name = eb.value.trim();
+                editId = null; render();
+            };}
+        }
         updateToolbar();
     }
 
-    function openItem(it) {
-        // 垃圾桶內不允許進入資料夾
-        if(currentTab === 'trash') return;
-        if(it.type === 'dir') {
-            pathStack.push({id: it.id, name: it.name});
-            selection.clear(); render();
-        }
-    }
-
-    function select(e, id) {
-        if(e.ctrlKey || e.metaKey) { selection.has(id) ? selection.delete(id) : selection.add(id); }
+    function toggleSelect(e, id) {
+        if (e.ctrlKey || e.metaKey) { selection.has(id) ? selection.delete(id) : selection.add(id); }
         else { selection.clear(); selection.add(id); }
         render();
     }
 
-    function updateToolbar() {
-        document.getElementById('path-box').innerText = currentTab==='recent'?"最近項目":pathStack.map(x=>x.name).join(' / ');
-        const tbox = document.getElementById('t-box');
-        tbox.innerHTML = "";
-
-        if(selection.size > 0) {
-            if(currentTab !== 'trash') {
-                tbox.append(createBtn("剪下", () => { clip={mode:'move', ids:[...selection]}; selection.clear(); render(); }));
-                tbox.append(createBtn("複製", () => { clip={mode:'copy', ids:[...selection]}; selection.clear(); render(); }));
-                tbox.append(createBtn("刪除", () => { selection.forEach(id => {const it=db.find(x=>x.id===id); if(it) it.del=true;}); selection.clear(); render(); }, true));
-            } else {
-                tbox.append(createBtn("復原", () => {
-                    selection.forEach(id => {
-                        const it = db.find(x=>x.id===id);
-                        if(it) { it.del = false; cascadeRestore(it.id); }
-                    });
-                    selection.clear(); render();
-                }));
-                tbox.append(createBtn("永久刪除", () => {
-                    if(confirm("永久刪除不可恢復，確定？")) {
-                        selection.forEach(id => purge(id));
-                        selection.clear(); render();
-                    }
-                }, true));
-            }
-        } else if(clip.ids.length > 0 && currentTab === 'drive') {
-            tbox.append(createBtn("在此貼上", handlePaste));
-            tbox.append(createBtn("取消", () => { clip.ids=[]; render(); }));
+    function openItem(item) {
+        if (item.type === 'dir' && !item.del) {
+            pathStack.push({id: item.id, name: item.name});
+            selection.clear(); render();
         }
     }
 
-    function createBtn(txt, act, dan=false) {
+    function updateToolbar() {
+        document.getElementById('view-title').innerText = currentTab === 'recent' ? "最近項目" : pathStack[pathStack.length-1].name;
+        const tools = document.getElementById('tool-box');
+        tools.innerHTML = "";
+
+        if (selection.size > 0) {
+            if (currentTab !== 'trash') {
+                if (selection.size === 1) tools.append(createCapsule("重命名", () => { editId = [...selection][0]; render(); }));
+                tools.append(createCapsule("剪下", () => { clip = {mode:'move', ids:[...selection]}; selection.clear(); showToast("已剪下項目"); render(); }));
+                tools.append(createCapsule("刪除", () => { selection.forEach(id => { const it=db.find(x=>x.id===id); if(it) it.del=true; }); selection.clear(); render(); }, true));
+            } else {
+                tools.append(createCapsule("還原", () => { selection.forEach(id => { const it=db.find(x=>x.id===id); if(it) it.del=false; }); selection.clear(); render(); }));
+                tools.append(createCapsule("永久清除", () => purge(), true));
+            }
+        } else if (clip.ids.length > 0 && currentTab === 'drive') {
+            tools.append(createCapsule("貼上到此處", handlePaste));
+            tools.append(createCapsule("取消", () => { clip.ids = []; render(); }));
+        }
+    }
+
+    function createCapsule(txt, act, dan=false) {
         const b = document.createElement('button');
-        b.className = `btn-capsule ${dan?'danger':''}`;
+        b.className = `btn-capsule-tool ${dan?'danger':''}`;
         b.innerText = txt; b.onclick = (e) => { e.stopPropagation(); act(); }; return b;
     }
 
     function handlePaste() {
-        const targetPid = pathStack[pathStack.length-1].id;
+        const pid = pathStack[pathStack.length-1].id;
         clip.ids.forEach(id => {
-            const ori = db.find(x => x.id === id);
-            if(!ori) return;
-            if(clip.mode === 'move') {
-                if(isDescendant(id, targetPid)) { showToast("無法將資料夾移入自身子目錄"); return; }
-                ori.pid = targetPid;
-                ori.name = getSafeName(ori.name, targetPid, ori.type);
-            } else {
-                deepCopy(id, targetPid);
+            const it = db.find(x => x.id === id);
+            if(it) {
+                if(it.type === 'dir' && isDescendant(it.id, pid)) { showToast("無法移至子目錄"); return; }
+                it.pid = pid;
             }
         });
         clip.ids = []; render();
     }
 
-    function deepCopy(id, newPid) {
-        const ori = db.find(x => x.id === id);
-        if(!ori) return;
-        const newId = crypto.randomUUID();
-        const newName = getSafeName(ori.name, newPid, ori.type);
-        db.push({ ...ori, id: newId, pid: newPid, name: newName, time: Date.now() });
-        if(ori.type === 'dir') {
-            db.filter(x => x.pid === id && !x.del).forEach(child => deepCopy(child.id, newId));
+    function isDescendant(p, t) {
+        if(p === t) return true;
+        return db.filter(x => x.pid === p && x.type === 'dir').some(c => isDescendant(c.id, t));
+    }
+
+    function purge() {
+        if(confirm("永久清除選中項目？")) {
+            selection.forEach(id => {
+                const it = db.find(x => x.id === id);
+                if(it && it.type === 'dir') {
+                    const subs = collectAll(id);
+                    db = db.filter(x => !subs.includes(x.id) && x.id !== id);
+                } else { db = db.filter(x => x.id !== id); }
+            });
+            selection.clear(); render();
         }
     }
 
-    function isDescendant(pid, tid) {
-        if(pid === tid) return true;
-        return db.filter(x => x.pid === pid && x.type === 'dir').some(c => isDescendant(c.id, tid));
-    }
-
-    function purge(id) {
-        const it = db.find(x => x.id === id);
-        if(!it) return;
-        if(it.type === 'dir') {
-            db.filter(x => x.pid === id).forEach(c => purge(c.id));
-        }
-        db = db.filter(x => x.id !== id);
-    }
-
-    function cascadeRestore(pid) {
-        db.filter(x => x.pid === pid).forEach(c => { c.del = false; cascadeRestore(c.id); });
+    function collectAll(pid) {
+        let res = [];
+        db.filter(x => x.pid === pid).forEach(c => {
+            res.push(c.id);
+            if(c.type === 'dir') res = res.concat(collectAll(c.id));
+        });
+        return res;
     }
 
     function handleUpload(inp) {
         const pid = pathStack[pathStack.length-1].id;
         Array.from(inp.files).forEach(f => {
-            db.push({ id: crypto.randomUUID(), name: getSafeName(f.name, pid, 'file'), type: 'file', pid: pid, del: false, time: Date.now() });
+            db.push({id: crypto.randomUUID(), name: f.name, type: 'file', pid: pid, del: false, time: Date.now()});
         });
-        inp.value = ""; // 修復：清空input
-        render();
-    }
-
-    function createFolder() {
-        const pid = pathStack[pathStack.length-1].id;
-        const name = getSafeName("新資料夾", pid, 'dir');
-        db.push({ id: crypto.randomUUID(), name, type: 'dir', pid, del: false, time: Date.now() });
-        render();
-    }
-
-    function switchTab(t) {
-        currentTab = t; selection.clear();
-        pathStack = [{id:'0', name: t === 'trash' ? "垃圾桶" : "我的硬碟"}];
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.id === `nav-${t}`));
-        render();
+        inp.value = ""; showToast("上傳完成"); render();
     }
 
     function showToast(m) {
         const t = document.getElementById('toast');
         t.innerText = m; t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 3000);
+        setTimeout(() => t.style.display = 'none', 2500);
     }
 
-    document.getElementById('sinp').oninput = (e) => { searchQuery = e.target.value; render(); };
+    function switchTab(t) {
+        currentTab = t; selection.clear();
+        document.querySelectorAll('.nav-item, .nav-sub-item').forEach(el => el.classList.remove('active'));
+        document.getElementById(`nav-${t}`).classList.add('active');
+        if(t !== 'drive') pathStack = [{id:'0', name:"我的硬碟"}];
+        render();
+    }
+
+    document.getElementById('search-inp').oninput = (e) => { searchQuery = e.target.value; render(); };
     window.onload = render;
 </script>
 </body>
