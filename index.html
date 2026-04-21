@@ -11,8 +11,10 @@
             --text-main: #202124;
             --text-sub: #5f6368;
             --accent: #1a73e8;
-            --accent-soft: rgba(26, 115, 232, 0.08);
+            --accent-soft: #c2dbff;
             --danger: #d93025;
+            --folder-color: #fbbc04;
+            --file-color: #1a73e8;
             --side-w: 260px;
             --side-w-min: 72px;
             --capsule: 999px;
@@ -32,6 +34,7 @@
         .sidebar-btn:hover { background: var(--border-light); }
         .sidebar-btn.primary { background: var(--accent); color: white; border: none; }
         .sidebar-btn.primary:hover { background: #1669d8; }
+        .sidebar-btn svg { stroke: currentColor; }
         #sidebar.collapsed .sidebar-btn { justify-content: center; padding: 0; }
         #sidebar.collapsed .sidebar-btn span { display: none; }
         #sidebar.collapsed .sidebar-btn svg { margin: 0; }
@@ -58,8 +61,6 @@
         .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15); }
         .search-box input { background: transparent; border: none; padding: 0 8px; width: 100%; font-size: 14px; }
 
-        .sort-select { border: 1px solid var(--border-light); border-radius: var(--capsule); height: 40px; padding: 0 20px; font-size: 14px; cursor: pointer; background: var(--bg-white); color: var(--text-main); appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
-
         .t-btn { height: 40px; background: var(--bg-white); border: 1px solid var(--border-light); padding: 0 20px; border-radius: var(--capsule); cursor: pointer; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; color: var(--text-main); transition: background 0.15s, border-color 0.15s; }
         .t-btn:hover { background: var(--border-light); }
         .t-btn.primary { background: var(--accent); color: white; border: none; }
@@ -75,15 +76,15 @@
         .card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .card-info { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .list-header { display: grid; grid-template-columns: 4fr 2fr 1fr; padding: 12px 16px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border-light); font-weight: 500; letter-spacing: 0.3px; }
-        .row { display: grid; grid-template-columns: 4fr 2fr 1fr; padding: 0 16px; height: 48px; align-items: center; border-radius: 12px; cursor: pointer; margin-bottom: 2px; transition: background 0.1s; }
-        .row:hover:not(.locked) { background: var(--border-light); }
-        .row.selected { background: var(--accent-soft); }
+        .list-header { display: grid; grid-template-columns: 1fr 80px; padding: 12px 16px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border-light); font-weight: 500; letter-spacing: 0.3px; }
+        .row { display: grid; grid-template-columns: 1fr 80px; padding: 0 16px; height: 48px; align-items: center; border-radius: 12px; cursor: pointer; margin-bottom: 2px; transition: background 0.1s; }
+        .row:hover:not(.locked) { background: #f1f3f4; }
+        .row.selected { background: #c2dbff; }
         .row.locked { opacity: 0.5; pointer-events: none; }
 
         .svg-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .folder-icon { color: #5f6368; fill: none; }
-        .file-icon { color: #5f6368; }
+        .folder-icon { color: var(--folder-color); fill: var(--folder-color); stroke: none; }
+        .file-icon { color: var(--file-color); stroke: var(--file-color); fill: none; }
 
         .inline-input { border: 1.5px solid var(--accent); padding: 6px 10px; border-radius: 12px; width: 90%; font-size: 14px; background: var(--bg-white); }
 
@@ -100,11 +101,11 @@
     </div>
     <div class="sidebar-tools">
         <button class="sidebar-btn primary" onclick="document.getElementById('file-up').click()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <svg class="svg-icon" viewBox="0 0 24 24" style="color:white"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span>上傳文件</span>
         </button>
         <button class="sidebar-btn" onclick="createFolder()">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+            <svg class="svg-icon folder-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
             <span>建立文件夾</span>
         </button>
     </div>
@@ -136,11 +137,9 @@
 
 <script>
     (function(){
-        // ---------- 純 SVG 圖標 (內聯) ----------
         const ICON_FOLDER = `<svg class="svg-icon folder-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
         const ICON_FILE = `<svg class="svg-icon file-icon" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
 
-        // ---------- 全局狀態 ----------
         let db = [
             {id: '1', name: "座標算法核心", type: 'dir', pid: '0', del: false, time: Date.now() - 1000000},
             {id: '2', name: "10D_Storage_v1.bin", type: 'file', pid: '1', del: false, time: Date.now() - 800000},
@@ -151,13 +150,11 @@
         let currentTab = 'drive';
         let pathStack = [{id: '0', name: "我的硬碟"}];
         let selection = new Set();
-        let clip = { mode: null, ids: [] };  // 'copy' 或 'move'
+        let clip = { mode: null, ids: [] };
         let editId = null;
         let searchQuery = "";
-        let sortBy = "time";
         let toastTimer = null;
 
-        // ---------- 輔助函數 ----------
         function showToast(msg) {
             const t = document.getElementById('toast');
             t.innerText = msg;
@@ -170,7 +167,6 @@
             document.getElementById('sidebar').classList.toggle('collapsed');
         }
 
-        // 生成唯一 ID (使用 crypto.randomUUID 或降級)
         function generateId() {
             if (typeof crypto !== 'undefined' && crypto.randomUUID) {
                 return crypto.randomUUID();
@@ -178,7 +174,6 @@
             return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
         }
 
-        // 檢查是否為後代 (防止循環移動)
         function isDescendant(ancestorId, descendantId) {
             if (ancestorId === descendantId) return true;
             const children = db.filter(x => x.pid === ancestorId && !x.del && x.type === 'dir');
@@ -188,7 +183,6 @@
             return false;
         }
 
-        // 獲取所有後代 ID (用於永久刪除)
         function collectDescendantIds(folderId) {
             let ids = [];
             const children = db.filter(x => x.pid === folderId && x.type === 'dir');
@@ -196,14 +190,12 @@
                 ids.push(child.id);
                 ids = ids.concat(collectDescendantIds(child.id));
             }
-            // 加上文件
             const files = db.filter(x => x.pid === folderId && x.type === 'file');
             ids.push(...files.map(f => f.id));
             return ids;
         }
 
-        // 重名檢查 (基於目標父目錄)
-        function getSafeName(baseName, targetPid, type) {
+        function getUniqueName(baseName, targetPid, type) {
             let name = baseName;
             let ext = "";
             if (type === 'file') {
@@ -213,36 +205,48 @@
                     ext = baseName.substring(dotIdx);
                 }
             }
-            let newName = baseName;
+            let candidate = baseName;
             let counter = 1;
-            while (db.some(x => x.pid === targetPid && x.name === newName && !x.del)) {
-                newName = type === 'file' ? `${name}_副本${counter > 1 ? counter : ''}${ext}` : `${baseName}_副本${counter > 1 ? counter : ''}`;
+            while (db.some(x => x.pid === targetPid && x.name === candidate && !x.del)) {
+                candidate = type === 'file' ? `${name}_副本${counter > 1 ? counter : ''}${ext}` : `${baseName}_副本${counter > 1 ? counter : ''}`;
                 counter++;
             }
-            return newName;
+            return candidate;
         }
 
-        // 深拷貝 (遞歸)
-        function deepCopy(srcId, targetPid) {
+        function deepCopyWithRename(srcId, targetPid) {
             const src = db.find(x => x.id === srcId);
             if (!src) return;
             const newId = generateId();
-            const safeName = getSafeName(src.name, targetPid, src.type);
-            db.push({ ...src, id: newId, pid: targetPid, name: safeName, time: Date.now() });
+            const uniqueName = getUniqueName(src.name, targetPid, src.type);
+            db.push({ ...src, id: newId, pid: targetPid, name: uniqueName, time: Date.now() });
             if (src.type === 'dir') {
                 const children = db.filter(x => x.pid === srcId && !x.del);
-                children.forEach(child => deepCopy(child.id, newId));
+                children.forEach(child => deepCopyWithRename(child.id, newId));
             }
         }
 
-        // 切換視圖時重置剪貼板 (避免混淆)
+        function moveWithRename(srcId, targetPid) {
+            const item = db.find(x => x.id === srcId);
+            if (!item) return false;
+            if (item.pid === targetPid) return true;
+            if (item.type === 'dir' && isDescendant(srcId, targetPid)) {
+                showToast(`無法移動：目標為來源的子資料夾`);
+                return false;
+            }
+            const newName = getUniqueName(item.name, targetPid, item.type);
+            item.name = newName;
+            item.pid = targetPid;
+            return true;
+        }
+
         function switchTab(tab) {
             currentTab = tab;
             pathStack = [{id: '0', name: tab === 'drive' ? '我的硬碟' : (tab === 'recent' ? '最近項目' : '垃圾桶')}];
             selection.clear();
             searchQuery = "";
             editId = null;
-            clip = { mode: null, ids: [] };  // 切換時清空剪貼板
+            clip = { mode: null, ids: [] };
             render();
             document.querySelectorAll('.nav-item').forEach(i => {
                 i.classList.toggle('active', i.id === `menu-${tab}`);
@@ -257,7 +261,6 @@
             render();
         }
 
-        // 渲染主視圖
         function render() {
             const bc = document.getElementById('breadcrumb');
             if (currentTab === 'drive') {
@@ -285,13 +288,10 @@
                 if (searchQuery) {
                     items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
                 }
-                items.sort((a, b) => {
-                    if (sortBy === 'name') return a.name.localeCompare(b.name);
-                    return b.time - a.time;
-                });
+                items.sort((a, b) => a.name.localeCompare(b.name));
 
                 const list = document.createElement('div');
-                list.innerHTML = `<div class="list-header"><span>名稱</span><span>修改日期</span><span>大小</span></div>`;
+                list.innerHTML = `<div class="list-header"><span>名稱</span><span>大小</span></div>`;
 
                 items.forEach(item => {
                     const isLocked = clip.ids.includes(item.id);
@@ -320,7 +320,6 @@
 
                     row.innerHTML = `
                         <div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?ICON_FOLDER:ICON_FILE}${nameBlock}</div>
-                        <div style="font-size:13px;color:var(--text-sub)">${new Date(item.time).toLocaleDateString()}</div>
                         <div style="font-size:13px;color:var(--text-sub)">-</div>
                     `;
                     list.appendChild(row);
@@ -337,7 +336,7 @@
                             if (target) {
                                 const newName = inp.value.trim();
                                 if (newName && newName !== target.name) {
-                                    target.name = getSafeName(newName, target.pid, target.type);
+                                    target.name = getUniqueName(newName, target.pid, target.type);
                                 }
                             }
                             editId = null;
@@ -358,25 +357,19 @@
             const right = document.createElement('div');
             right.className = 'tool-group';
 
-            // 預設視圖 (無選取、無剪貼板)
+            if (currentTab !== 'recent') {
+                right.innerHTML = `<div class="search-box"><input type="text" placeholder="搜尋..." value="${searchQuery}" id="search-inp"></div>`;
+            }
+
+            // 无选中且无剪贴板内容时显示搜索框即可
             if (currentTab === 'drive' && selection.size === 0 && clip.ids.length === 0) {
-                // 左側無操作 (上傳/新建已在側邊欄)
-                right.innerHTML = `
-                    <div class="search-box"><input type="text" placeholder="搜尋..." value="${searchQuery}" id="search-inp"></div>
-                    <select class="sort-select" id="sort-select">
-                        <option value="time" ${sortBy==='time'?'selected':''}>按日期</option>
-                        <option value="name" ${sortBy==='name'?'selected':''}>按名稱</option>
-                    </select>
-                `;
                 tb.append(left, right);
                 const sinp = document.getElementById('search-inp');
                 if (sinp) sinp.oninput = (e) => { searchQuery = e.target.value; render(); };
-                const ssel = document.getElementById('sort-select');
-                if (ssel) ssel.onchange = (e) => { sortBy = e.target.value; render(); };
                 return;
             }
 
-            // 有選取項目
+            // 有选中项目时
             if (selection.size > 0) {
                 if (currentTab === 'trash') {
                     left.append(btn("還原", () => {
@@ -397,21 +390,30 @@
                         selection.clear(); render();
                     }, false, true));
                 } else {
+                    // 单个选中：显示重命名、移动、复制、删除
                     if (selection.size === 1) {
-                        left.append(btn("重新命名", () => { editId = Array.from(selection)[0]; render(); }));
+                        left.append(btn("重新命名", () => { editId = Array.from(selection)[0]; render(); }, true));
+                        left.append(btn("移動", () => { clip = { mode: 'move', ids: Array.from(selection) }; selection.clear(); render(); }, true));
+                        left.append(btn("複製", () => { clip = { mode: 'copy', ids: Array.from(selection) }; selection.clear(); render(); }, true));
+                        left.append(btn("刪除", () => {
+                            selection.forEach(id => { const it = db.find(x=>x.id===id); if(it) it.del = true; });
+                            selection.clear(); render();
+                        }, false, true));
+                    } else {
+                        // 多个选中：显示批量移动、批量复制、批量删除
+                        left.append(btn("批量移動", () => { clip = { mode: 'move', ids: Array.from(selection) }; selection.clear(); render(); }, true));
+                        left.append(btn("批量複製", () => { clip = { mode: 'copy', ids: Array.from(selection) }; selection.clear(); render(); }, true));
+                        left.append(btn("批量刪除", () => {
+                            selection.forEach(id => { const it = db.find(x=>x.id===id); if(it) it.del = true; });
+                            selection.clear(); render();
+                        }, false, true));
                     }
-                    left.append(btn("複製", () => { clip = { mode: 'copy', ids: Array.from(selection) }; selection.clear(); render(); }));
-                    left.append(btn("移動", () => { clip = { mode: 'move', ids: Array.from(selection) }; selection.clear(); render(); }));
-                    left.append(btn("刪除", () => {
-                        selection.forEach(id => { const it = db.find(x=>x.id===id); if(it) it.del = true; });
-                        selection.clear(); render();
-                    }, false, true));
                 }
                 tb.append(left, right);
                 return;
             }
 
-            // 剪貼板模式 (僅在 drive 顯示)
+            // 剪贴板模式
             if (clip.ids.length > 0 && currentTab === 'drive') {
                 left.append(btn(`貼上 (${clip.ids.length})`, handlePaste, true));
                 left.append(btn("取消", () => { clip = { mode: null, ids: [] }; render(); }));
@@ -419,7 +421,6 @@
                 return;
             }
 
-            // 若在垃圾桶/最近但有剪貼板，不顯示貼上按鈕 (但提供取消)
             if (clip.ids.length > 0 && currentTab !== 'drive') {
                 left.append(btn("取消剪貼", () => { clip = { mode: null, ids: [] }; render(); }));
                 tb.append(left, right);
@@ -427,6 +428,8 @@
             }
 
             tb.append(left, right);
+            const sinp = document.getElementById('search-inp');
+            if (sinp) sinp.oninput = (e) => { searchQuery = e.target.value; render(); };
         }
 
         function btn(text, action, isPrimary = false, isDanger = false) {
@@ -443,26 +446,16 @@
             if (validIds.length === 0) { clip = { mode: null, ids: [] }; render(); return; }
 
             if (clip.mode === 'move') {
-                // 移動前檢查循環引用
                 for (let id of validIds) {
-                    const item = db.find(x => x.id === id);
-                    if (item && item.type === 'dir' && isDescendant(id, targetPid)) {
-                        showToast(`無法移動：目標資料夾為「${item.name}」的子資料夾`);
+                    const success = moveWithRename(id, targetPid);
+                    if (success === false) {
                         clip = { mode: null, ids: [] };
                         render();
                         return;
                     }
                 }
-                // 執行移動
-                validIds.forEach(id => {
-                    const item = db.find(x => x.id === id);
-                    if (item && item.pid !== targetPid) {
-                        item.name = getSafeName(item.name, targetPid, item.type);
-                        item.pid = targetPid;
-                    }
-                });
             } else if (clip.mode === 'copy') {
-                validIds.forEach(id => deepCopy(id, targetPid));
+                validIds.forEach(id => deepCopyWithRename(id, targetPid));
             }
             clip = { mode: null, ids: [] };
             render();
@@ -475,7 +468,7 @@
             }
             const newId = generateId();
             const targetPid = pathStack[pathStack.length - 1].id;
-            const safeName = getSafeName("未命名資料夾", targetPid, 'dir');
+            const safeName = getUniqueName("未命名資料夾", targetPid, 'dir');
             db.push({ id: newId, name: safeName, type: 'dir', pid: targetPid, del: false, time: Date.now() });
             editId = newId;
             render();
@@ -490,14 +483,13 @@
             const file = input.files[0];
             if (file) {
                 const targetPid = pathStack[pathStack.length - 1].id;
-                const safeName = getSafeName(file.name, targetPid, 'file');
+                const safeName = getUniqueName(file.name, targetPid, 'file');
                 db.push({ id: generateId(), name: safeName, type: 'file', pid: targetPid, del: false, time: Date.now() });
                 render();
             }
-            input.value = ''; // 允許重複上傳同名文件
+            input.value = '';
         }
 
-        // 掛載全局函數
         window.toggleSidebar = toggleSidebar;
         window.switchTab = switchTab;
         window.goPath = goPath;
@@ -505,7 +497,6 @@
         window.handleUpload = handleUpload;
         window.handlePaste = handlePaste;
 
-        // 初始化
         render();
     })();
 </script>
