@@ -3,116 +3,96 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AETHER 10D ARCHITECT</title>
+    <title>AETHER 10D ARCHITECT · 修復版</title>
     <link rel="icon" href="IMG_1978.jpeg" type="image/jpeg">
     <style>
         :root {
-            --bg-white: #ffffff;
-            --border-light: #f1f3f4;
-            --text-main: #202124;
-            --text-sub: #5f6368;
+            --bg: #ffffff;
+            --border: #f1f3f4;
+            --text: #202124;
+            --sub: #5f6368;
             --accent: #1a73e8;
             --accent-soft: #c2dbff;
             --danger: #d93025;
-            --folder-color: #fbbc04;
-            --file-color: #1a73e8;
+            --folder: #fbbc04;
+            --file: #1a73e8;
             --side-w: 260px;
-            --side-w-min: 72px;
-            --capsule: 999px;
+            --side-min: 72px;
+            --radius: 999px;
             --preview-w: 360px;
         }
-
-        * { box-sizing: border-box; outline: none; }
-        body { margin: 0; font-family: "Segoe UI", "PingFang TC", sans-serif; display: flex; height: 100vh; background: var(--bg-white); overflow: hidden; color: var(--text-main); }
-
-        #sidebar { width: var(--side-w); background: var(--bg-white); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; transition: width 0.25s ease; flex-shrink: 0; }
-        #sidebar.collapsed { width: var(--side-w-min); }
-
-        .brand { height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-bottom: 1px solid var(--border-light); }
-        .logo-img { 
-            width: 44px; 
-            height: 44px; 
-            border-radius: 14px; 
-            object-fit: cover; 
-            border: 1px solid var(--border-light); 
-            transition: transform 0.4s ease;
-        }
+        * { box-sizing: border-box; margin: 0; }
+        body { font-family: "Segoe UI", "PingFang TC", sans-serif; display: flex; height: 100vh; overflow: hidden; color: var(--text); background: var(--bg); }
+        #sidebar { width: var(--side-w); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: width 0.2s; flex-shrink: 0; background: var(--bg); }
+        #sidebar.collapsed { width: var(--side-min); }
+        .brand { height: 90px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-bottom: 1px solid var(--border); }
+        .logo-img { width: 56px; height: 56px; border-radius: 16px; object-fit: cover; border: 1px solid var(--border); transition: transform 0.3s; }
         .logo-img.rotate { transform: rotate(360deg); }
-
-        .sidebar-tools { padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border-light); }
-        .sidebar-btn { height: 40px; background: var(--bg-white); border: 1px solid var(--border-light); border-radius: var(--capsule); cursor: pointer; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); transition: background 0.15s, border-color 0.15s; padding: 0 12px; }
+        .sidebar-tools { padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); }
+        .sidebar-btn { height: 40px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 500; transition: 0.15s; padding: 0 12px; min-width: 40px; white-space: nowrap; background: var(--bg); color: var(--text); }
         .sidebar-btn:hover { background: #e8f0fe; border-color: var(--accent); }
         .sidebar-btn.primary { background: var(--accent); color: white; border: none; }
         .sidebar-btn.primary:hover { background: #1669d8; }
-        .sidebar-btn.disabled { opacity: 0.5; pointer-events: none; background: var(--border-light); color: var(--text-sub); }
-        .sidebar-btn svg { stroke: currentColor; }
-        #sidebar.collapsed .sidebar-btn { justify-content: center; padding: 0; }
-        #sidebar.collapsed .sidebar-btn span { display: none; }
+        .sidebar-btn.disabled { opacity: 0.6; background: #f5f5f5; border-color: #ddd; }
+        .sidebar-btn.disabled:hover { background: #f5f5f5; border-color: #ddd; }
+        .sidebar-btn svg { stroke: currentColor; flex-shrink: 0; }
+        .sidebar-btn span { opacity: 1; transition: opacity 0.15s; }
+        #sidebar.collapsed .sidebar-btn span { opacity: 0; width: 0; overflow: hidden; }
+        #sidebar.collapsed .sidebar-btn { padding: 0; justify-content: center; gap: 0; }
         #sidebar.collapsed .sidebar-btn svg { margin: 0; }
-
         .nav-section { flex: 1; padding-top: 12px; }
-        .nav-item { height: 48px; display: flex; align-items: center; cursor: pointer; color: var(--text-sub); transition: all 0.15s; margin: 4px 12px 4px 0; border-radius: 0 var(--capsule) var(--capsule) 0; font-weight: 400; }
+        .nav-item { height: 48px; display: flex; align-items: center; cursor: pointer; color: var(--sub); margin: 4px 12px 4px 0; border-radius: 0 var(--radius) var(--radius) 0; transition: 0.15s; }
         .nav-item:hover { background: #e8f0fe; color: var(--accent); }
         .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
         .nav-icon { width: 72px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .nav-text { white-space: nowrap; font-size: 14px; }
-        #sidebar.collapsed .nav-text { display: none; }
-
-        main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg-white); }
-        header { height: 64px; padding: 0 24px; display: flex; align-items: center; border-bottom: 1px solid var(--border-light); background: var(--bg-white); font-size: 15px; }
-        .breadcrumb { display: flex; align-items: center; gap: 8px; color: var(--text-sub); }
-        .breadcrumb span { cursor: pointer; padding: 4px 8px; border-radius: var(--capsule); transition: background 0.1s; }
+        #sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
+        main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: var(--bg); }
+        header { height: 64px; padding: 0 24px; display: flex; align-items: center; border-bottom: 1px solid var(--border); font-size: 15px; }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; color: var(--sub); overflow-x: auto; white-space: nowrap; flex: 1; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+        .breadcrumb::-webkit-scrollbar { height: 4px; }
+        .breadcrumb::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .breadcrumb span { cursor: pointer; padding: 4px 8px; border-radius: var(--radius); display: inline-block; }
         .breadcrumb span:hover { background: #e8f0fe; }
-        .breadcrumb span:last-child { color: var(--text-main); font-weight:500; cursor: default; background: transparent; }
-
-        .toolbar { height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); background: var(--bg-white); }
+        .breadcrumb span:last-child { color: var(--text); font-weight: 500; cursor: default; background: transparent; }
+        .toolbar { height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
         .tool-group { display: flex; align-items: center; gap: 10px; }
-
-        .search-box { background: var(--bg-white); border: 1px solid var(--border-light); border-radius: var(--capsule); padding: 0 16px; display: flex; align-items: center; height: 40px; width: 260px; transition: box-shadow 0.15s, border-color 0.15s; }
-        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15); }
+        .search-box { border: 1px solid var(--border); border-radius: var(--radius); padding: 0 16px; display: flex; align-items: center; height: 40px; width: 260px; transition: 0.15s; background: var(--bg); }
+        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
         .search-box input { background: transparent; border: none; padding: 0 8px; width: 100%; font-size: 14px; }
-
-        .t-btn { height: 40px; background: var(--bg-white); border: 1px solid var(--border-light); padding: 0 20px; border-radius: var(--capsule); cursor: pointer; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; color: var(--text-main); transition: background 0.15s, border-color 0.15s; }
+        .t-btn { height: 40px; border: 1px solid var(--border); padding: 0 20px; border-radius: var(--radius); cursor: pointer; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: 0.15s; background: var(--bg); color: var(--text); }
         .t-btn:hover { background: #e8f0fe; border-color: var(--accent); }
-        .t-btn.primary { background: var(--accent); color: white; border: none; }
-        .t-btn.primary:hover { background: #1669d8; }
+        .t-btn.primary { background: #d9eaff; color: #1a73e8; border: none; }
+        .t-btn.primary:hover { background: #c2dbff; }
         .t-btn.danger { color: var(--danger); border-color: #fce8e6; }
         .t-btn.danger:hover { background: #fce8e6; border-color: var(--danger); }
-
         .content-pane { display: flex; flex: 1; overflow: hidden; }
         .viewport { flex: 1; overflow-y: auto; padding: 24px; }
-        .preview-pane { width: var(--preview-w); border-left: 1px solid var(--border-light); display: flex; flex-direction: column; background: var(--bg-white); }
-        .preview-header { padding: 16px 20px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; }
+        .preview-pane { width: var(--preview-w); border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg); }
+        .preview-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
         .preview-title { font-weight: 600; font-size: 16px; }
-        .preview-close { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; color: var(--text-sub); }
-        .preview-close:hover { background: var(--border-light); }
+        .preview-close { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: var(--sub); background: transparent; }
+        .preview-close:hover { background: var(--border); }
         .preview-content { flex: 1; overflow: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .preview-content img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .preview-content embed { width: 100%; height: 100%; border: none; }
+        .preview-content img { max-width: 100%; height: auto; }
+        .preview-content embed { width: 100%; height: 100%; border: none; min-height: 400px; }
         .preview-content pre { white-space: pre-wrap; word-break: break-word; font-family: monospace; background: #f8f9fa; padding: 16px; border-radius: 12px; width: 100%; }
-        .preview-unsupported { color: var(--text-sub); text-align: center; margin-top: 40px; }
-
+        .preview-unsupported { color: var(--sub); text-align: center; margin-top: 40px; }
         .empty-state { text-align: center; color: #9aa0a6; margin-top: 100px; font-size: 14px; }
-
         .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-        .card { border: 1px solid var(--border-light); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 12px; background: var(--bg-white); transition: box-shadow 0.15s, border-color 0.15s; cursor: pointer; }
+        .card { border: 1px solid var(--border); border-radius: 20px; padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.15s; background: var(--bg); }
         .card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,0.04); background: #e8f0fe; }
         .card-info { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        .list-header { display: grid; grid-template-columns: 1fr 200px 100px; padding: 12px 16px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid var(--border-light); font-weight: 500; letter-spacing: 0.3px; }
-        .row { display: grid; grid-template-columns: 1fr 200px 100px; padding: 0 16px; height: 48px; align-items: center; border-radius: 12px; cursor: pointer; margin-bottom: 2px; transition: background 0.1s; }
+        .list-header { display: grid; grid-template-columns: 1fr 200px 100px; padding: 12px 16px; font-size: 12px; color: var(--sub); border-bottom: 1px solid var(--border); font-weight: 500; letter-spacing: 0.3px; }
+        .row { display: grid; grid-template-columns: 1fr 200px 100px; padding: 0 16px; height: 48px; align-items: center; border-radius: 12px; cursor: pointer; margin-bottom: 2px; transition: 0.1s; }
         .row:hover:not(.locked) { background: #d9eaff; }
         .row.selected { background: var(--accent-soft); }
         .row.locked { opacity: 0.5; pointer-events: none; }
-
         .svg-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .folder-icon { color: var(--folder-color); fill: var(--folder-color); stroke: none; }
-        .file-icon { color: var(--file-color); stroke: var(--file-color); fill: none; }
-
-        .inline-input { border: 1.5px solid var(--accent); padding: 6px 10px; border-radius: 12px; width: 90%; font-size: 14px; background: var(--bg-white); }
-
+        .folder-icon { color: var(--folder); fill: var(--folder); stroke: none; }
+        .file-icon { color: var(--file); stroke: var(--file); fill: none; }
+        .inline-input { border: 1.5px solid var(--accent); padding: 6px 10px; border-radius: 12px; width: 90%; font-size: 14px; background: var(--bg); }
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2a2a2a; color: white; padding: 12px 24px; border-radius: 40px; font-size: 13px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        [title] { cursor: help; }
     </style>
 </head>
 <body>
@@ -121,14 +101,14 @@
 
 <aside id="sidebar">
     <div class="brand" onclick="App.toggleSidebar()" title="點擊收合側邊欄">
-        <img src="IMG_1978.jpeg" class="logo-img" id="logo-img" alt="Logo">
+        <img src="IMG_1978.jpeg" class="logo-img" id="logo-img" alt="Logo" onerror="this.style.display='none'">
     </div>
     <div class="sidebar-tools">
-        <button id="btn-upload" class="sidebar-btn primary" onclick="document.getElementById('file-up').click()" title="上傳文件（可多選）">
+        <button id="btn-upload" class="sidebar-btn primary" title="上傳文件（可多選）">
             <svg class="svg-icon" viewBox="0 0 24 24" style="color:white"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <span>上傳文件</span>
         </button>
-        <button id="btn-newfolder" class="sidebar-btn" onclick="App.createFolder()" title="建立新資料夾">
+        <button id="btn-newfolder" class="sidebar-btn" title="建立新資料夾">
             <svg class="svg-icon folder-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
             <span>建立文件夾</span>
         </button>
@@ -153,13 +133,20 @@
     <header>
         <div class="breadcrumb" id="breadcrumb"></div>
     </header>
-    <div class="toolbar" id="main-toolbar"></div>
+    <div class="toolbar" id="main-toolbar">
+        <div class="tool-group" id="tool-left"></div>
+        <div class="tool-group" id="tool-right">
+            <div class="search-box">
+                <input type="text" placeholder="搜尋..." id="search-inp">
+            </div>
+        </div>
+    </div>
     <div class="content-pane">
-        <div class="viewport" id="main-view" onclick="App.onViewportClick(event)"></div>
+        <div class="viewport" id="main-view"></div>
         <div class="preview-pane" id="preview-pane" style="display: none;">
             <div class="preview-header">
                 <span class="preview-title" id="preview-title">預覽</span>
-                <button class="preview-close" onclick="App.closePreview()" title="關閉預覽">
+                <button class="preview-close" id="preview-close-btn" title="關閉預覽">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
@@ -168,724 +155,704 @@
     </div>
 </main>
 
-<input type="file" id="file-up" style="display:none" multiple onchange="App.handleUpload(this)">
+<input type="file" id="file-up" style="display:none" multiple>
 
 <script>
-    (function(){
-        // ---------- 安全轉義 ----------
-        const escapeHtml = (text) => {
-            if (!text) return '';
-            return String(text).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-        };
+(function(){
+    /* ---- 全局工具 ---- */
+    const escapeHtml = (text) => {
+        if (!text) return '';
+        return String(text).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    };
+    const ICON_FOLDER = `<svg class="svg-icon folder-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
+    const ICON_FILE = `<svg class="svg-icon file-icon" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+    const formatSize = (bytes) => {
+        if (bytes === 0) return '0 B';
+        const k = 1024, sizes = ['B','KB','MB','GB'];
+        const i = Math.floor(Math.log(bytes)/Math.log(k));
+        return parseFloat((bytes/Math.pow(k,i)).toFixed(2)) + ' ' + sizes[i];
+    };
+    const PREVIEW_EXTENSIONS = new Set(['pdf','txt','csv','html','css','php','jpg','jpeg','png','gif','bmp','tiff','svg']);
 
-        const ICON_FOLDER = `<svg class="svg-icon folder-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`;
-        const ICON_FILE = `<svg class="svg-icon file-icon" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>`;
+    /* ---- 数据库 ---- */
+    let db = [
+        {id:'1', name:'座標算法核心', type:'dir', pid:'0', del:false, time:Date.now()-1000000, size:0, content:null},
+        {id:'2', name:'10D_Storage_v1.bin', type:'file', pid:'1', del:false, time:Date.now()-800000, size:3, content:new Uint8Array([0x00,0x01,0x02])},
+        {id:'3', name:'開發筆記', type:'dir', pid:'0', del:false, time:Date.now()-500000, size:0, content:null},
+        {id:'4', name:'License.txt', type:'file', pid:'0', del:false, time:Date.now(), size:4096, content:new TextEncoder().encode("This is a license file.\n")}
+    ];
 
-        const formatSize = (bytes) => {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        };
+    /* ---- 状态 ---- */
+    let currentTab = 'drive';
+    let pathStack = [{id:'0', name:'我的硬碟'}];
+    let selection = new Set();
+    let clip = { mode:null, ids:[] };
+    let editId = null;
+    let searchQuery = '';
+    let toastTimer = null;
+    let previewItem = null;
+    let previewObjectUrl = null;
+    let isUploading = false;
+    let clickTimers = new Map();
+    let suspendInput = false;
 
-        const PREVIEW_EXTENSIONS = new Set([
-            'pdf', 'txt', 'csv', 'html', 'css', 'php',
-            'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg'
-        ]);
+    /* ---- DOM 引用 ---- */
+    const searchInput = document.getElementById('search-inp');
+    searchInput.addEventListener('input', function(e) {
+        if (suspendInput) { suspendInput = false; return; }
+        commitEdit();
+        searchQuery = e.target.value;
+        render();
+    });
 
-        // ---------- 資料庫 ----------
-        let db = [
-            {id: '1', name: "座標算法核心", type: 'dir', pid: '0', del: false, time: Date.now() - 1000000, size: 0, content: null},
-            {id: '2', name: "10D_Storage_v1.bin", type: 'file', pid: '1', del: false, time: Date.now() - 800000, size: 2048000, content: new Uint8Array([0x00, 0x01, 0x02])},
-            {id: '3', name: "開發筆記", type: 'dir', pid: '0', del: false, time: Date.now() - 500000, size: 0, content: null},
-            {id: '4', name: "License.txt", type: 'file', pid: '0', del: false, time: Date.now(), size: 4096, content: new TextEncoder().encode("This is a license file.\n")}
-        ];
-
-        let currentTab = 'drive';
-        let pathStack = [{id: '0', name: "我的硬碟"}];
-        let selection = new Set();
-        let clip = { mode: null, ids: [] };
-        let editId = null;
-        let searchQuery = "";
-        let toastTimer = null;
-        let previewItem = null;
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.style.display = 'block';
-            if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => t.style.display = 'none', 2000);
+    /* ---- 工具函数 ---- */
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.display = 'block';
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.style.display = 'none', 2000);
+    }
+    function generateId() {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+        return Date.now() + '-' + Math.random().toString(36).substring(2,11);
+    }
+    function isNameAvailable(name, targetPid, excludeId=null) {
+        return !db.some(x => x.pid===targetPid && x.name===name && !x.del && x.id!==excludeId);
+    }
+    function getUniqueName(baseName, targetPid, type, excludeId=null) {
+        let name = baseName, ext = '';
+        if (type==='file') {
+            const dot = baseName.lastIndexOf('.');
+            if (dot>0) { name = baseName.substring(0,dot); ext = baseName.substring(dot); }
         }
-
-        function generateId() {
-            if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-            return Date.now() + '-' + Math.random().toString(36).substring(2, 11);
+        let candidate = baseName, counter = 1;
+        while (!isNameAvailable(candidate, targetPid, excludeId)) {
+            candidate = type==='file' ? `${name}_副本${counter>1?counter:''}${ext}` : `${baseName}_副本${counter>1?counter:''}`;
+            counter++;
         }
-
-        function isDescendant(ancestorId, descendantId) {
-            if (ancestorId === descendantId) return true;
-            const children = db.filter(x => x.pid === ancestorId && x.type === 'dir');
-            for (let child of children) {
-                if (isDescendant(child.id, descendantId)) return true;
-            }
-            return false;
+        return candidate;
+    }
+    function isDescendant(ancestorId, descendantId) {
+        if (ancestorId===descendantId) return true;
+        const children = db.filter(x => x.pid===ancestorId && x.type==='dir');
+        for (let child of children) if (isDescendant(child.id, descendantId)) return true;
+        return false;
+    }
+    function collectAllDescendantIds(folderId) {
+        let ids = [], stack = [folderId];
+        while (stack.length) {
+            const pid = stack.pop();
+            const children = db.filter(x => x.pid===pid);
+            for (let c of children) { ids.push(c.id); if (c.type==='dir') stack.push(c.id); }
         }
+        return ids;
+    }
 
-        function collectAllDescendantIds(folderId) {
-            let ids = [];
-            const stack = [folderId];
-            while (stack.length) {
-                const pid = stack.pop();
-                const children = db.filter(x => x.pid === pid);
-                for (let child of children) {
-                    ids.push(child.id);
-                    if (child.type === 'dir') stack.push(child.id);
-                }
-            }
-            return ids;
+    window._renameWarnings = window._renameWarnings || [];
+    function relocateItem(item, targetPid) {
+        if (item.pid===targetPid) return true;
+        if (item.type==='dir' && isDescendant(item.id, targetPid)) {
+            showToast('無法移動：目標為來源的子資料夾'); return false;
         }
-
-        function isNameAvailable(name, targetPid, excludeId = null) {
-            return !db.some(x => x.pid === targetPid && x.name === name && !x.del && x.id !== excludeId);
-        }
-
-        function getUniqueName(baseName, targetPid, type, excludeId = null) {
-            let name = baseName;
-            let ext = "";
-            if (type === 'file') {
-                const dotIdx = baseName.lastIndexOf('.');
-                if (dotIdx > 0) { name = baseName.substring(0, dotIdx); ext = baseName.substring(dotIdx); }
-            }
-            let candidate = baseName;
-            let counter = 1;
-            while (!isNameAvailable(candidate, targetPid, excludeId)) {
-                candidate = type === 'file' ? `${name}_副本${counter > 1 ? counter : ''}${ext}` : `${baseName}_副本${counter > 1 ? counter : ''}`;
-                counter++;
-            }
-            return candidate;
-        }
-
-        function relocateItem(item, targetPid) {
-            if (item.pid === targetPid) return true;
-            if (item.type === 'dir' && isDescendant(item.id, targetPid)) {
-                showToast(`無法移動：目標為來源的子資料夾`);
-                return false;
-            }
-            const newName = getUniqueName(item.name, targetPid, item.type, item.id);
+        const newName = getUniqueName(item.name, targetPid, item.type, item.id);
+        if (newName!==item.name) {
+            window._renameWarnings.push(`${item.name} → ${newName}`);
             item.name = newName;
-            item.pid = targetPid;
+        }
+        item.pid = targetPid;
+        return true;
+    }
+    function moveFolderRecursive(folderId, targetPid) {
+        const folder = db.find(x => x.id===folderId);
+        if (!folder || folder.type!=='dir') return false;
+        if (!relocateItem(folder, targetPid)) return false;
+        const children = db.filter(x => x.pid===folderId);
+        for (let c of children) {
+            if (c.type==='dir') { if (!moveFolderRecursive(c.id, folder.id)) return false; }
+            else {
+                const newName = getUniqueName(c.name, folder.id, 'file', c.id);
+                if (newName!==c.name) { window._renameWarnings.push(`${c.name} → ${newName}`); c.name = newName; }
+                c.pid = folder.id;
+            }
+        }
+        return true;
+    }
+    function deepCopy(srcId, targetPid) {
+        const src = db.find(x => x.id===srcId);
+        if (!src || src.del) return false;
+        if (src.type==='dir' && isDescendant(srcId, targetPid)) {
+            showToast('無法複製：目標為來源的子資料夾'); return false;
+        }
+        const newId = generateId();
+        const uniqueName = getUniqueName(src.name, targetPid, src.type);
+        if (uniqueName!==src.name) window._renameWarnings.push(`${src.name} → ${uniqueName}`);
+        const newItem = { ...src, id:newId, pid:targetPid, name:uniqueName, time:Date.now() };
+        if (src.type==='file' && src.content) newItem.content = src.content.slice();
+        db.push(newItem);
+        if (src.type==='dir') {
+            const children = db.filter(x => x.pid===srcId && !x.del);
+            children.forEach(c => deepCopy(c.id, newId));
+        }
+        return true;
+    }
+    function restoreFolderRecursive(folderId, originalPid) {
+        const folder = db.find(x => x.id===folderId);
+        if (!folder) return;
+        const parentExists = db.some(x => x.id===originalPid && !x.del);
+        const targetPid = parentExists ? originalPid : '0';
+        const newName = getUniqueName(folder.name, targetPid, folder.type, folder.id);
+        if (newName!==folder.name) showToast(`還原資料夾「${folder.name}」更名為「${newName}」`);
+        folder.name = newName; folder.pid = targetPid; folder.del = false; folder.time = Date.now();
+        db.filter(x => x.pid===folderId).forEach(c => {
+            if (c.type==='dir') restoreFolderRecursive(c.id, folder.id);
+            else {
+                const nn = getUniqueName(c.name, folder.id, 'file', c.id);
+                if (nn!==c.name) showToast(`還原檔案「${c.name}」更名為「${nn}」`);
+                c.del=false; c.name=nn; c.pid=folder.id; c.time=Date.now();
+            }
+        });
+    }
+
+    function downloadFile(item) {
+        if (item.type!=='file' || !item.content || item.content.length===0) { showToast('文件內容為空'); return; }
+        const blob = new Blob([item.content]);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href=url; a.download=item.name; a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function createZip(files) {
+        const encoder = new TextEncoder();
+        const centralDir = [];
+        let offset = 0;
+        const fileParts = [];
+
+        for (let file of files) {
+            const nameBytes = encoder.encode(file.path);
+            const isDir = file.path.endsWith('/');
+            const content = isDir ? new Uint8Array(0) : (file.content || new Uint8Array(0));
+            const crc = 0;
+            const timeVal = file.time || Date.now();
+            const modTime = new Date(timeVal);
+            const dosDate = ((modTime.getFullYear()-1980)<<9) | ((modTime.getMonth()+1)<<5) | modTime.getDate();
+            const dosTime = (modTime.getHours()<<11) | (modTime.getMinutes()<<5) | Math.floor(modTime.getSeconds()/2);
+
+            const localSize = 30 + nameBytes.length;
+            const local = new Uint8Array(localSize);
+            const lv = new DataView(local.buffer);
+            lv.setUint32(0, 0x04034b50, true);
+            lv.setUint16(4, 0x0a, true);
+            lv.setUint16(6, 0, true);
+            lv.setUint16(8, 0, true);
+            lv.setUint16(10, dosTime, true);
+            lv.setUint16(12, dosDate, true);
+            lv.setUint32(14, crc, true);
+            lv.setUint32(18, content.length, true);
+            lv.setUint32(22, content.length, true);
+            lv.setUint16(26, nameBytes.length, true);
+            lv.setUint16(28, 0, true);
+            local.set(nameBytes, 30);
+            fileParts.push(local);
+            if (!isDir) fileParts.push(content);
+            offset += local.length + (isDir?0:content.length);
+
+            const cdLen = 46 + nameBytes.length;
+            const cd = new Uint8Array(cdLen);
+            const cdv = new DataView(cd.buffer);
+            cdv.setUint32(0, 0x02014b50, true);
+            cdv.setUint16(4, 0x0a, true);
+            cdv.setUint16(6, 0x0a, true);
+            cdv.setUint16(8, 0, true);
+            cdv.setUint16(10, 0, true);
+            cdv.setUint16(12, dosTime, true);
+            cdv.setUint16(14, dosDate, true);
+            cdv.setUint32(16, crc, true);
+            cdv.setUint32(20, content.length, true);
+            cdv.setUint32(24, content.length, true);
+            cdv.setUint16(28, nameBytes.length, true);
+            cdv.setUint16(30, 0, true);
+            cdv.setUint16(32, 0, true);
+            cdv.setUint16(34, 0, true);
+            cdv.setUint16(36, isDir?0x10:0, true);
+            cdv.setUint32(38, 0, true);
+            cdv.setUint32(42, offset - local.length - (isDir?0:content.length), true);
+            cd.set(nameBytes, 46);
+            centralDir.push({ entry:cd });
+        }
+
+        const cdSize = centralDir.reduce((s,c)=>s+c.entry.length,0);
+        const cdOffset = offset;
+        const cdBuffer = new Uint8Array(cdSize);
+        let pos = 0;
+        for (let c of centralDir) { cdBuffer.set(c.entry, pos); pos+=c.entry.length; }
+        fileParts.push(cdBuffer);
+
+        const eocd = new Uint8Array(22);
+        const ev = new DataView(eocd.buffer);
+        ev.setUint32(0, 0x06054b50, true);
+        ev.setUint16(4, 0, true);
+        ev.setUint16(6, 0, true);
+        ev.setUint16(8, centralDir.length, true);
+        ev.setUint16(10, centralDir.length, true);
+        ev.setUint32(12, cdSize, true);
+        ev.setUint32(16, cdOffset, true);
+        ev.setUint16(20, 0, true);
+        fileParts.push(eocd);
+
+        return new Blob(fileParts, { type:'application/zip' });
+    }
+
+    function downloadSelected() {
+        if (selection.size===0) return;
+        const selectedIds = [...selection];
+        const topIds = selectedIds.filter(id => {
+            let cur = db.find(x=>x.id===id);
+            while (cur && cur.pid!=='0') { if (selectedIds.includes(cur.pid)) return false; cur = db.find(x=>x.id===cur.pid); }
             return true;
-        }
+        });
+        const items = topIds.map(id=>db.find(x=>x.id===id)).filter(it=>it&&!it.del);
+        if (items.length===0) return;
 
-        function moveFolderRecursive(folderId, targetPid) {
-            const folder = db.find(x => x.id === folderId);
-            if (!folder || folder.type !== 'dir') return false;
-            if (!relocateItem(folder, targetPid)) return false;
-            const children = db.filter(x => x.pid === folderId);
-            for (let child of children) {
-                if (child.type === 'dir') {
-                    if (!moveFolderRecursive(child.id, folder.id)) return false;
-                } else {
-                    const newName = getUniqueName(child.name, folder.id, 'file', child.id);
-                    child.name = newName;
-                    child.pid = folder.id;
-                }
-            }
-            return true;
-        }
-
-        function deepCopy(srcId, targetPid) {
-            const src = db.find(x => x.id === srcId);
-            if (!src || src.del) return false;
-            if (src.type === 'dir' && isDescendant(srcId, targetPid)) {
-                showToast(`無法複製：目標為來源的子資料夾`);
-                return false;
-            }
-            const newId = generateId();
-            const uniqueName = getUniqueName(src.name, targetPid, src.type);
-            const newItem = { ...src, id: newId, pid: targetPid, name: uniqueName, time: Date.now() };
-            if (src.type === 'file' && src.content) newItem.content = src.content.slice();
-            db.push(newItem);
-            if (src.type === 'dir') {
-                const children = db.filter(x => x.pid === srcId && !x.del);
-                children.forEach(child => deepCopy(child.id, newId));
-            }
-            return true;
-        }
-
-        function restoreFolderRecursive(folderId, originalPid) {
-            const folder = db.find(x => x.id === folderId);
-            if (!folder) return;
-            const parentExists = db.some(x => x.id === originalPid && !x.del);
-            const targetPid = parentExists ? originalPid : '0';
-            folder.name = getUniqueName(folder.name, targetPid, folder.type, folder.id);
-            folder.pid = targetPid;
-            folder.del = false;
-            const children = db.filter(x => x.pid === folderId);
-            for (let child of children) {
-                if (child.type === 'dir') {
-                    restoreFolderRecursive(child.id, folder.id);
-                } else {
-                    child.del = false;
-                    child.name = getUniqueName(child.name, folder.id, 'file', child.id);
-                    child.pid = folder.id;
-                }
+        const downloads = [];
+        function collect(item, base='') {
+            if (item.type==='file') {
+                downloads.push({ path:base+item.name, content:item.content||new Uint8Array(0), time:item.time });
+            } else {
+                const children = db.filter(x=>x.pid===item.id && !x.del);
+                if (children.length===0) downloads.push({ path:base+item.name+'/', content:new Uint8Array(0), time:item.time });
+                else children.forEach(c=>collect(c, base+item.name+'/'));
             }
         }
-
-        // ---------- 下載 ----------
-        function downloadFile(item) {
-            if (item.type !== 'file') return;
-            let content = item.content || new TextEncoder().encode('');
-            const blob = new Blob([content]);
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = item.name;
-            a.click();
+        for (let it of items) {
+            if (it.type==='file') downloads.push({ path:it.name, content:it.content||new Uint8Array(0), time:it.time });
+            else collect(it, it.name+'/');
+        }
+        if (downloads.length===0) { showToast('無可下載檔案'); return; }
+        if (downloads.length===1 && items.length===1 && items[0].type==='file') downloadFile(items[0]);
+        else {
+            const zipBlob = createZip(downloads);
+            const url = URL.createObjectURL(zipBlob);
+            const a = document.createElement('a'); a.href=url; a.download=`archive_${Date.now()}.zip`; a.click();
             URL.revokeObjectURL(url);
+            showToast(`已打包 ${downloads.length} 個檔案`);
         }
+    }
 
-        function createZip(files) {
-            const encoder = new TextEncoder();
-            let centralDir = [];
-            let offset = 0;
-            const fileParts = [];
-
-            for (let file of files) {
-                const nameBytes = encoder.encode(file.path);
-                const content = file.content || new Uint8Array(0);
-                const crc = 0;
-                const modTime = file.time || Date.now();
-                const dosTime = ((modTime.getFullYear() - 1980) << 25) | ((modTime.getMonth() + 1) << 21) | (modTime.getDate() << 16) | (modTime.getHours() << 11) | (modTime.getMinutes() << 5) | (modTime.getSeconds() >> 1);
-
-                const localHeader = new Uint8Array(30 + nameBytes.length);
-                localHeader.set([0x50, 0x4B, 0x03, 0x04, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00], 0);
-                localHeader.set(new Uint8Array(new Uint16Array([dosTime & 0xFFFF, dosTime >> 16]).buffer), 10);
-                localHeader.set(new Uint8Array(new Uint32Array([crc, content.length, content.length, nameBytes.length]).buffer), 14);
-                localHeader.set(nameBytes, 30);
-                fileParts.push(localHeader);
-                fileParts.push(content);
-                offset += localHeader.length + content.length;
-
-                const cdEntry = new Uint8Array(46 + nameBytes.length);
-                cdEntry.set([0x50, 0x4B, 0x01, 0x02, 0x0A, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00], 0);
-                cdEntry.set(new Uint8Array(new Uint16Array([dosTime & 0xFFFF, dosTime >> 16]).buffer), 12);
-                cdEntry.set(new Uint8Array(new Uint32Array([crc, content.length, content.length, nameBytes.length, 0, 0, 0, 0, 0, offset - localHeader.length - content.length]).buffer), 16);
-                cdEntry.set(nameBytes, 46);
-                centralDir.push({ entry: cdEntry, offset: offset - localHeader.length - content.length });
-            }
-
-            const cdSize = centralDir.reduce((sum, c) => sum + c.entry.length, 0);
-            const cdOffset = offset;
-            const cdBuffer = new Uint8Array(cdSize);
-            let pos = 0;
-            for (let c of centralDir) {
-                cdBuffer.set(c.entry, pos);
-                pos += c.entry.length;
-            }
-            fileParts.push(cdBuffer);
-
-            const eocd = new Uint8Array(22);
-            eocd.set([0x50, 0x4B, 0x05, 0x06, 0x00, 0x00, 0x00, 0x00], 0);
-            eocd.set(new Uint8Array(new Uint16Array([centralDir.length, centralDir.length, cdSize, cdOffset]).buffer), 8);
-            fileParts.push(eocd);
-
-            return new Blob(fileParts, { type: 'application/zip' });
+    function closePreview() {
+        if (previewObjectUrl) {
+            URL.revokeObjectURL(previewObjectUrl);
+            previewObjectUrl = null;
         }
+        document.getElementById('preview-pane').style.display = 'none';
+        previewItem = null;
+    }
+    function showPreview(item) {
+        commitEdit();
+        const pane = document.getElementById('preview-pane');
+        const titleEl = document.getElementById('preview-title');
+        const contentEl = document.getElementById('preview-content');
+        titleEl.textContent = item.name;
+        contentEl.innerHTML = '';
+        if (previewObjectUrl) { URL.revokeObjectURL(previewObjectUrl); previewObjectUrl = null; }
 
-        function downloadSelected() {
-            if (selection.size === 0) return;
-            const selectedIds = [...selection];
-            const items = selectedIds.map(id => db.find(x => x.id === id)).filter(it => it && !it.del);
-            if (items.length === 0) return;
-
-            const filesToDownload = [];
-            function collectFiles(item, basePath = '') {
-                if (item.type === 'file') {
-                    filesToDownload.push({
-                        path: basePath + item.name,
-                        content: item.content || new Uint8Array(0),
-                        time: new Date(item.time)
-                    });
-                } else {
-                    const children = db.filter(x => x.pid === item.id && !x.del);
-                    for (let child of children) {
-                        collectFiles(child, basePath + item.name + '/');
-                    }
-                }
-            }
-            for (let item of items) {
-                if (item.type === 'file') {
-                    filesToDownload.push({ path: item.name, content: item.content || new Uint8Array(0), time: new Date(item.time) });
-                } else {
-                    collectFiles(item, item.name + '/');
-                }
-            }
-
-            if (filesToDownload.length === 0) {
-                showToast("沒有可下載的檔案");
-                return;
-            }
-
-            if (filesToDownload.length === 1 && items.length === 1 && items[0].type === 'file') {
-                downloadFile(items[0]);
-            } else {
-                const zipBlob = createZip(filesToDownload);
-                const url = URL.createObjectURL(zipBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `archive_${Date.now()}.zip`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast(`已打包 ${filesToDownload.length} 個檔案`);
-            }
-        }
-
-        // ---------- 內嵌預覽 ----------
-        function showPreview(item) {
-            previewItem = item;
-            const pane = document.getElementById('preview-pane');
-            const titleEl = document.getElementById('preview-title');
-            const contentEl = document.getElementById('preview-content');
-            
-            titleEl.textContent = item.name;
-            contentEl.innerHTML = '';
-            
-            const ext = item.name.split('.').pop().toLowerCase();
-            if (!PREVIEW_EXTENSIONS.has(ext)) {
-                contentEl.innerHTML = `<div class="preview-unsupported">不支援預覽 .${ext} 檔案</div>`;
-                pane.style.display = 'flex';
-                return;
-            }
-            
-            let content = item.content;
-            if (!content) content = new Uint8Array(0);
-            const blob = new Blob([content]);
-            const url = URL.createObjectURL(blob);
-            
-            if (['jpg','jpeg','png','gif','bmp','tiff','svg'].includes(ext)) {
-                const img = document.createElement('img');
-                img.src = url;
-                img.onload = () => URL.revokeObjectURL(url);
-                contentEl.appendChild(img);
-            } else if (ext === 'pdf') {
-                const embed = document.createElement('embed');
-                embed.src = url;
-                embed.type = 'application/pdf';
-                embed.style.width = '100%';
-                embed.style.height = '100%';
-                contentEl.appendChild(embed);
-                setTimeout(() => URL.revokeObjectURL(url), 2000);
-            } else {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const pre = document.createElement('pre');
-                    pre.textContent = e.target.result;
-                    contentEl.appendChild(pre);
-                    URL.revokeObjectURL(url);
-                };
-                reader.readAsText(blob);
-            }
-            
+        if (item.type==='file' && (!item.content || item.content.length===0)) {
+            contentEl.innerHTML = '<div class="preview-unsupported">檔案內容為空</div>';
             pane.style.display = 'flex';
+            return;
         }
-
-        function closePreview() {
-            document.getElementById('preview-pane').style.display = 'none';
-            previewItem = null;
+        const ext = item.name.split('.').pop().toLowerCase();
+        if (!PREVIEW_EXTENSIONS.has(ext)) {
+            contentEl.innerHTML = `<div class="preview-unsupported">不支援預覽 .${escapeHtml(ext)} 檔案</div>`;
+            pane.style.display = 'flex';
+            return;
         }
+        const content = item.content || new Uint8Array(0);
+        const blob = new Blob([content]);
+        const url = URL.createObjectURL(blob);
+        previewObjectUrl = url;
 
-        function updateSidebarButtons() {
-            const uploadBtn = document.getElementById('btn-upload');
-            const folderBtn = document.getElementById('btn-newfolder');
-            const disabled = currentTab !== 'drive';
-            uploadBtn.classList.toggle('disabled', disabled);
-            folderBtn.classList.toggle('disabled', disabled);
-        }
-
-        // ---------- 渲染 ----------
-        function render() {
-            const bc = document.getElementById('breadcrumb');
-            if (currentTab === 'drive') {
-                bc.innerHTML = pathStack.map((p, i) => {
-                    return `<span onclick="App.goPath(${i})">${escapeHtml(p.name)}</span>`;
-                }).join(' / ');
-            } else {
-                bc.innerHTML = `<span>${escapeHtml(pathStack[0].name)}</span>`;
-            }
-
-            const v = document.getElementById('main-view');
-            v.innerHTML = "";
-            const curPid = pathStack[pathStack.length - 1].id;
-
-            let items = [];
-            if (currentTab === 'recent') {
-                items = db.filter(x => x.type === 'file' && !x.del).sort((a,b) => b.time - a.time).slice(0, 15);
-                const grid = document.createElement('div');
-                grid.className = 'card-grid';
-                items.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.setAttribute('data-id', item.id);
-                    card.innerHTML = `<div class="card-icon">${ICON_FILE}</div><div class="card-info" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>`;
-                    card.ondblclick = () => {
-                        const file = db.find(x => x.id === item.id);
-                        if (file && !file.del) {
-                            showPreview(file);
-                        }
-                    };
-                    grid.appendChild(card);
-                });
-                v.appendChild(grid);
-                if (items.length === 0) v.innerHTML = `<div class="empty-state">暫無最近項目</div>`;
-            } else {
-                items = currentTab === 'drive' ? db.filter(x => x.pid === curPid && !x.del) : db.filter(x => x.del);
-                if (searchQuery) {
-                    const q = searchQuery.toLowerCase();
-                    items = items.filter(x => x.name.toLowerCase().includes(q));
-                }
-                items.sort((a,b) => a.name.localeCompare(b.name));
-
-                const list = document.createElement('div');
-                list.innerHTML = `<div class="list-header"><span>名稱</span><span>建立時間</span><span>大小</span></div>`;
-
-                items.forEach(item => {
-                    const isLocked = clip.ids.includes(item.id);
-                    const row = document.createElement('div');
-                    row.className = `row ${selection.has(item.id) ? 'selected' : ''} ${isLocked ? 'locked' : ''}`;
-                    row.setAttribute('data-id', item.id);
-
-                    row.ondblclick = (e) => {
-                        e.stopPropagation();
-                        editId = null;
-                        if (currentTab === 'trash') {
-                            if (item.type === 'file') {
-                                showPreview(item);
-                            } else {
-                                showToast("垃圾桶內項目無法開啟");
-                            }
-                            return;
-                        }
-                        if (item.type === 'dir') {
-                            pathStack.push({id: item.id, name: item.name});
-                            selection.clear();
-                            closePreview();
-                            render();
-                        } else {
-                            showPreview(item);
-                        }
-                    };
-
-                    let nameBlock;
-                    if (editId === item.id) {
-                        nameBlock = `<input type="text" class="inline-input" id="inp-edit" value="${escapeHtml(item.name)}">`;
-                    } else {
-                        nameBlock = `<span>${escapeHtml(item.name)}</span>`;
-                    }
-
-                    const timeStr = new Date(item.time).toLocaleString('zh-TW', {hour12: false});
-                    const sizeStr = item.type === 'dir' ? '-' : formatSize(item.size || 0);
-
-                    row.innerHTML = `
-                        <div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?ICON_FOLDER:ICON_FILE}${nameBlock}</div>
-                        <div style="font-size:13px;color:var(--text-sub)">${escapeHtml(timeStr)}</div>
-                        <div style="font-size:13px;color:var(--text-sub)">${escapeHtml(sizeStr)}</div>
-                    `;
-                    list.appendChild(row);
-                });
-                v.appendChild(list);
-                if (items.length === 0) v.innerHTML = `<div class="empty-state">${searchQuery ? '找不到匹配項目' : '此處空空如也'}</div>`;
-
-                if (editId) {
-                    const inp = document.getElementById('inp-edit');
-                    if (inp) {
-                        inp.focus();
-                        const target = db.find(x => x.id === editId);
-                        const originalName = target?.name || '';
-                        inp.onblur = () => {
-                            const newName = inp.value.trim();
-                            if (target && newName && newName !== originalName) {
-                                target.name = getUniqueName(newName, target.pid, target.type, target.id);
-                            }
-                            editId = null;
-                            render();
-                        };
-                        inp.onkeydown = (e) => {
-                            if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
-                            if (e.key === 'Escape') { inp.value = originalName; inp.blur(); }
-                        };
-                    }
-                }
-            }
-            updateToolbar();
-            updateSidebarButtons();
-            
-            if (previewItem) {
-                const stillExists = db.some(x => x.id === previewItem.id && !x.del);
-                if (!stillExists) {
-                    closePreview();
-                }
-            }
-        }
-
-        function updateToolbar() {
-            const tb = document.getElementById('main-toolbar');
-            tb.innerHTML = "";
-            const left = document.createElement('div');
-            left.className = 'tool-group';
-            const right = document.createElement('div');
-            right.className = 'tool-group';
-
-            if (currentTab !== 'recent') {
-                right.innerHTML = `<div class="search-box"><input type="text" placeholder="搜尋..." value="${escapeHtml(searchQuery)}" id="search-inp"></div>`;
-            }
-
-            const bindSearch = () => {
-                const sinp = document.getElementById('search-inp');
-                if (sinp) sinp.oninput = (e) => { searchQuery = e.target.value; render(); };
+        if (['jpg','jpeg','png','gif','bmp','tiff','svg'].includes(ext)) {
+            const img = document.createElement('img'); img.src = url; contentEl.appendChild(img);
+        } else if (ext==='pdf') {
+            const embed = document.createElement('embed');
+            embed.src = url; embed.type = 'application/pdf';
+            embed.style.width='100%'; embed.style.height='100%'; contentEl.appendChild(embed);
+        } else {
+            const reader = new FileReader();
+            reader.onload = e => {
+                contentEl.innerHTML = `<pre>${escapeHtml(e.target.result)}</pre>`;
+                URL.revokeObjectURL(url);
+                previewObjectUrl = null;
             };
+            reader.readAsText(blob);
+        }
+        pane.style.display = 'flex';
+        previewItem = item;
+    }
+    document.getElementById('preview-close-btn').addEventListener('click', closePreview);
 
-            if (currentTab === 'drive' && selection.size === 0 && clip.ids.length === 0) {
-                tb.append(left, right);
-                bindSearch();
-                return;
-            }
+    function commitEdit() {
+        const id = editId; if (!id) return false;
+        const inp = document.getElementById('inp-edit');
+        if (!inp) { editId = null; return false; }
+        let newName = inp.value.trim();
+        const target = db.find(x => x.id===id);
+        if (target && newName && newName!==target.name) {
+            const unique = getUniqueName(newName, target.pid, target.type, target.id);
+            if (unique!==newName) showToast(`重新命名時自動更名為「${unique}」`);
+            target.name = unique; target.time = Date.now();
+        } else if (target && !newName) inp.value = target.name;
+        editId = null;
+        return true;
+    }
+    function cancelEdit() { if (!editId) return; editId = null; render(); }
 
-            if (selection.size > 0) {
-                if (currentTab === 'trash') {
-                    left.append(btn("還原", () => {
-                        const selectedIds = [...selection];
-                        selectedIds.forEach(id => {
-                            const it = db.find(x => x.id === id);
-                            if (!it || !it.del) return;
-                            const originalPid = it.pid;
-                            if (it.type === 'dir') {
-                                restoreFolderRecursive(id, originalPid);
-                            } else {
-                                const parentExists = db.some(x => x.id === originalPid && !x.del);
-                                const targetPid = parentExists ? originalPid : '0';
-                                it.name = getUniqueName(it.name, targetPid, 'file', it.id);
-                                it.pid = targetPid;
-                                it.del = false;
-                            }
-                        });
-                        selection.clear();
-                        closePreview();
-                        render();
-                    }, true));
-                    left.append(btn("永久刪除", () => {
-                        const toDelete = [...selection];
-                        toDelete.forEach(id => {
-                            const item = db.find(x => x.id === id);
-                            if (item && item.type === 'dir') {
-                                const descendants = collectAllDescendantIds(id);
-                                db = db.filter(x => !descendants.includes(x.id) && x.id !== id);
-                            } else {
-                                db = db.filter(x => x.id !== id);
-                            }
-                        });
-                        selection.clear();
-                        closePreview();
-                        render();
+    function updateSidebarButtons() {
+        const uploadBtn = document.getElementById('btn-upload');
+        const folderBtn = document.getElementById('btn-newfolder');
+        if (isUploading) {
+            uploadBtn.classList.add('disabled');
+        } else {
+            uploadBtn.classList.toggle('disabled', currentTab !== 'drive');
+        }
+        folderBtn.classList.toggle('disabled', currentTab !== 'drive');
+    }
+
+    function updateSelectionVisuals() {
+        document.querySelectorAll('.row').forEach(row => {
+            const id = row.getAttribute('data-id');
+            if (id) row.classList.toggle('selected', selection.has(id));
+        });
+        updateToolbar();
+    }
+    function handleItemClick(e, id) {
+        if (e.target.tagName==='INPUT') return;
+        if (commitEdit()) { render(); return; }
+        // 如果该行被锁定（在剪贴板中），阻止任何操作
+        const row = e.currentTarget;
+        if (row.classList.contains('locked')) return;
+
+        const timer = clickTimers.get(id);
+        if (timer) clearTimeout(timer);
+        const t = setTimeout(() => {
+            clickTimers.delete(id);
+            if (selection.has(id)) selection.delete(id); else selection.add(id);
+            updateSelectionVisuals();
+        }, 200);
+        clickTimers.set(id, t);
+        e.stopPropagation();
+    }
+
+    function updateToolbar() {
+        const left = document.getElementById('tool-left');
+        left.innerHTML = '';
+        if (currentTab==='drive' && selection.size===0 && clip.ids.length===0) return;
+        if (selection.size>0) {
+            if (currentTab==='trash') {
+                left.append(btn('還原', () => {
+                    [...selection].forEach(id => {
+                        const it = db.find(x=>x.id===id);
+                        if (!it || !it.del) return;
+                        if (it.type==='dir') restoreFolderRecursive(id, it.pid);
+                        else {
+                            const parentExists = db.some(x=>x.id===it.pid && !x.del);
+                            const targetPid = parentExists ? it.pid : '0';
+                            const newName = getUniqueName(it.name, targetPid, 'file', it.id);
+                            if (newName!==it.name) showToast(`還原檔案更名為「${newName}」`);
+                            it.name = newName; it.pid = targetPid; it.del = false; it.time = Date.now();
+                        }
+                    });
+                    selection.clear(); closePreview(); render();
+                }, true));
+                left.append(btn('永久刪除', () => {
+                    [...selection].forEach(id => {
+                        const item = db.find(x=>x.id===id);
+                        if (item && item.type==='dir') {
+                            const descendants = collectAllDescendantIds(id);
+                            db = db.filter(x => !descendants.includes(x.id) && x.id!==id);
+                        } else db = db.filter(x => x.id!==id);
+                    });
+                    selection.clear(); closePreview(); render();
+                }, false, true));
+            } else if (currentTab==='drive') {
+                left.append(btn('下載', downloadSelected, true));
+                if (selection.size===1) {
+                    left.append(btn('重新命名', () => { editId = [...selection][0]; render(); }, true));
+                    left.append(btn('移動', () => { clip = { mode:'move', ids:[...selection] }; selection.clear(); render(); }, true));
+                    left.append(btn('複製', () => { clip = { mode:'copy', ids:[...selection] }; selection.clear(); render(); }, true));
+                    left.append(btn('刪除', () => {
+                        selection.forEach(id => { const it=db.find(x=>x.id===id); if(it)it.del=true; });
+                        selection.clear(); closePreview(); render();
                     }, false, true));
                 } else {
-                    left.append(btn("下載", downloadSelected, true));
-                    if (selection.size === 1) {
-                        left.append(btn("重新命名", () => { editId = Array.from(selection)[0]; render(); }, true));
-                        left.append(btn("移動", () => { clip = { mode: 'move', ids: Array.from(selection) }; selection.clear(); render(); }, true));
-                        left.append(btn("複製", () => { clip = { mode: 'copy', ids: Array.from(selection) }; selection.clear(); render(); }, true));
-                        left.append(btn("刪除", () => {
-                            selection.forEach(id => { const it = db.find(x=>x.id===id); if(it) it.del = true; });
-                            selection.clear();
-                            closePreview();
-                            render();
-                        }, false, true));
-                    } else {
-                        left.append(btn("批量移動", () => { clip = { mode: 'move', ids: Array.from(selection) }; selection.clear(); render(); }, true));
-                        left.append(btn("批量複製", () => { clip = { mode: 'copy', ids: Array.from(selection) }; selection.clear(); render(); }, true));
-                        left.append(btn("批量刪除", () => {
-                            selection.forEach(id => { const it = db.find(x=>x.id===id); if(it) it.del = true; });
-                            selection.clear();
-                            closePreview();
-                            render();
-                        }, false, true));
-                    }
+                    left.append(btn('批量移動', () => { clip = { mode:'move', ids:[...selection] }; selection.clear(); render(); }, true));
+                    left.append(btn('批量複製', () => { clip = { mode:'copy', ids:[...selection] }; selection.clear(); render(); }, true));
+                    left.append(btn('批量刪除', () => {
+                        selection.forEach(id => { const it=db.find(x=>x.id===id); if(it)it.del=true; });
+                        selection.clear(); closePreview(); render();
+                    }, false, true));
                 }
-                tb.append(left, right);
-                bindSearch();
-                return;
             }
-
-            if (clip.ids.length > 0 && currentTab === 'drive') {
-                left.append(btn(`貼上 (${clip.ids.length})`, () => handlePaste(), true));
-                left.append(btn("取消", () => { clip = { mode: null, ids: [] }; render(); }));
-                tb.append(left, right);
-                bindSearch();
-                return;
-            }
-
-            if (clip.ids.length > 0 && currentTab !== 'drive') {
-                left.append(btn("取消剪貼", () => { clip = { mode: null, ids: [] }; render(); }));
-                tb.append(left, right);
-                bindSearch();
-                return;
-            }
-
-            tb.append(left, right);
-            bindSearch();
+        } else if (clip.ids.length>0 && currentTab==='drive') {
+            left.append(btn(`貼上 (${clip.ids.length})`, () => handlePaste(), true));
+            left.append(btn('取消', () => { clip = {mode:null,ids:[]}; render(); }));
+        } else if (clip.ids.length>0 && currentTab!=='drive') {
+            left.append(btn('取消剪贴', () => { clip = {mode:null,ids:[]}; render(); }));
         }
+    }
+    function btn(text, action, isPrimary=false, isDanger=false) {
+        const b = document.createElement('button');
+        b.className = `t-btn${isPrimary?' primary':''}${isDanger?' danger':''}`;
+        b.textContent = text;
+        b.onclick = action;
+        return b;
+    }
 
-        function btn(text, action, isPrimary = false, isDanger = false) {
-            const b = document.createElement('button');
-            b.className = `t-btn ${isPrimary ? 'primary' : ''} ${isDanger ? 'danger' : ''}`;
-            b.textContent = text;
-            b.onclick = action;
-            return b;
-        }
-
-        function handlePaste() {
-            const targetPid = pathStack[pathStack.length - 1].id;
-            const validIds = clip.ids.filter(id => {
-                const item = db.find(x => x.id === id);
-                return item && !item.del;
-            });
-            if (validIds.length === 0) { clip = { mode: null, ids: [] }; render(); return; }
-
-            if (clip.mode === 'move') {
-                for (let id of validIds) {
-                    const item = db.find(x => x.id === id);
-                    if (item && item.type === 'dir' && isDescendant(id, targetPid)) {
-                        showToast(`無法移動：目標為來源的子資料夾`);
-                        clip = { mode: null, ids: [] };
-                        render();
-                        return;
-                    }
+    function handlePaste() {
+        if (currentTab!=='drive') { showToast('只能在「我的硬碟」貼上'); clip={mode:null,ids:[]}; render(); return; }
+        const targetPid = pathStack[pathStack.length-1].id;
+        const validIds = clip.ids.filter(id => { const it=db.find(x=>x.id===id); return it && !it.del; });
+        if (validIds.length===0) { clip={mode:null,ids:[]}; render(); return; }
+        const rootIds = validIds.filter(id => {
+            let cur = db.find(x=>x.id===id);
+            while (cur && cur.pid!=='0') { if (validIds.includes(cur.pid)) return false; cur = db.find(x=>x.id===cur.pid); }
+            return true;
+        });
+        window._renameWarnings = [];
+        if (clip.mode==='move') {
+            for (let id of validIds) {
+                const item = db.find(x=>x.id===id);
+                if (item && item.type==='dir' && isDescendant(id, targetPid)) {
+                    showToast('無法移動：目標為來源的子資料夾'); clip={mode:null,ids:[]}; render(); return;
                 }
-                validIds.forEach(id => {
-                    const item = db.find(x => x.id === id);
-                    if (item.type === 'dir') {
-                        moveFolderRecursive(id, targetPid);
-                    } else {
-                        relocateItem(item, targetPid);
-                    }
-                });
-                showToast(`已移動 ${validIds.length} 個項目`);
-            } else if (clip.mode === 'copy') {
-                let count = 0;
-                validIds.forEach(id => { if (deepCopy(id, targetPid)) count++; });
-                showToast(`已複製 ${count} 個項目`);
             }
-            clip = { mode: null, ids: [] };
+            for (let id of rootIds) {
+                const item = db.find(x=>x.id===id);
+                if (item.type==='dir') moveFolderRecursive(id, targetPid);
+                else relocateItem(item, targetPid);
+            }
+            showToast(`已移動 ${rootIds.length} 個項目`);
+        } else {
+            let cnt = 0;
+            for (let id of rootIds) if (deepCopy(id, targetPid)) cnt++;
+            showToast(`已複製 ${cnt} 個項目`);
+        }
+        if (window._renameWarnings.length>0) {
+            const preview = window._renameWarnings.slice(0,3).join('，');
+            showToast(`部分檔案因重名已自動更名：${preview}${window._renameWarnings.length>3?'…':''}`);
+        }
+        clip = {mode:null,ids:[]};
+        suspendInput = true;
+        searchInput.value = '';
+        searchQuery = '';
+        closePreview();
+        render();
+    }
+
+    const uploadBtn = document.getElementById('btn-upload');
+    const newFolderBtn = document.getElementById('btn-newfolder');
+    const fileInput = document.getElementById('file-up');
+
+    uploadBtn.addEventListener('click', () => {
+        if (uploadBtn.classList.contains('disabled')) { showToast('目前無法上傳'); return; }
+        commitEdit(); fileInput.click();
+    });
+    newFolderBtn.addEventListener('click', () => {
+        if (newFolderBtn.classList.contains('disabled')) { showToast('請在「我的硬碟」建立資料夾'); return; }
+        commitEdit(); App.createFolder();
+    });
+
+    fileInput.addEventListener('change', function() {
+        if (currentTab!=='drive') { showToast('請在「我的硬碟」上傳'); fileInput.value=''; return; }
+        if (isUploading) { fileInput.value=''; return; }
+        const files = fileInput.files;
+        if (!files.length) return;
+        const targetPid = pathStack[pathStack.length-1].id;
+        isUploading = true; updateSidebarButtons();
+        showToast(`正在上傳 ${files.length} 個文件...`);
+
+        const promises = [];
+        for (let file of files) {
+            promises.push(new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = e => resolve({ name:file.name, size:file.size, content:new Uint8Array(e.target.result) });
+                reader.onerror = () => resolve(null);
+                reader.readAsArrayBuffer(file);
+            }));
+        }
+        Promise.all(promises).then(results => {
+            let cnt = 0;
+            for (let res of results) {
+                if (!res) continue;
+                const safeName = getUniqueName(res.name, targetPid, 'file');
+                if (safeName!==res.name) showToast(`檔案「${res.name}」已更名為「${safeName}」`);
+                db.push({ id:generateId(), name:safeName, type:'file', pid:targetPid, del:false, time:Date.now(), size:res.size, content:res.content });
+                cnt++;
+            }
+            suspendInput = true;
+            searchInput.value = '';
+            searchQuery = '';
+            render();
+            showToast(`已上傳 ${cnt} 個文件`);
+            fileInput.value = '';
+            isUploading = false;
+            updateSidebarButtons();
+        }).catch(() => { showToast('上傳失敗'); fileInput.value=''; isUploading=false; updateSidebarButtons(); });
+    });
+
+    window.App = {
+        toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            const logo = document.getElementById('logo-img');
+            logo.classList.add('rotate');
+            setTimeout(() => logo.classList.remove('rotate'), 300);
+        },
+        switchTab(tab) {
+            commitEdit();
+            currentTab = tab;
+            pathStack = [{id:'0', name: tab==='drive'?'我的硬碟':(tab==='recent'?'最近項目':'垃圾桶')}];
+            selection.clear();
+            suspendInput = true;
+            searchInput.value = '';
+            searchQuery = '';
+            editId = null;
+            clip = {mode:null,ids:[]};
             closePreview();
             render();
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.id===`menu-${tab}`));
+            updateSidebarButtons();
+        },
+        goPath(idx) {
+            if (currentTab!=='drive') return;
+            commitEdit();
+            pathStack = pathStack.slice(0, idx+1);
+            selection.clear(); editId=null; closePreview();
+            render();
+        },
+        createFolder() {
+            if (currentTab!=='drive') { showToast('請在「我的硬碟」建立資料夾'); return; }
+            const targetPid = pathStack[pathStack.length-1].id;
+            const newName = getUniqueName('未命名資料夾', targetPid, 'dir');
+            db.push({ id:generateId(), name:newName, type:'dir', pid:targetPid, del:false, time:Date.now(), size:0, content:null });
+            editId = db[db.length-1].id;
+            render();
+        }
+    };
+
+    function render() {
+        clickTimers.forEach(t => clearTimeout(t));
+        clickTimers.clear();
+
+        const bc = document.getElementById('breadcrumb');
+        if (currentTab==='drive') {
+            bc.innerHTML = pathStack.map((p,i) => `<span onclick="App.goPath(${i})">${escapeHtml(p.name)}</span>`).join(' / ');
+        } else {
+            bc.innerHTML = `<span style="cursor:default;padding:4px 8px;border-radius:var(--radius);color:var(--text);font-weight:500;">${escapeHtml(pathStack[0].name)}</span>`;
         }
 
-        window.App = {
-            toggleSidebar() {
-                const sidebar = document.getElementById('sidebar');
-                const logo = document.getElementById('logo-img');
-                logo.classList.add('rotate');
-                sidebar.classList.toggle('collapsed');
-                setTimeout(() => logo.classList.remove('rotate'), 400);
-            },
-            switchTab(tab) {
-                currentTab = tab;
-                pathStack = [{id: '0', name: tab === 'drive' ? '我的硬碟' : (tab === 'recent' ? '最近項目' : '垃圾桶')}];
-                selection.clear(); searchQuery = ""; editId = null; clip = { mode: null, ids: [] };
-                closePreview();
-                render();
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.id === `menu-${tab}`));
-                updateSidebarButtons();
-            },
-            goPath(idx) {
-                if (currentTab !== 'drive') return;
-                pathStack = pathStack.slice(0, idx + 1);
-                selection.clear(); editId = null; closePreview(); render();
-            },
-            createFolder() {
-                if (currentTab !== 'drive') return showToast("請在「我的硬碟」中建立資料夾");
-                const newId = generateId();
-                const targetPid = pathStack[pathStack.length - 1].id;
-                const name = getUniqueName("未命名資料夾", targetPid, 'dir');
-                db.push({ id: newId, name, type: 'dir', pid: targetPid, del: false, time: Date.now(), size: 0, content: null });
-                editId = newId;
-                render();
-            },
-            handleUpload(input) {
-                if (currentTab !== 'drive') { showToast("請在「我的硬碟」中上傳"); input.value = ''; return; }
-                const files = input.files;
-                if (!files.length) return;
-                
-                const targetPid = pathStack[pathStack.length - 1].id;
-                const uploadBtn = document.getElementById('btn-upload');
-                uploadBtn.classList.add('disabled');
-                showToast(`正在上傳 ${files.length} 個文件...`);
-                
-                const promises = [];
-                for (let file of files) {
-                    promises.push(new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            resolve({
-                                name: file.name,
-                                size: file.size,
-                                content: new Uint8Array(e.target.result)
-                            });
-                        };
-                        reader.readAsArrayBuffer(file);
-                    }));
-                }
-                
-                Promise.all(promises).then(results => {
-                    for (let res of results) {
-                        const safeName = getUniqueName(res.name, targetPid, 'file');
-                        db.push({
-                            id: generateId(),
-                            name: safeName,
-                            type: 'file',
-                            pid: targetPid,
-                            del: false,
-                            time: Date.now(),
-                            size: res.size,
-                            content: res.content
-                        });
-                    }
-                    render();
-                    showToast(`已上傳 ${results.length} 個文件`);
-                    uploadBtn.classList.remove('disabled');
-                    input.value = '';
-                }).catch(err => {
-                    showToast('上傳失敗');
-                    uploadBtn.classList.remove('disabled');
-                    input.value = '';
+        const v = document.getElementById('main-view');
+        v.innerHTML = '';
+        const curPid = pathStack[pathStack.length-1].id;
+        let items = [];
+
+        if (currentTab==='recent') {
+            items = db.filter(x => x.type==='file' && !x.del).sort((a,b)=>b.time-a.time).slice(0,30);
+            if (searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
+            const grid = document.createElement('div'); grid.className = 'card-grid';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-id', item.id);
+                card.innerHTML = `<div>${ICON_FILE}</div><div class="card-info">${escapeHtml(item.name)}</div>`;
+                card.addEventListener('click', e => handleItemClick(e, item.id));
+                card.addEventListener('dblclick', e => {
+                    const t = clickTimers.get(item.id); if (t) { clearTimeout(t); clickTimers.delete(item.id); }
+                    if (commitEdit()) { render(); return; }
+                    selection.clear(); updateSelectionVisuals();
+                    if (!item.del) showPreview(item);
                 });
-            },
-            onViewportClick(e) { 
-                if (e.target === document.getElementById('main-view')) { 
-                    selection.clear(); 
-                    render(); 
+                grid.appendChild(card);
+            });
+            v.appendChild(grid);
+            if (items.length===0) v.innerHTML = '<div class="empty-state">暫無最近項目</div>';
+        } else if (currentTab==='drive') {
+            items = db.filter(x => x.pid===curPid && !x.del);
+            if (searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
+            items.sort((a,b)=>b.time-a.time);
+            const list = document.createElement('div');
+            list.innerHTML = '<div class="list-header"><span>名稱</span><span>建立時間</span><span>大小</span></div>';
+            items.forEach(item => {
+                const locked = clip.ids.includes(item.id);
+                const row = document.createElement('div');
+                row.className = `row${selection.has(item.id)?' selected':''}${locked?' locked':''}`;
+                row.setAttribute('data-id', item.id);
+                row.addEventListener('click', e => handleItemClick(e, item.id));
+                row.addEventListener('dblclick', e => {
+                    const t = clickTimers.get(item.id); if (t) { clearTimeout(t); clickTimers.delete(item.id); }
+                    if (commitEdit()) { render(); return; }
+                    if (currentTab==='trash') { showToast('垃圾桶內項目無法開啟'); return; }
+                    selection.clear(); updateSelectionVisuals();
+                    if (item.type==='dir') { pathStack.push({id:item.id, name:item.name}); closePreview(); render(); }
+                    else showPreview(item);
+                });
+                const nameBlock = (editId===item.id)
+                    ? `<input type="text" class="inline-input" id="inp-edit" value="${escapeHtml(item.name)}">`
+                    : `<span>${escapeHtml(item.name)}</span>`;
+                const timeStr = new Date(item.time).toLocaleString('zh-TW', {hour12:false});
+                const sizeStr = item.type==='dir' ? '-' : formatSize(item.size||0);
+                row.innerHTML = `<div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?ICON_FOLDER:ICON_FILE}${nameBlock}</div><div>${escapeHtml(timeStr)}</div><div>${escapeHtml(sizeStr)}</div>`;
+                list.appendChild(row);
+            });
+            v.appendChild(list);
+            if (items.length===0) v.innerHTML = `<div class="empty-state">${searchQuery?'找不到匹配項目':'此處空空如也'}</div>`;
+
+            if (editId) {
+                const inp = document.getElementById('inp-edit');
+                if (inp) {
+                    inp.focus();
+                    inp.onblur = () => { if (commitEdit()) render(); };
+                    inp.onkeydown = e => {
+                        if (e.key==='Enter') { e.preventDefault(); if (commitEdit()) render(); }
+                        else if (e.key==='Escape') { e.preventDefault(); cancelEdit(); }
+                    };
                 }
-            },
-            closePreview() { closePreview(); }
-        };
+            }
+        } else {
+            items = db.filter(x => x.del);
+            if (searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
+            items.sort((a,b)=>b.time-a.time);
+            const list = document.createElement('div');
+            list.innerHTML = '<div class="list-header"><span>名稱</span><span>原始時間</span><span>大小</span></div>';
+            items.forEach(item => {
+                const row = document.createElement('div');
+                row.className = `row${selection.has(item.id)?' selected':''}`;
+                row.setAttribute('data-id', item.id);
+                row.addEventListener('click', e => handleItemClick(e, item.id));
+                const timeStr = new Date(item.time).toLocaleString('zh-TW', {hour12:false});
+                const sizeStr = item.type==='dir' ? '-' : formatSize(item.size||0);
+                row.innerHTML = `<div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?ICON_FOLDER:ICON_FILE}<span>${escapeHtml(item.name)}</span></div><div>${escapeHtml(timeStr)}</div><div>${escapeHtml(sizeStr)}</div>`;
+                list.appendChild(row);
+            });
+            v.appendChild(list);
+            if (items.length===0) v.innerHTML = '<div class="empty-state">垃圾桶是空的</div>';
+        }
 
-        document.getElementById('main-view').addEventListener('click', (e) => {
-            const row = e.target.closest('.row');
-            if (!row || row.classList.contains('locked')) return;
-            if (e.target.tagName === 'INPUT') return;
-            const id = row.getAttribute('data-id');
-            if (!id) return;
-            if (selection.has(id)) selection.delete(id);
-            else selection.add(id);
-            render();
-        });
-
-        render();
+        updateToolbar();
         updateSidebarButtons();
-    })();
+        if (previewItem && !db.some(x => x.id===previewItem.id && !x.del)) closePreview();
+
+        v.onclick = function(e) {
+            if (!e.target.closest('.row, .card') && selection.size>0) {
+                selection.clear();
+                updateSelectionVisuals();
+            }
+        };
+    }
+
+    render();
+    updateSidebarButtons();
+})();
 </script>
 </body>
 </html>
