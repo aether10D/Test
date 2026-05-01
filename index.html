@@ -6,7 +6,7 @@
   <title>AETHER 10D ARCHITECT</title>
   <style>
     :root {
-      --bg: #fff;
+      --bg: #ffffff;
       --border: #e8eaed;
       --text: #202124;
       --sub: #5f6368;
@@ -20,30 +20,58 @@
       --radius: 999px;
       --preview-w: 360px;
       --icon-size: 76px;
+      --glass-bg: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.35);
+      --glass-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --glass-blur: 12px;
     }
-    * { box-sizing: border-box; margin: 0; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
     body {
       font-family: "Segoe UI", "PingFang TC", sans-serif;
       display: flex;
       height: 100vh;
       overflow: hidden;
       color: var(--text);
-      background: #fafbfc;
+      background: #ffffff;
       user-select: none;
       -webkit-user-select: none;
     }
-    img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+
+    img {
+      -webkit-user-drag: none;
+      user-drag: none;
+      pointer-events: none;
+    }
+
+    /* 玻璃质感通用样式 */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+
     #sidebar {
       width: var(--side-w);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      transition: width 0.22s cubic-bezier(0.4,0.0,0.2,1.0);
+      transition: width 0.22s cubic-bezier(0.4, 0.0, 0.2, 1.0);
       flex-shrink: 0;
       background: #ffffff;
       z-index: 30;
     }
-    #sidebar.collapsed { width: var(--side-min); }
+
+    #sidebar.collapsed {
+      width: var(--side-min);
+    }
+
     .brand {
       height: 72px;
       display: flex;
@@ -52,17 +80,23 @@
       cursor: pointer;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
+      background: #ffffff;
     }
+
     .logo-img {
       width: 46px;
       height: 46px;
       border-radius: 14px;
       object-fit: cover;
       border: 1px solid var(--border);
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
       flex-shrink: 0;
     }
-    .logo-img.rotate { transform: rotate(360deg); }
+
+    .logo-img.rotate {
+      transform: rotate(360deg);
+    }
+
     .sidebar-tools {
       padding: 10px 8px;
       display: flex;
@@ -70,7 +104,9 @@
       gap: 6px;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
+      background: #ffffff;
     }
+
     .sidebar-btn {
       height: 42px;
       border: 1px solid var(--border);
@@ -86,25 +122,70 @@
       padding: 0 14px;
       min-width: 42px;
       white-space: nowrap;
-      background: var(--bg);
+      background: var(--glass-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
       color: var(--text);
       flex-shrink: 0;
       overflow: hidden;
     }
-    .sidebar-btn:hover { background: #e8f0fe; border-color: var(--accent); }
-    .sidebar-btn.primary { background: var(--accent); color: white; border: none; }
-    .sidebar-btn.primary:hover { background: #1669d8; }
-    .sidebar-btn.disabled { opacity: 0.55; background: #f5f5f5; border-color: #ddd; pointer-events: none; }
-    .sidebar-btn svg { stroke: currentColor; flex-shrink: 0; width: 18px; height: 18px; }
+
+    .sidebar-btn:hover {
+      background: rgba(232, 240, 254, 0.7);
+      border-color: var(--accent);
+    }
+
+    .sidebar-btn.primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+    }
+
+    .sidebar-btn.primary:hover {
+      background: #1669d8;
+    }
+
+    .sidebar-btn.disabled {
+      opacity: 0.55;
+      background: #f5f5f5;
+      border-color: #ddd;
+      pointer-events: none;
+      backdrop-filter: none;
+    }
+
+    .sidebar-btn svg {
+      stroke: currentColor;
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+    }
+
     .sidebar-btn span {
       opacity: 1;
       transition: opacity 0.18s;
       white-space: nowrap;
       font-size: 13px;
     }
-    #sidebar.collapsed .sidebar-btn span { display: none; }
-    #sidebar.collapsed .sidebar-btn { justify-content: center; padding: 0; }
-    .nav-section { flex: 1; padding-top: 10px; overflow-y: auto; }
+
+    #sidebar.collapsed .sidebar-btn span {
+      display: none;
+    }
+
+    #sidebar.collapsed .sidebar-btn {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .nav-section {
+      flex: 1;
+      padding-top: 10px;
+      overflow-y: auto;
+      background: #ffffff;
+    }
+
     .nav-item {
       height: 44px;
       display: flex;
@@ -115,23 +196,62 @@
       border-radius: 0 var(--radius) var(--radius) 0;
       transition: 0.15s;
     }
-    .nav-item:hover { background: #e8f0fe; color: var(--accent); }
-    .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
-    .nav-icon { width: 52px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .nav-text { white-space: nowrap; font-size: 14px; transition: opacity 0.18s; }
-    #sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; width: 0; overflow: hidden; }
-    #sidebar.collapsed .nav-icon { width: 48px; }
 
-    main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #fafbfc; }
+    .nav-item:hover {
+      background: rgba(232, 240, 254, 0.6);
+      color: var(--accent);
+    }
+
+    .nav-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .nav-icon {
+      width: 52px;
+      height: 44px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-text {
+      white-space: nowrap;
+      font-size: 14px;
+      transition: opacity 0.18s;
+    }
+
+    #sidebar.collapsed .nav-text {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      overflow: hidden;
+    }
+
+    #sidebar.collapsed .nav-icon {
+      width: 48px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: #ffffff;
+    }
+
     header {
       height: 56px;
       padding: 0 20px;
       display: flex;
       align-items: center;
       border-bottom: 1px solid var(--border);
-      background: #fff;
+      background: #ffffff;
       flex-shrink: 0;
     }
+
     .breadcrumb {
       display: flex;
       align-items: center;
@@ -142,9 +262,25 @@
       flex: 1;
       font-size: 14px;
     }
-    .breadcrumb span { cursor: pointer; padding: 5px 10px; border-radius: var(--radius); transition: 0.15s; }
-    .breadcrumb span:hover { background: #e8f0fe; }
-    .breadcrumb span:last-child { color: var(--text); font-weight: 600; cursor: default; background: transparent; }
+
+    .breadcrumb span {
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: var(--radius);
+      transition: 0.15s;
+    }
+
+    .breadcrumb span:hover {
+      background: rgba(232, 240, 254, 0.5);
+    }
+
+    .breadcrumb span:last-child {
+      color: var(--text);
+      font-weight: 600;
+      cursor: default;
+      background: transparent;
+    }
+
     .toolbar {
       height: 56px;
       padding: 0 20px;
@@ -152,18 +288,32 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
-      background: #fff;
+      background: #ffffff;
       flex-shrink: 0;
     }
-    .tool-group { display: flex; align-items: center; gap: 8px; }
-    .tool-group-right { display: flex; align-items: center; gap: 8px; }
+
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-group-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .view-toggle {
       display: flex;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(4px);
     }
+
     .view-btn {
       height: 34px;
       width: 34px;
@@ -177,8 +327,16 @@
       transition: 0.15s;
       flex-shrink: 0;
     }
-    .view-btn.active { background: var(--accent-soft); color: var(--accent); }
-    .view-btn:hover { background: #f1f3f4; }
+
+    .view-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .view-btn:hover {
+      background: rgba(241, 243, 244, 0.6);
+    }
+
     .search-box {
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -188,11 +346,27 @@
       height: 36px;
       width: 220px;
       transition: 0.15s;
-      background: #fafbfc;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
       flex-shrink: 0;
     }
-    .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(26,115,232,0.12); background: #fff; }
-    .search-box input { background: transparent; border: none; padding: 0 6px; width: 100%; font-size: 13px; outline: none; color: var(--text); }
+
+    .search-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.12);
+      background: #fff;
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      padding: 0 6px;
+      width: 100%;
+      font-size: 13px;
+      outline: none;
+      color: var(--text);
+    }
+
     .t-btn {
       height: 34px;
       border: 1px solid var(--border);
@@ -205,32 +379,93 @@
       align-items: center;
       gap: 6px;
       transition: 0.15s;
-      background: #fff;
+      background: var(--glass-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
       color: var(--text);
       white-space: nowrap;
       flex-shrink: 0;
     }
-    .t-btn:hover { background: #e8f0fe; border-color: var(--accent); }
-    .t-btn.primary { background: #e8f0fe; color: #1a73e8; border: none; }
-    .t-btn.primary:hover { background: #d2e3fc; }
-    .t-btn.danger { color: var(--danger); border-color: #fce8e6; }
-    .t-btn.danger:hover { background: #fce8e6; border-color: var(--danger); }
 
-    .content-pane { display: flex; flex: 1; overflow: hidden; min-height: 0; }
-    .viewport { flex: 1; overflow-y: auto; padding: 20px; min-width: 0; }
+    .t-btn:hover {
+      background: rgba(232, 240, 254, 0.7);
+      border-color: var(--accent);
+    }
+
+    .t-btn.primary {
+      background: #e8f0fe;
+      color: #1a73e8;
+      border: none;
+    }
+
+    .t-btn.primary:hover {
+      background: #d2e3fc;
+    }
+
+    .t-btn.danger {
+      color: var(--danger);
+      border-color: #fce8e6;
+    }
+
+    .t-btn.danger:hover {
+      background: #fce8e6;
+      border-color: var(--danger);
+    }
+
+    .content-pane {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      min-width: 0;
+      background: #ffffff;
+    }
+
     .preview-pane {
       width: var(--preview-w);
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      background: #fff;
+      background: #ffffff;
       position: relative;
       z-index: 20;
       flex-shrink: 0;
     }
-    .preview-pane.maximized { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 100; border: none; }
-    .resize-handle { position: absolute; left: -3px; top: 0; bottom: 0; width: 6px; cursor: col-resize; z-index: 50; background: transparent; }
-    .resize-handle:hover,.resize-handle:active { background: rgba(26,115,232,0.15); }
+
+    .preview-pane.maximized {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 100;
+      border: none;
+    }
+
+    .resize-handle {
+      position: absolute;
+      left: -3px;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      cursor: col-resize;
+      z-index: 50;
+      background: transparent;
+    }
+
+    .resize-handle:hover,
+    .resize-handle:active {
+      background: rgba(26, 115, 232, 0.15);
+    }
+
     .preview-header {
       padding: 14px 18px;
       border-bottom: 1px solid var(--border);
@@ -238,24 +473,111 @@
       align-items: center;
       justify-content: space-between;
       flex-shrink: 0;
+      background: #ffffff;
     }
-    .preview-title { font-weight: 600; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
-    .preview-close,.preview-max,.preview-edit {
-      width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; border: none; color: var(--sub); background: transparent; transition: 0.15s;
+
+    .preview-title {
+      font-weight: 600;
+      font-size: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 180px;
     }
-    .preview-close:hover,.preview-max:hover,.preview-edit:hover { background: #e8eaed; }
-    .preview-content { flex: 1; overflow: auto; padding: 18px; display: flex; flex-direction: column; align-items: center; }
-    .preview-content img { max-width: 100%; height: auto; }
-    .preview-content video,.preview-content audio { max-width: 100%; }
-    .preview-content pre { white-space: pre-wrap; word-break: break-word; font-family: monospace; background: #f8f9fa; padding: 14px; border-radius: 12px; width: 100%; font-size: 13px; }
-    .preview-content textarea { width: 100%; flex: 1; border: 1px solid var(--border); border-radius: 12px; padding: 14px; font-family: monospace; font-size: 13px; resize: vertical; min-height: 280px; }
-    .edit-actions { display: flex; gap: 8px; margin-top: 10px; }
-    .preview-unsupported { color: var(--sub); text-align: center; margin-top: 36px; }
-    .empty-state { text-align: center; color: #9aa0a6; margin-top: 80px; font-size: 14px; }
+
+    .preview-close,
+    .preview-max,
+    .preview-edit {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      color: var(--sub);
+      background: transparent;
+      transition: 0.15s;
+    }
+
+    .preview-close:hover,
+    .preview-max:hover,
+    .preview-edit:hover {
+      background: #e8eaed;
+    }
+
+    .preview-content {
+      flex: 1;
+      overflow: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #ffffff;
+    }
+
+    .preview-content img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .preview-content video,
+    .preview-content audio {
+      max-width: 100%;
+    }
+
+    .preview-content pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: monospace;
+      background: #f8f9fa;
+      padding: 14px;
+      border-radius: 12px;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    .preview-content textarea {
+      width: 100%;
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-family: monospace;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 280px;
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .preview-unsupported {
+      color: var(--sub);
+      text-align: center;
+      margin-top: 36px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #9aa0a6;
+      margin-top: 80px;
+      font-size: 14px;
+    }
 
     /* 图标卡片视图 */
-    .icon-grid { display: flex; flex-wrap: wrap; gap: 10px 8px; align-content: flex-start; padding: 4px; }
+    .icon-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 8px;
+      align-content: flex-start;
+      padding: 4px;
+    }
+
     .icon-item {
       width: 105px;
       display: flex;
@@ -264,15 +586,34 @@
       cursor: pointer;
       padding: 12px 4px 10px;
       border-radius: 18px;
-      transition: background 0.12s, transform 0.35s cubic-bezier(0.4,0.0,0.2,1.0), opacity 0.35s cubic-bezier(0.4,0.0,0.2,1.0);
+      transition: background 0.12s, transform 0.35s cubic-bezier(0.4, 0.0, 0.2, 1.0), opacity 0.35s cubic-bezier(0.4, 0.0, 0.2, 1.0);
       position: relative;
       z-index: 1;
       will-change: transform, opacity;
+      background: #ffffff;
     }
-    .icon-item:hover { background: rgba(26,115,232,0.05); }
-    .icon-item.selected { background: var(--accent-soft); border-radius: 16px; }
-    .icon-item.locked { opacity: 0.45; pointer-events: none; filter: grayscale(0.4); }
-    .icon-item.drag-active { background: rgba(249,171,0,0.12); border-radius: 16px; z-index: 10; }
+
+    .icon-item:hover {
+      background: rgba(26, 115, 232, 0.05);
+    }
+
+    .icon-item.selected {
+      background: var(--accent-soft);
+      border-radius: 16px;
+    }
+
+    .icon-item.locked {
+      opacity: 0.45;
+      pointer-events: none;
+      filter: grayscale(0.4);
+    }
+
+    .icon-item.drag-active {
+      background: rgba(249, 171, 0, 0.12);
+      border-radius: 16px;
+      z-index: 10;
+    }
+
     .icon-wrap {
       width: var(--icon-size);
       height: var(--icon-size);
@@ -283,8 +624,25 @@
       position: relative;
       pointer-events: none;
     }
-    .icon-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; pointer-events: none; }
-    .icon-wrap embed { width: 400%; height: 400%; transform: scale(0.25); transform-origin: top left; border: none; pointer-events: none; border-radius: 8px; }
+
+    .icon-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    .icon-wrap embed {
+      width: 400%;
+      height: 400%;
+      transform: scale(0.25);
+      transform-origin: top left;
+      border: none;
+      pointer-events: none;
+      border-radius: 8px;
+    }
+
     .icon-name {
       text-align: center;
       word-break: break-word;
@@ -294,6 +652,7 @@
       pointer-events: none;
       transition: font-size 0.15s;
     }
+
     .icon-item .inline-input {
       border: 1.5px solid var(--accent);
       padding: 4px 8px;
@@ -306,18 +665,31 @@
       z-index: 5;
       pointer-events: auto;
     }
+
     /* 吸入动画 */
     .icon-item.inhale {
-      transition: transform 0.38s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.28s ease-in;
+      transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.28s ease-in;
       pointer-events: none;
       z-index: 50;
     }
-    .jelly-anim { animation: iconJelly 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+
+    .jelly-anim {
+      animation: iconJelly 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
     @keyframes iconJelly {
-      0% { transform: scale(1); }
-      30% { transform: scale(1.14,0.84); }
-      55% { transform: scale(0.92,1.08); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(1);
+      }
+      30% {
+        transform: scale(1.14, 0.84);
+      }
+      55% {
+        transform: scale(0.92, 1.08);
+      }
+      100% {
+        transform: scale(1);
+      }
     }
 
     /* 列表视图 */
@@ -332,6 +704,7 @@
       background: #fff;
       border-radius: 12px 12px 0 0;
     }
+
     .row {
       display: grid;
       grid-template-columns: 1fr 200px 100px;
@@ -344,31 +717,184 @@
       transition: background 0.1s;
       background: #fff;
     }
-    .row:hover:not(.locked) { background: #e8f0fe; }
-    .row.selected { background: var(--accent-soft); }
-    .row.locked { opacity: 0.5; pointer-events: none; }
-    .row .inline-input { border: 1.5px solid var(--accent); padding: 5px 10px; border-radius: 10px; width: 85%; font-size: 13px; background: #fff; }
 
-    .svg-icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .folder-icon-svg { color: var(--folder); fill: var(--folder); stroke: none; }
-    .file-icon-svg { color: var(--file); stroke: var(--file); fill: none; }
-    .file-glass-icon { width: 24px; height: 24px; flex-shrink: 0; }
-    .file-glass-icon-large { width: 56px; height: 56px; flex-shrink: 0; }
-
-    #toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: #2a2a2a; color: #fff; padding: 11px 22px; border-radius: 40px;
-      font-size: 13px; display: none; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.18); pointer-events: none;
+    .row:hover:not(.locked) {
+      background: #e8f0fe;
     }
 
-    .home-container { padding: 20px; height: 100%; overflow-y: auto; }
-    .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 16px; }
-    .home-card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 18px; transition: 0.15s; display: flex; flex-direction: column; gap: 10px; }
-    .home-card:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .category-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
-    .category-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 14px; cursor: pointer; transition: 0.15s; text-align: center; }
-    .category-card:hover { border-color: var(--accent); background: #f8fbff; }
-    .tag { background: #e8f0fe; color: var(--accent); padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .row.selected {
+      background: var(--accent-soft);
+    }
+
+    .row.locked {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .row .inline-input {
+      border: 1.5px solid var(--accent);
+      padding: 5px 10px;
+      border-radius: 10px;
+      width: 85%;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    .svg-icon {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .folder-icon-svg {
+      color: var(--folder);
+      fill: var(--folder);
+      stroke: none;
+    }
+
+    .file-icon-svg {
+      color: var(--file);
+      stroke: var(--file);
+      fill: none;
+    }
+
+    .file-glass-icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .file-glass-icon-large {
+      width: 56px;
+      height: 56px;
+      flex-shrink: 0;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(42, 42, 42, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff;
+      padding: 11px 22px;
+      border-radius: 40px;
+      font-size: 13px;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      pointer-events: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* 首页新增样式 */
+    .home-container {
+      padding: 20px;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .home-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      transition: 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .home-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .home-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .home-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .home-card-title {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .home-card-sub {
+      font-size: 13px;
+      color: var(--sub);
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .category-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      transition: 0.15s;
+      text-align: center;
+    }
+
+    .category-card:hover {
+      border-color: var(--accent);
+      background: #f8fbff;
+    }
+
+    .tag {
+      background: #e8f0fe;
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    .recent-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f3f4;
+      cursor: pointer;
+    }
+
+    .recent-item:last-child {
+      border-bottom: none;
+    }
+
+    .cat-label {
+      font-weight: 500;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
@@ -376,13 +902,13 @@
 <aside id="sidebar">
   <div class="brand" onclick="App.toggleSidebar()"><img src="IMG_1978.jpeg" class="logo-img" id="logo-img" alt="Logo" onerror="this.style.display='none'"></div>
   <div class="sidebar-tools">
-    <button id="btn-upload" class="sidebar-btn primary"><svg class="svg-icon" viewBox="0 0 24 24" style="color:white"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>上傳文件</span></button>
-    <button id="btn-newfolder" class="sidebar-btn"><svg class="svg-icon folder-icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg><span>建立文件夾</span></button>
+    <button id="btn-upload" class="sidebar-btn primary"><svg class="svg-icon" viewBox="0 0 24 24" style="color:white"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>上传文件</span></button>
+    <button id="btn-newfolder" class="sidebar-btn"><svg class="svg-icon folder-icon-svg" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg><span>建立文件夹</span></button>
   </div>
   <div class="nav-section">
-    <div class="nav-item active" id="menu-home" onclick="App.switchTab('home')"><div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-text">首頁</div></div>
+    <div class="nav-item active" id="menu-home" onclick="App.switchTab('home')"><div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-text">首页</div></div>
     <div class="nav-item" id="menu-drive" onclick="App.switchTab('drive')"><div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="7" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="17" cy="12" r="1.5"/><path d="M9 5l1-1h4l1 1"/></svg></div><div class="nav-text">我的硬碟</div></div>
-    <div class="nav-item" id="menu-recent" onclick="App.switchTab('recent')"><div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="nav-text">最近項目</div></div>
+    <div class="nav-item" id="menu-recent" onclick="App.switchTab('recent')"><div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="nav-text">最近项目</div></div>
     <div class="nav-item" id="menu-trash" onclick="App.switchTab('trash')"><div class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div><div class="nav-text">垃圾桶</div></div>
   </div>
 </aside>
@@ -392,14 +918,14 @@
     <div class="tool-group" id="tool-left"></div>
     <div class="tool-group-right">
       <div class="view-toggle" id="view-toggle" style="display:flex;"><button class="view-btn active" id="view-list" onclick="App.setView('list')"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button><button class="view-btn" id="view-card" onclick="App.setView('card')"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></button></div>
-      <div class="search-box"><input type="text" placeholder="搜尋..." id="search-inp"></div>
+      <div class="search-box"><input type="text" placeholder="搜寻..." id="search-inp"></div>
     </div>
   </div>
   <div class="content-pane">
     <div class="viewport" id="main-view"></div>
     <div class="preview-pane" id="preview-pane" style="display:none;">
       <div class="resize-handle" id="resize-handle"></div>
-      <div class="preview-header"><span class="preview-title" id="preview-title">預覽</span><div class="flex-row"><button class="preview-edit" id="preview-edit-btn" style="display:none;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="preview-max" id="preview-max-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button><button class="preview-close" id="preview-close-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>
+      <div class="preview-header"><span class="preview-title" id="preview-title">预览</span><div class="flex-row"><button class="preview-edit" id="preview-edit-btn" style="display:none;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="preview-max" id="preview-max-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button><button class="preview-close" id="preview-close-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>
       <div class="preview-content" id="preview-content"></div>
     </div>
   </div>
@@ -412,8 +938,8 @@
     const isIPad = /iPad|Macintosh/.test(ua) && 'ontouchend' in document;
     const isPC = !/Mobi|Android|iPhone|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua) || isIPad;
     if (!isPC && !isIPad) {
-      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">此頁面僅支援電腦或 iPad 開啟</div>';
-      throw new Error('裝置不支援');
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">此页面仅支援电脑或 iPad 开启</div>';
+      throw new Error('装置不支援');
     }
   })();
 
@@ -464,13 +990,13 @@
   const TEXT_EXTS = new Set(['txt','md','csv','html','css','js','ts','py','java','cpp','json','xml','yaml','sh','bat','php','asp','aspx','jsp','rb','go','swift','sql','ini','cfg','conf']);
 
   let db = [
-    {id:'1', name:'座標算法核心', type:'dir', pid:'0', del:false, time:Date.now()-1000000, size:0},
+    {id:'1', name:'坐标算法核心', type:'dir', pid:'0', del:false, time:Date.now()-1000000, size:0},
     {id:'2', name:'10D_Storage_v1.bin', type:'file', pid:'1', del:false, time:Date.now()-800000, size:3, content:new Uint8Array([0,1,2])},
-    {id:'3', name:'開發筆記', type:'dir', pid:'0', del:false, time:Date.now()-500000, size:0},
+    {id:'3', name:'开发笔记', type:'dir', pid:'0', del:false, time:Date.now()-500000, size:0},
     {id:'4', name:'License.txt', type:'file', pid:'0', del:false, time:Date.now(), size:4096, content:new TextEncoder().encode("This is a license file.\n")}
   ];
   let currentTab = 'home';
-  let pathStack = [{id:'0', name:'首頁'}];
+  let pathStack = [{id:'0', name:'首页'}];
   let selection = new Set();
   let clip = { mode:null, ids:[] };
   let editId = null;
@@ -481,11 +1007,10 @@
   let isUploading = false;
   let viewMode = 'list';
   let lastClickId = null, lastClickTime = 0;
-  const DOUBLE_CLICK_MS = 250;
   let draggingId = null, draggingType = null, dropInProgress = false;
   let signPoints = parseInt(localStorage.getItem('cloud_sign_points') || '0');
   let signDate = localStorage.getItem('cloud_sign_date') || '';
-  let userName = localStorage.getItem('user_name') || '用戶';
+  let userName = localStorage.getItem('user_name') || '用户';
   const thumbCache = new Map();
 
   function getGreeting() { const hour = new Date().getHours(); if (hour < 12) return '上午好'; if (hour < 18) return '中午好'; return '晚上好'; }
@@ -501,10 +1026,10 @@
   function isDescendant(aid, did) { if(aid===did) return true; const children = db.filter(x => x.pid===aid && x.type==='dir'); for(let c of children) if(isDescendant(c.id, did)) return true; return false; }
   function getTopIds(ids) { return ids.filter(id => { let cur=db.find(x=>x.id===id); while(cur&&cur.pid!=='0'){ if(ids.includes(cur.pid)) return false; cur=db.find(x=>x.id===cur.pid); } return true; }); }
   function markDeletedRecursive(fid) { const folder=db.find(x=>x.id===fid); if(!folder||folder.type!=='dir') return; folder.del=true; db.filter(x=>x.pid===fid).forEach(c=>{ if(c.type==='dir') markDeletedRecursive(c.id); else c.del=true; }); }
-  function relocateItem(item, targetPid) { if(item.pid===targetPid) return true; if(item.type==='dir' && isDescendant(item.id, targetPid)){ showToast('無法移動：目標為來源的子資料夾'); return false; } const newName = getUniqueName(item.name, targetPid, item.type, item.id); if(newName!==item.name) showToast(`已自動更名為「${newName}」`); item.name = newName; item.pid = targetPid; item.time = Date.now(); return true; }
-  function moveFolderRecursive(fid, targetPid) { const folder = db.find(x=>x.id===fid); if(!folder||folder.type!=='dir') return false; if(!relocateItem(folder, targetPid)) return false; db.filter(x=>x.pid===fid).forEach(c=>{ if(c.type==='dir') moveFolderRecursive(c.id, folder.id); else { const nn=getUniqueName(c.name, folder.id, 'file', c.id); if(nn!==c.name) showToast(`子項更名「${nn}」`); c.name=nn; c.pid=folder.id; c.time=Date.now(); } }); return true; }
-  function deepCopy(srcId, targetPid) { const src = db.find(x=>x.id===srcId); if(!src||src.del) return false; if(src.type==='dir' && isDescendant(srcId, targetPid)){ showToast('無法複製：目標為來源的子資料夾'); return false; } const newId = generateId(); const uname = getUniqueName(src.name, targetPid, src.type); if(uname!==src.name) showToast(`複製時更名為「${uname}」`); const newItem = {...src, id:newId, pid:targetPid, name:uname, time:Date.now()}; if(src.type==='file' && src.content) newItem.content = src.content.slice(); db.push(newItem); if(src.type==='dir') db.filter(x=>x.pid===srcId && !x.del).forEach(c=>deepCopy(c.id, newId)); return true; }
-  function restoreItem(id) { const item = db.find(x=>x.id===id); if(!item||!item.del) return false; if(item.pid!=='0'){ const parent=db.find(x=>x.id===item.pid); if(!parent||parent.del){ showToast(`無法還原「${item.name}」，原資料夾已不存在`); return false; } } const nn = getUniqueName(item.name, item.pid, item.type, item.id); if(nn!==item.name) showToast(`還原時更名為「${nn}」`); item.name=nn; item.del=false; item.time=Date.now(); if(item.type==='dir') db.filter(x=>x.pid===item.id&&x.del).forEach(c=>{ c.del=false; c.time=Date.now(); if(c.type==='dir') restoreItem(c.id); }); return true; }
+  function relocateItem(item, targetPid) { if(item.pid===targetPid) return true; if(item.type==='dir' && isDescendant(item.id, targetPid)){ showToast('无法移动：目标为来源的子文件夹'); return false; } const newName = getUniqueName(item.name, targetPid, item.type, item.id); if(newName!==item.name) showToast(`已自动更名为「${newName}」`); item.name = newName; item.pid = targetPid; item.time = Date.now(); return true; }
+  function moveFolderRecursive(fid, targetPid) { const folder = db.find(x=>x.id===fid); if(!folder||folder.type!=='dir') return false; if(!relocateItem(folder, targetPid)) return false; db.filter(x=>x.pid===fid).forEach(c=>{ if(c.type==='dir') moveFolderRecursive(c.id, folder.id); else { const nn=getUniqueName(c.name, folder.id, 'file', c.id); if(nn!==c.name) showToast(`子项更名「${nn}」`); c.name=nn; c.pid=folder.id; c.time=Date.now(); } }); return true; }
+  function deepCopy(srcId, targetPid) { const src = db.find(x=>x.id===srcId); if(!src||src.del) return false; if(src.type==='dir' && isDescendant(srcId, targetPid)){ showToast('无法复制：目标为来源的子文件夹'); return false; } const newId = generateId(); const uname = getUniqueName(src.name, targetPid, src.type); if(uname!==src.name) showToast(`复制时更名为「${uname}」`); const newItem = {...src, id:newId, pid:targetPid, name:uname, time:Date.now()}; if(src.type==='file' && src.content) newItem.content = src.content.slice(); db.push(newItem); if(src.type==='dir') db.filter(x=>x.pid===srcId && !x.del).forEach(c=>deepCopy(c.id, newId)); return true; }
+  function restoreItem(id) { const item = db.find(x=>x.id===id); if(!item||!item.del) return false; if(item.pid!=='0'){ const parent=db.find(x=>x.id===item.pid); if(!parent||parent.del){ showToast(`无法还原「${item.name}」，原文件夹已不存在`); return false; } } const nn = getUniqueName(item.name, item.pid, item.type, item.id); if(nn!==item.name) showToast(`还原时更名为「${nn}」`); item.name=nn; item.del=false; item.time=Date.now(); if(item.type==='dir') db.filter(x=>x.pid===item.id&&x.del).forEach(c=>{ c.del=false; c.time=Date.now(); if(c.type==='dir') restoreItem(c.id); }); return true; }
 
   async function generateThumbnail(fileItem) {
     if (!fileItem.content || fileItem.content.length===0) return null;
@@ -541,7 +1066,7 @@
   }
 
   function closePreview() { if(previewObjectUrl){ URL.revokeObjectURL(previewObjectUrl); previewObjectUrl=null; } document.getElementById('preview-pane').style.display='none'; document.getElementById('preview-content').innerHTML=''; previewItem=null; }
-  function downloadItem(item) { if(item.type!=='file'||!item.content||item.content.length===0){ showToast('文件內容為空'); return; } const blob=new Blob([item.content]); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=item.name; a.click(); URL.revokeObjectURL(url); }
+  function downloadItem(item) { if(item.type!=='file'||!item.content||item.content.length===0){ showToast('文件内容为空'); return; } const blob=new Blob([item.content]); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=item.name; a.click(); URL.revokeObjectURL(url); }
 
   function showPreview(item) {
     commitEdit();
@@ -552,22 +1077,31 @@
     titleEl.textContent = item.name; contentEl.innerHTML = '';
     if(previewObjectUrl){ URL.revokeObjectURL(previewObjectUrl); previewObjectUrl=null; }
     editBtn.style.display = 'none';
-    if(item.type==='file' && (!item.content||item.content.length===0)){ contentEl.innerHTML='<div class="preview-unsupported">檔案內容為空</div>'; pane.style.display='flex'; return; }
+    if(item.type==='file' && (!item.content||item.content.length===0)){ contentEl.innerHTML='<div class="preview-unsupported">档案内容为空</div>'; pane.style.display='flex'; return; }
     const ext = item.name.split('.').pop().toLowerCase();
-    if(!KNOWN_EXTS.has(ext)){ contentEl.innerHTML = `<div class="preview-unsupported">不支援預覽 .${escapeHtml(ext)} 檔案</div><button class="t-btn primary" onclick="downloadItem(window._previewItem)" style="margin-top:12px;">下載查看</button>`; window._previewItem = item; pane.style.display='flex'; return; }
+    if(!KNOWN_EXTS.has(ext)){ contentEl.innerHTML = `<div class="preview-unsupported">不支援预览 .${escapeHtml(ext)} 档案</div><button class="t-btn primary" onclick="downloadItem(window._previewItem)" style="margin-top:12px;">下载查看</button>`; window._previewItem = item; pane.style.display='flex'; return; }
     const blob = new Blob([item.content||new Uint8Array(0)]); const url = URL.createObjectURL(blob); previewObjectUrl = url;
     if(VID_EXTS.has(ext)){ const video = document.createElement('video'); video.src=url; video.controls=true; video.style.maxWidth='100%'; contentEl.appendChild(video); }
     else if(AUD_EXTS.has(ext)){ const audio = document.createElement('audio'); audio.src=url; audio.controls=true; audio.style.width='100%'; contentEl.appendChild(audio); }
     else if(IMG_EXTS.has(ext)){ const img = document.createElement('img'); img.src=url; contentEl.appendChild(img); if(ext!=='svg') editBtn.style.display = 'flex'; }
     else if(ext==='pdf'){ const embed = document.createElement('embed'); embed.src=url; embed.type='application/pdf'; embed.style.width='100%'; embed.style.height='100%'; contentEl.appendChild(embed); }
-    else if(TEXT_EXTS.has(ext)){ const reader = new FileReader(); reader.onload = e => { const text = e.target.result; const pre = document.createElement('pre'); pre.textContent = text; contentEl.appendChild(pre); editBtn.style.display = 'flex'; URL.revokeObjectURL(url); previewObjectUrl = null; }; reader.readAsText(blob, 'UTF-8'); }
-    else { contentEl.innerHTML = `<div class="preview-unsupported">不支援預覽 .${escapeHtml(ext)} 檔案</div><button class="t-btn primary" onclick="downloadItem(window._previewItem)" style="margin-top:12px;">下載查看</button>`; window._previewItem = item; }
+    else if(TEXT_EXTS.has(ext)){ const reader = new FileReader(); reader.onload = e => { const text = e.target.result; const pre = document.createElement('pre'); pre.textContent = text; 
+      // 自适应字体大小：根据文本长度
+      const len = text.length;
+      let fontSize = 13;
+      if (len < 100) fontSize = 18;
+      else if (len < 500) fontSize = 16;
+      else if (len < 2000) fontSize = 14;
+      else fontSize = 12;
+      pre.style.fontSize = fontSize + 'px';
+      contentEl.appendChild(pre); editBtn.style.display = 'flex'; URL.revokeObjectURL(url); previewObjectUrl = null; }; reader.readAsText(blob, 'UTF-8'); }
+    else { contentEl.innerHTML = `<div class="preview-unsupported">不支援预览 .${escapeHtml(ext)} 档案</div><button class="t-btn primary" onclick="downloadItem(window._previewItem)" style="margin-top:12px;">下载查看</button>`; window._previewItem = item; }
     pane.style.display = 'flex'; previewItem = item; window._previewItem = item;
   }
 
   function startEditFromButton() { if (!previewItem) return; const ext = previewItem.name.split('.').pop().toLowerCase(); if (IMG_EXTS.has(ext) && ext!=='svg') startImageEdit(previewItem, previewObjectUrl); else if (TEXT_EXTS.has(ext)) startTextEdit(previewItem); }
   function startTextEdit(item) { const contentEl = document.getElementById('preview-content'); const text = contentEl.querySelector('pre')?.textContent || ''; contentEl.innerHTML = ''; const ta = document.createElement('textarea'); ta.value = text; contentEl.appendChild(ta); const actions = document.createElement('div'); actions.className='edit-actions'; const saveBtn = document.createElement('button'); saveBtn.className='t-btn primary'; saveBtn.textContent='保存更改'; saveBtn.onclick = () => { item.content = new TextEncoder().encode(ta.value); item.size = item.content.length; item.time = Date.now(); showToast('文件已保存'); showPreview(item); }; const cancelBtn = document.createElement('button'); cancelBtn.className='t-btn'; cancelBtn.textContent='取消'; cancelBtn.onclick = () => showPreview(item); actions.appendChild(saveBtn); actions.appendChild(cancelBtn); contentEl.appendChild(actions); }
-  function startImageEdit(item, originalUrl) { const contentEl = document.getElementById('preview-content'); contentEl.innerHTML = ''; const canvas = document.createElement('canvas'); canvas.style.maxWidth='100%'; canvas.style.border='1px solid var(--border)'; contentEl.appendChild(canvas); const ctx = canvas.getContext('2d'); const img = new Image(); img.src = originalUrl; img.onload = () => { canvas.width = img.width; canvas.height = img.height; ctx.drawImage(img,0,0); let painting = false; canvas.onmousedown = e => { painting=true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); }; canvas.onmouseup = () => painting=false; canvas.onmouseleave = () => painting=false; canvas.onmousemove = e => { if(!painting) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.strokeStyle='red'; ctx.lineWidth=2; ctx.stroke(); }; }; const actions = document.createElement('div'); actions.className='edit-actions'; const saveBtn = document.createElement('button'); saveBtn.className='t-btn primary'; saveBtn.textContent='保存編輯'; saveBtn.onclick = () => { canvas.toBlob(blob => { const reader = new FileReader(); reader.onload = () => { item.content = new Uint8Array(reader.result); item.size = item.content.length; item.time = Date.now(); showToast('圖片已保存'); showPreview(item); }; reader.readAsArrayBuffer(blob); }, 'image/png'); }; const cancelBtn = document.createElement('button'); cancelBtn.className='t-btn'; cancelBtn.textContent='取消'; cancelBtn.onclick = () => showPreview(item); actions.appendChild(saveBtn); actions.appendChild(cancelBtn); contentEl.appendChild(actions); }
+  function startImageEdit(item, originalUrl) { const contentEl = document.getElementById('preview-content'); contentEl.innerHTML = ''; const canvas = document.createElement('canvas'); canvas.style.maxWidth='100%'; canvas.style.border='1px solid var(--border)'; contentEl.appendChild(canvas); const ctx = canvas.getContext('2d'); const img = new Image(); img.src = originalUrl; img.onload = () => { canvas.width = img.width; canvas.height = img.height; ctx.drawImage(img,0,0); let painting = false; canvas.onmousedown = e => { painting=true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); }; canvas.onmouseup = () => painting=false; canvas.onmouseleave = () => painting=false; canvas.onmousemove = e => { if(!painting) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.strokeStyle='red'; ctx.lineWidth=2; ctx.stroke(); }; }; const actions = document.createElement('div'); actions.className='edit-actions'; const saveBtn = document.createElement('button'); saveBtn.className='t-btn primary'; saveBtn.textContent='保存编辑'; saveBtn.onclick = () => { canvas.toBlob(blob => { const reader = new FileReader(); reader.onload = () => { item.content = new Uint8Array(reader.result); item.size = item.content.length; item.time = Date.now(); showToast('图片已保存'); showPreview(item); }; reader.readAsArrayBuffer(blob); }, 'image/png'); }; const cancelBtn = document.createElement('button'); cancelBtn.className='t-btn'; cancelBtn.textContent='取消'; cancelBtn.onclick = () => showPreview(item); actions.appendChild(saveBtn); actions.appendChild(cancelBtn); contentEl.appendChild(actions); }
 
   document.getElementById('preview-close-btn').addEventListener('click', closePreview);
   document.getElementById('preview-max-btn').addEventListener('click', () => { document.getElementById('preview-pane').classList.toggle('maximized'); });
@@ -604,8 +1138,8 @@
     e.preventDefault(); const fc = e.target.closest('.folder-item'); if(!fc || !draggingId) return;
     const folderId = fc.getAttribute('data-id'); if(!folderId || folderId===draggingId) return;
     const src = db.find(x=>x.id===draggingId); if(!src) return;
-    if(src.pid===folderId){ showToast('項目已在該資料夾中'); return; }
-    if(src.type==='dir'&&isDescendant(draggingId,folderId)){ showToast('無法移動：目標為來源的子資料夾'); return; }
+    if(src.pid===folderId){ showToast('项目已在該文件夹中'); return; }
+    if(src.type==='dir'&&isDescendant(draggingId,folderId)){ showToast('无法移动：目标为来源的子文件夹'); return; }
     fc.classList.remove('drag-active');
     const sourceIcon = document.querySelector(`.icon-item[data-id='${draggingId}']`); if(!sourceIcon) return;
     dropInProgress = true; sourceIcon.style.transition = '';
@@ -617,8 +1151,8 @@
     const reset = () => {
       sourceIcon.removeEventListener('transitionend', reset); sourceIcon.classList.remove('inhale','locked');
       sourceIcon.style.transform=''; sourceIcon.style.opacity=''; dropInProgress=false;
-      if(draggingType==='file'){ relocateItem(src,folderId); showToast(`已將 ${src.name} 移入資料夾`); }
-      else { moveFolderRecursive(draggingId,folderId); showToast(`已將資料夾「${src.name}」移入`); }
+      if(draggingType==='file'){ relocateItem(src,folderId); showToast(`已将 ${src.name} 移入文件夹`); }
+      else { moveFolderRecursive(draggingId,folderId); showToast(`已将文件夹「${src.name}」移入`); }
       draggingId=null; draggingType=null; render();
     };
     sourceIcon.addEventListener('transitionend', function handler(e){ if(e.propertyName==='transform'||e.propertyName==='opacity'){ sourceIcon.removeEventListener('transitionend',handler); reset(); } });
@@ -636,11 +1170,11 @@
     if(id === lastClickId && (now - lastClickTime) < DOUBLE_CLICK_MS){
       lastClickId = null;
       const item = db.find(x=>x.id===id); if(!item || target.classList.contains('locked')) return;
-      if(currentTab==='trash'){ showToast('垃圾桶內項目無法開啟'); return; }
+      if(currentTab==='trash'){ showToast('垃圾桶内项目无法开启'); return; }
       selection.clear(); syncSelectionUI(); updateToolbar();
       if(currentTab==='recent'){
         if(item.type==='file') showPreview(item);
-        else showToast('最近項目僅供檢視');
+        else showToast('最近项目仅供检视');
         return;
       }
       if(item.type==='dir' && currentTab==='drive'){ searchInput.value=''; searchQuery=''; pathStack.push({id:item.id,name:item.name}); closePreview(); render(); }
@@ -667,27 +1201,27 @@
     if(currentTab==='recent') return;
     if(selection.size > 0){
       if(currentTab === 'trash'){
-        left.appendChild(btn('還原', () => { const top = getTopIds([...selection]); top.forEach(id => restoreItem(id)); selection.clear(); syncSelectionUI(); closePreview(); render(); }, true));
-        left.appendChild(btn('永久刪除', () => { const top = getTopIds([...selection]); top.forEach(id => { const it = db.find(x=>x.id===id); if(it && it.type==='dir'){ const desc = collectAllDescendantIds(id, true); db = db.filter(x => !desc.includes(x.id) && x.id !== id); } else db = db.filter(x => x.id !== id); }); selection.clear(); syncSelectionUI(); closePreview(); render(); }, false, true));
+        left.appendChild(btn('还原', () => { const top = getTopIds([...selection]); top.forEach(id => restoreItem(id)); selection.clear(); syncSelectionUI(); closePreview(); render(); }, true));
+        left.appendChild(btn('永久删除', () => { const top = getTopIds([...selection]); top.forEach(id => { const it = db.find(x=>x.id===id); if(it && it.type==='dir'){ const desc = collectAllDescendantIds(id, true); db = db.filter(x => !desc.includes(x.id) && x.id !== id); } else db = db.filter(x => x.id !== id); }); selection.clear(); syncSelectionUI(); closePreview(); render(); }, false, true));
       } else if(currentTab === 'drive'){
-        left.appendChild(btn('下載', downloadSelected, true));
+        left.appendChild(btn('下载', downloadSelected, true));
         if(selection.size === 1) left.appendChild(btn('重新命名', () => { editId = [...selection][0]; render(); }, true));
-        left.appendChild(btn(selection.size===1?'移動':'批量移動', () => { clip = { mode:'move', ids:[...selection] }; selection.clear(); syncSelectionUI(); render(); }, true));
-        left.appendChild(btn(selection.size===1?'複製':'批量複製', () => { clip = { mode:'copy', ids:[...selection] }; selection.clear(); syncSelectionUI(); render(); }, true));
-        left.appendChild(btn(selection.size===1?'刪除':'批量刪除', () => { const top = getTopIds([...selection]); top.forEach(id => { const it = db.find(x=>x.id===id); if(it && it.type==='dir') markDeletedRecursive(id); else if(it) it.del = true; }); selection.clear(); syncSelectionUI(); closePreview(); render(); }, false, true));
+        left.appendChild(btn(selection.size===1?'移动':'批量移动', () => { clip = { mode:'move', ids:[...selection] }; selection.clear(); syncSelectionUI(); render(); }, true));
+        left.appendChild(btn(selection.size===1?'复制':'批量复制', () => { clip = { mode:'copy', ids:[...selection] }; selection.clear(); syncSelectionUI(); render(); }, true));
+        left.appendChild(btn(selection.size===1?'删除':'批量删除', () => { const top = getTopIds([...selection]); top.forEach(id => { const it = db.find(x=>x.id===id); if(it && it.type==='dir') markDeletedRecursive(id); else if(it) it.del = true; }); selection.clear(); syncSelectionUI(); closePreview(); render(); }, false, true));
       }
     } else if(clip.ids.length > 0 && currentTab === 'drive'){
-      left.appendChild(btn(`貼上 (${clip.ids.length})`, handlePaste, true));
+      left.appendChild(btn(`贴上 (${clip.ids.length})`, handlePaste, true));
       left.appendChild(btn('取消', () => { clip = { mode:null, ids:[] }; render(); }));
     } else if(clip.ids.length > 0 && currentTab !== 'drive'){
-      left.appendChild(btn('取消剪貼', () => { clip = { mode:null, ids:[] }; render(); }));
+      left.appendChild(btn('取消剪贴', () => { clip = { mode:null, ids:[] }; render(); }));
     }
   }
 
   function btn(text, action, isPrimary=false, isDanger=false){ const b = document.createElement('button'); b.className = 't-btn'+(isPrimary?' primary':'')+(isDanger?' danger':''); b.textContent=text; b.onclick=action; return b; }
-  function handlePaste(){ if(currentTab !== 'drive'){ showToast('只能在「我的硬碟」貼上'); clip={mode:null,ids:[]}; render(); return; } const targetPid = pathStack[pathStack.length-1].id; const valid = clip.ids.filter(id => { const it=db.find(x=>x.id===id); return it && !it.del; }); if(valid.length===0){ showToast('剪貼簿中的項目已不存在'); clip={mode:null,ids:[]}; render(); return; } const rootIds = getTopIds(valid); if(clip.mode === 'move'){ for(let id of rootIds){ const item = db.find(x=>x.id===id); if(item && item.type==='dir' && isDescendant(id, targetPid)){ showToast('無法移動：目標為來源的子資料夾'); return; } } for(let id of rootIds){ const item = db.find(x=>x.id===id); if(item.type==='dir') moveFolderRecursive(id, targetPid); else relocateItem(item, targetPid); } showToast(`已移動 ${rootIds.length} 個項目`); } else { let cnt = 0; rootIds.forEach(id => { if(deepCopy(id, targetPid)) cnt++; }); showToast(`已複製 ${cnt} 個項目`); } clip = { mode:null, ids:[] }; selection.clear(); syncSelectionUI(); searchInput.value=''; searchQuery=''; closePreview(); render(); }
+  function handlePaste(){ if(currentTab !== 'drive'){ showToast('只能在「我的硬碟」贴上'); clip={mode:null,ids:[]}; render(); return; } const targetPid = pathStack[pathStack.length-1].id; const valid = clip.ids.filter(id => { const it=db.find(x=>x.id===id); return it && !it.del; }); if(valid.length===0){ showToast('剪贴簿中的项目已不存在'); clip={mode:null,ids:[]}; render(); return; } const rootIds = getTopIds(valid); if(clip.mode === 'move'){ for(let id of rootIds){ const item = db.find(x=>x.id===id); if(item && item.type==='dir' && isDescendant(id, targetPid)){ showToast('无法移动：目标为来源的子文件夹'); return; } } for(let id of rootIds){ const item = db.find(x=>x.id===id); if(item.type==='dir') moveFolderRecursive(id, targetPid); else relocateItem(item, targetPid); } showToast(`已移动 ${rootIds.length} 个项目`); } else { let cnt = 0; rootIds.forEach(id => { if(deepCopy(id, targetPid)) cnt++; }); showToast(`已复制 ${cnt} 个项目`); } clip = { mode:null, ids:[] }; selection.clear(); syncSelectionUI(); searchInput.value=''; searchQuery=''; closePreview(); render(); }
   function collectAllDescendantIds(fid, incDel=false){ let ids=[], stack=[fid]; while(stack.length){ const pid=stack.pop(); const children=db.filter(x=>x.pid===pid&&(incDel||!x.del)); for(let c of children){ ids.push(c.id); if(c.type==='dir') stack.push(c.id); } } return ids; }
-  function downloadSelected() { if(selection.size===0) return; const topIds=getTopIds([...selection]); const items=topIds.map(id=>db.find(x=>x.id===id)).filter(it=>it&&!it.del); if(items.length===0) return; const downloads=[]; function collect(item,base=''){ const safeName=item.name.replace(/[\/\\]/g,'_'); if(item.type==='file') downloads.push({path:base+safeName,content:item.content||new Uint8Array(0),time:item.time}); else { downloads.push({path:base+safeName+'/',content:new Uint8Array(0),time:item.time}); db.filter(x=>x.pid===item.id&&!x.del).forEach(c=>collect(c,base+safeName+'/')); } } items.forEach(it=>collect(it)); if(downloads.length===0){ showToast('無可下載檔案'); return; } if(downloads.length===1 && items.length===1 && items[0].type==='file'){ const item=items[0]; const blob=new Blob([item.content]); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=item.name; a.click(); URL.revokeObjectURL(url); } else { const encoder=new TextEncoder(); const centralDir=[]; let offset=0; const fileParts=[]; for(let file of downloads){ const nameBytes=encoder.encode(file.path); const isDir=file.path.endsWith('/'); const content=isDir?new Uint8Array(0):(file.content||new Uint8Array(0)); const crc=isDir?0:crc32(content); const timeVal=file.time||Date.now(); const modTime=new Date(timeVal); const dosDate=((modTime.getFullYear()-1980)<<9)|((modTime.getMonth()+1)<<5)|modTime.getDate(); const dosTime=(modTime.getHours()<<11)|(modTime.getMinutes()<<5)|Math.floor(modTime.getSeconds()/2); const localSize=30+nameBytes.length; const local=new Uint8Array(localSize); const lv=new DataView(local.buffer); lv.setUint32(0,0x04034b50,true); lv.setUint16(4,0x14,true); lv.setUint16(6,0x0800,true); lv.setUint16(8,0,true); lv.setUint16(10,dosTime,true); lv.setUint16(12,dosDate,true); lv.setUint32(14,crc,true); lv.setUint32(18,content.length,true); lv.setUint32(22,content.length,true); lv.setUint16(26,nameBytes.length,true); lv.setUint16(28,0,true); local.set(nameBytes,30); fileParts.push(local); if(!isDir) fileParts.push(content); offset+=local.length+(isDir?0:content.length); const cdLen=46+nameBytes.length; const cd=new Uint8Array(cdLen); const cdv=new DataView(cd.buffer); cdv.setUint32(0,0x02014b50,true); cdv.setUint16(4,0x14,true); cdv.setUint16(6,0x14,true); cdv.setUint16(8,0x0800,true); cdv.setUint16(10,0,true); cdv.setUint16(12,dosTime,true); cdv.setUint16(14,dosDate,true); cdv.setUint32(16,crc,true); cdv.setUint32(20,content.length,true); cdv.setUint32(24,content.length,true); cdv.setUint16(28,nameBytes.length,true); cdv.setUint16(30,0,true); cdv.setUint16(32,0,true); cdv.setUint16(34,0,true); cdv.setUint16(36,isDir?0x10:0,true); cdv.setUint32(38,0,true); cdv.setUint32(42,offset-local.length-(isDir?0:content.length),true); cd.set(nameBytes,46); centralDir.push({entry:cd}); } const cdSize=centralDir.reduce((s,c)=>s+c.entry.length,0); const cdOffset=offset; const cdBuffer=new Uint8Array(cdSize); let pos=0; centralDir.forEach(c=>{ cdBuffer.set(c.entry,pos); pos+=c.entry.length; }); fileParts.push(cdBuffer); const eocd=new Uint8Array(22); const ev=new DataView(eocd.buffer); ev.setUint32(0,0x06054b50,true); ev.setUint16(4,0,true); ev.setUint16(6,0,true); ev.setUint16(8,centralDir.length,true); ev.setUint16(10,centralDir.length,true); ev.setUint32(12,cdSize,true); ev.setUint32(16,cdOffset,true); ev.setUint16(20,0,true); fileParts.push(eocd); const zipBlob=new Blob(fileParts,{type:'application/zip'}); const url=URL.createObjectURL(zipBlob); const a=document.createElement('a'); a.href=url; a.download=`archive_${Date.now()}.zip`; a.click(); URL.revokeObjectURL(url); showToast(`已打包 ${downloads.length} 個檔案`); } }
+  function downloadSelected() { if(selection.size===0) return; const topIds=getTopIds([...selection]); const items=topIds.map(id=>db.find(x=>x.id===id)).filter(it=>it&&!it.del); if(items.length===0) return; const downloads=[]; function collect(item,base=''){ const safeName=item.name.replace(/[\/\\]/g,'_'); if(item.type==='file') downloads.push({path:base+safeName,content:item.content||new Uint8Array(0),time:item.time}); else { downloads.push({path:base+safeName+'/',content:new Uint8Array(0),time:item.time}); db.filter(x=>x.pid===item.id&&!x.del).forEach(c=>collect(c,base+safeName+'/')); } } items.forEach(it=>collect(it)); if(downloads.length===0){ showToast('无可下载档案'); return; } if(downloads.length===1 && items.length===1 && items[0].type==='file'){ const item=items[0]; const blob=new Blob([item.content]); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=item.name; a.click(); URL.revokeObjectURL(url); } else { const encoder=new TextEncoder(); const centralDir=[]; let offset=0; const fileParts=[]; for(let file of downloads){ const nameBytes=encoder.encode(file.path); const isDir=file.path.endsWith('/'); const content=isDir?new Uint8Array(0):(file.content||new Uint8Array(0)); const crc=isDir?0:crc32(content); const timeVal=file.time||Date.now(); const modTime=new Date(timeVal); const dosDate=((modTime.getFullYear()-1980)<<9)|((modTime.getMonth()+1)<<5)|modTime.getDate(); const dosTime=(modTime.getHours()<<11)|(modTime.getMinutes()<<5)|Math.floor(modTime.getSeconds()/2); const localSize=30+nameBytes.length; const local=new Uint8Array(localSize); const lv=new DataView(local.buffer); lv.setUint32(0,0x04034b50,true); lv.setUint16(4,0x14,true); lv.setUint16(6,0x0800,true); lv.setUint16(8,0,true); lv.setUint16(10,dosTime,true); lv.setUint16(12,dosDate,true); lv.setUint32(14,crc,true); lv.setUint32(18,content.length,true); lv.setUint32(22,content.length,true); lv.setUint16(26,nameBytes.length,true); lv.setUint16(28,0,true); local.set(nameBytes,30); fileParts.push(local); if(!isDir) fileParts.push(content); offset+=local.length+(isDir?0:content.length); const cdLen=46+nameBytes.length; const cd=new Uint8Array(cdLen); const cdv=new DataView(cd.buffer); cdv.setUint32(0,0x02014b50,true); cdv.setUint16(4,0x14,true); cdv.setUint16(6,0x14,true); cdv.setUint16(8,0x0800,true); cdv.setUint16(10,0,true); cdv.setUint16(12,dosTime,true); cdv.setUint16(14,dosDate,true); cdv.setUint32(16,crc,true); cdv.setUint32(20,content.length,true); cdv.setUint32(24,content.length,true); cdv.setUint16(28,nameBytes.length,true); cdv.setUint16(30,0,true); cdv.setUint16(32,0,true); cdv.setUint16(34,0,true); cdv.setUint16(36,isDir?0x10:0,true); cdv.setUint32(38,0,true); cdv.setUint32(42,offset-local.length-(isDir?0:content.length),true); cd.set(nameBytes,46); centralDir.push({entry:cd}); } const cdSize=centralDir.reduce((s,c)=>s+c.entry.length,0); const cdOffset=offset; const cdBuffer=new Uint8Array(cdSize); let pos=0; centralDir.forEach(c=>{ cdBuffer.set(c.entry,pos); pos+=c.entry.length; }); fileParts.push(cdBuffer); const eocd=new Uint8Array(22); const ev=new DataView(eocd.buffer); ev.setUint32(0,0x06054b50,true); ev.setUint16(4,0,true); ev.setUint16(6,0,true); ev.setUint16(8,centralDir.length,true); ev.setUint16(10,centralDir.length,true); ev.setUint32(12,cdSize,true); ev.setUint32(16,cdOffset,true); ev.setUint16(20,0,true); fileParts.push(eocd); const zipBlob=new Blob(fileParts,{type:'application/zip'}); const url=URL.createObjectURL(zipBlob); const a=document.createElement('a'); a.href=url; a.download=`archive_${Date.now()}.zip`; a.click(); URL.revokeObjectURL(url); showToast(`已打包 ${downloads.length} 个档案`); } }
   function crc32(data){ let crc=0xFFFFFFFF; const table=[]; for(let i=0;i<256;i++){ let c=i; for(let j=0;j<8;j++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); table[i]=c; } for(let i=0;i<data.length;i++) crc=table[(crc^data[i])&0xFF]^(crc>>>8); return (crc^0xFFFFFFFF)>>>0; }
 
   const searchInput = document.getElementById('search-inp');
@@ -698,25 +1232,25 @@
   const fileInput = document.getElementById('file-up');
   uploadBtn.addEventListener('click', ()=>{ if(uploadBtn.classList.contains('disabled')) return; commitEdit(); fileInput.click(); });
   newFolderBtn.addEventListener('click', ()=>{ if(newFolderBtn.classList.contains('disabled')) return; commitEdit(); App.createFolder(); });
-  fileInput.addEventListener('change', function(){ if(currentTab!=='drive'){ showToast('請在「我的硬碟」上傳'); fileInput.value=''; return; } if(isUploading){ fileInput.value=''; return; } const files=fileInput.files; if(!files.length) return; const targetPid=pathStack[pathStack.length-1].id; isUploading=true; updateSidebarButtons(); showToast(`正在上傳 ${files.length} 個文件...`); const proms=[]; for(let file of files){ proms.push(new Promise(resolve=>{ const r=new FileReader(); r.onload=e=>resolve({name:file.name,size:file.size,content:new Uint8Array(e.target.result)}); r.onerror=()=>resolve(null); r.readAsArrayBuffer(file); })); } Promise.all(proms).then(results=>{ let cnt=0; for(let res of results){ if(!res) continue; const nn=getUniqueName(res.name,targetPid,'file'); if(nn!==res.name) showToast(`檔案「${res.name}」已更名為「${nn}」`); db.push({id:generateId(),name:nn,type:'file',pid:targetPid,del:false,time:Date.now(),size:res.size,content:res.content}); cnt++; } searchInput.value=''; searchQuery=''; render(); showToast(`已上傳 ${cnt} 個文件`); fileInput.value=''; isUploading=false; updateSidebarButtons(); }).catch(()=>{ showToast('上傳失敗'); fileInput.value=''; isUploading=false; updateSidebarButtons(); }); });
+  fileInput.addEventListener('change', function(){ if(currentTab!=='drive'){ showToast('请在「我的硬碟」上传'); fileInput.value=''; return; } if(isUploading){ fileInput.value=''; return; } const files=fileInput.files; if(!files.length) return; const targetPid=pathStack[pathStack.length-1].id; isUploading=true; updateSidebarButtons(); showToast(`正在上传 ${files.length} 个文件...`); const proms=[]; for(let file of files){ proms.push(new Promise(resolve=>{ const r=new FileReader(); r.onload=e=>resolve({name:file.name,size:file.size,content:new Uint8Array(e.target.result)}); r.onerror=()=>resolve(null); r.readAsArrayBuffer(file); })); } Promise.all(proms).then(results=>{ let cnt=0; for(let res of results){ if(!res) continue; const nn=getUniqueName(res.name,targetPid,'file'); if(nn!==res.name) showToast(`档案「${res.name}」已更名为「${nn}」`); db.push({id:generateId(),name:nn,type:'file',pid:targetPid,del:false,time:Date.now(),size:res.size,content:res.content}); cnt++; } searchInput.value=''; searchQuery=''; render(); showToast(`已上传 ${cnt} 个文件`); fileInput.value=''; isUploading=false; updateSidebarButtons(); }).catch(()=>{ showToast('上传失败'); fileInput.value=''; isUploading=false; updateSidebarButtons(); }); });
   function updateSidebarButtons(){ const up=document.getElementById('btn-upload'), nf=document.getElementById('btn-newfolder'); up.classList.toggle('disabled', isUploading||currentTab!=='drive'); nf.classList.toggle('disabled', currentTab!=='drive'); }
 
   window.App = {
     toggleSidebar(){ document.getElementById('sidebar').classList.toggle('collapsed'); const logo=document.getElementById('logo-img'); logo.classList.add('rotate'); setTimeout(()=>logo.classList.remove('rotate'),300); },
-    switchTab(tab){ if(isUploading){ showToast('上傳中，請稍後再切換'); return; } commitEdit(); currentTab=tab; clip={mode:null,ids:[]}; if(tab==='home') pathStack=[{id:'0',name:'首頁'}]; else if(tab==='drive') pathStack=[{id:'0',name:'我的硬碟'}]; else if(tab==='recent') pathStack=[{id:'0',name:'最近項目'}]; else if(tab==='trash') pathStack=[{id:'0',name:'垃圾桶'}]; selection.clear(); syncSelectionUI(); searchInput.value=''; searchQuery=''; editId=null; closePreview(); lastClickId=null; document.querySelectorAll('.nav-item').forEach(i=>i.classList.toggle('active',i.id===`menu-${tab}`)); updateSidebarButtons(); document.getElementById('view-toggle').style.display=(tab==='drive')?'flex':'none'; render(); },
+    switchTab(tab){ if(isUploading){ showToast('上传中，请稍后再切换'); return; } commitEdit(); currentTab=tab; clip={mode:null,ids:[]}; if(tab==='home') pathStack=[{id:'0',name:'首页'}]; else if(tab==='drive') pathStack=[{id:'0',name:'我的硬碟'}]; else if(tab==='recent') pathStack=[{id:'0',name:'最近项目'}]; else if(tab==='trash') pathStack=[{id:'0',name:'垃圾桶'}]; selection.clear(); syncSelectionUI(); searchInput.value=''; searchQuery=''; editId=null; closePreview(); lastClickId=null; document.querySelectorAll('.nav-item').forEach(i=>i.classList.toggle('active',i.id===`menu-${tab}`)); updateSidebarButtons(); document.getElementById('view-toggle').style.display=(tab==='drive')?'flex':'none'; render(); },
     goPath(idx){ if(currentTab!=='drive'||isUploading) return; commitEdit(); pathStack=pathStack.slice(0,idx+1); selection.clear(); syncSelectionUI(); editId=null; searchInput.value=''; searchQuery=''; closePreview(); lastClickId=null; render(); },
-    createFolder(){ if(currentTab!=='drive') return; const targetPid=pathStack[pathStack.length-1].id; const nn=getUniqueName('未命名資料夾',targetPid,'dir'); db.push({id:generateId(),name:nn,type:'dir',pid:targetPid,del:false,time:Date.now(),size:0}); editId=db[db.length-1].id; render(); },
+    createFolder(){ if(currentTab!=='drive') return; const targetPid=pathStack[pathStack.length-1].id; const nn=getUniqueName('未命名文件夹',targetPid,'dir'); db.push({id:generateId(),name:nn,type:'dir',pid:targetPid,del:false,time:Date.now(),size:0}); editId=db[db.length-1].id; render(); },
     setView(mode){ viewMode=mode; document.getElementById('view-list').classList.toggle('active',mode==='list'); document.getElementById('view-card').classList.toggle('active',mode==='card'); render(); }
   };
 
-  function commitEdit(){ const id=editId; if(!id) return false; const inp=document.getElementById('inp-edit'); const target=db.find(x=>x.id===id); let changed=false; if(target&&inp){ let nn=inp.value.trim(); if(nn&&nn!==target.name){ const un=getUniqueName(nn,target.pid,target.type,target.id); if(un!==nn) showToast(`重新命名時自動更名為「${un}」`); target.name=un; target.time=Date.now(); changed=true; } } editId=null; if(changed&&searchQuery){ searchInput.value=''; searchQuery=''; } return changed; }
+  function commitEdit(){ const id=editId; if(!id) return false; const inp=document.getElementById('inp-edit'); const target=db.find(x=>x.id===id); let changed=false; if(target&&inp){ let nn=inp.value.trim(); if(nn&&nn!==target.name){ const un=getUniqueName(nn,target.pid,target.type,target.id); if(un!==nn) showToast(`重新命名时自动更名为「${un}」`); target.name=un; target.time=Date.now(); changed=true; } } editId=null; if(changed&&searchQuery){ searchInput.value=''; searchQuery=''; } return changed; }
   function cancelEdit(){ if(!editId) return; editId=null; render(); }
 
   function adaptiveFontSize(name) { const len = name.length; if (len <= 6) return '15px'; if (len <= 12) return '14px'; if (len <= 18) return '13px'; if (len <= 24) return '12px'; return '11px'; }
 
   function renderHome() {
     const v=document.getElementById('main-view');
-    document.getElementById('breadcrumb').innerHTML = '<span style="cursor:default;padding:4px 8px;border-radius:var(--radius);color:var(--text);font-weight:500;">首頁</span>';
+    document.getElementById('breadcrumb').innerHTML = '<span style="cursor:default;padding:4px 8px;border-radius:var(--radius);color:var(--text);font-weight:500;">首页</span>';
     const now=new Date(); const day=now.getDate(); const month=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'][now.getMonth()];
     const todayStr=now.toDateString(); let signedToday=(signDate===todayStr);
     const imgExts=new Set(['jpg','jpeg','png','gif','bmp','svg','webp']);
@@ -742,8 +1276,8 @@
         <div class="category-card" data-filter="document"><svg viewBox="0 0 64 64" fill="none" stroke="#34a853" stroke-width="2"><path d="M20 8h18l10 10v36a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"/><polyline points="20 8 20 8 38 8 48 18 48 56"/><line x1="28" y1="28" x2="40" y2="28"/><line x1="28" y1="36" x2="40" y2="36"/></svg><div class="cat-label">文档</div><div class="tag" style="margin-top:4px;">${docCount} 个</div></div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;">
-        <div class="home-card"><h3 style="font-size:16px;font-weight:600;">最近看过</h3>${recentFiles.slice(0,4).map(f=>`<div class="recent-item">${getFileIconSmall(f.name)}<span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(f.name)}</span><span class="tag" style="margin-left:auto;">${formatSize(f.size||0)}</span></div>`).join('')}${recentFiles.length===0?'<div class="empty-state" style="margin-top:20px;">暫無最近文件</div>':''}</div>
-        <div class="home-card"><h3 style="font-size:16px;font-weight:600;">最近保存</h3>${recentItems.map(item=>{ const icon=item.type==='dir'?getFolderIconSmall():getFileIconSmall(item.name); return `<div class="recent-item">${icon}<span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(item.name)}</span></div>`; }).join('')}${recentItems.length===0?'<div class="empty-state" style="margin-top:20px;">暫無記錄</div>':''}</div>
+        <div class="home-card"><h3 style="font-size:16px;font-weight:600;">最近看过</h3>${recentFiles.slice(0,4).map(f=>`<div class="recent-item">${getFileIconSmall(f.name)}<span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(f.name)}</span><span class="tag" style="margin-left:auto;">${formatSize(f.size||0)}</span></div>`).join('')}${recentFiles.length===0?'<div class="empty-state" style="margin-top:20px;">暂无最近文件</div>':''}</div>
+        <div class="home-card"><h3 style="font-size:16px;font-weight:600;">最近保存</h3>${recentItems.map(item=>{ const icon=item.type==='dir'?getFolderIconSmall():getFileIconSmall(item.name); return `<div class="recent-item">${icon}<span style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(item.name)}</span></div>`; }).join('')}${recentItems.length===0?'<div class="empty-state" style="margin-top:20px;">暂无记录</div>':''}</div>
       </div>
     </div>`;
     v.innerHTML=html;
@@ -779,14 +1313,14 @@
         grid.appendChild(card);
       });
       v.appendChild(grid);
-      if(items.length===0) v.appendChild(elem('div','empty-state','暫無最近項目'));
+      if(items.length===0) v.appendChild(elem('div','empty-state','暂无最近项目'));
     } else if(currentTab==='drive'){
       items = db.filter(x=>x.pid===curPid && !x.del);
       if(searchQuery) items=items.filter(x=>x.name.toLowerCase().includes(searchQuery.toLowerCase()));
       items.sort((a,b)=>b.time-a.time);
       if(viewMode==='list'){
         const list=document.createElement('div');
-        list.innerHTML='<div class="list-header"><span>名稱</span><span>建立時間</span><span>大小</span></div>';
+        list.innerHTML='<div class="list-header"><span>名称</span><span>建立时间</span><span>大小</span></div>';
         items.forEach(item=>{
           const row=document.createElement('div'); row.className='row'; row.setAttribute('data-id',item.id);
           const nameBlock = (editId===item.id) ? `<input type="text" class="inline-input" id="inp-edit" value="${escapeHtml(item.name)}">` : `<span>${escapeHtml(item.name)}</span>`;
@@ -822,13 +1356,13 @@
         });
         v.appendChild(grid);
       }
-      if(items.length===0) v.appendChild(elem('div','empty-state',searchQuery?'找不到匹配項目':'此處空空如也'));
+      if(items.length===0) v.appendChild(elem('div','empty-state',searchQuery?'找不到匹配项目':'此处空空如也'));
     } else if(currentTab==='trash'){
       items = db.filter(x=>x.del);
       if(searchQuery) items=items.filter(x=>x.name.toLowerCase().includes(searchQuery.toLowerCase()));
       items.sort((a,b)=>b.time-a.time);
       const list=document.createElement('div');
-      list.innerHTML='<div class="list-header"><span>名稱</span><span>原始時間</span><span>大小</span></div>';
+      list.innerHTML='<div class="list-header"><span>名称</span><span>原始时间</span><span>大小</span></div>';
       items.forEach(item=>{
         const row=document.createElement('div'); row.className='row'; row.setAttribute('data-id',item.id);
         const timeStr=new Date(item.time).toLocaleString('zh-TW',{hour12:false});
