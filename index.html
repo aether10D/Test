@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AETHER 10D ARCHITECT · 白色胶囊 (多窗口全屏)</title>
+  <title>AETHER 10D ARCHITECT · 白色胶囊 (标签式多窗口)</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -68,12 +68,20 @@
     .view-btn { height:36px; width:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; background:transparent; border:none; color:var(--sub); transition:0.15s; }
     .view-btn.active { background:var(--accent-light); color:var(--accent); }
     .content-pane { flex:1; overflow:hidden; position:relative; }
+    #tabs-bar { height:40px; display:flex; align-items:center; border-bottom:1px solid var(--border); background:#f9f9fb; overflow-x:auto; white-space:nowrap; }
+    #tabs-bar .tab { display:inline-flex; align-items:center; height:32px; padding:0 12px; margin:0 2px; border-radius:12px; cursor:pointer; background:transparent; transition:0.15s; font-size:13px; user-select:none; }
+    #tabs-bar .tab:hover { background:rgba(0,0,0,0.04); }
+    #tabs-bar .tab.active { background:var(--accent-light); color:var(--accent); font-weight:500; }
+    #tabs-bar .tab.minimized { opacity:0.6; font-style:italic; }
+    #tabs-bar .tab-close { margin-left:8px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; color:var(--sub); font-size:14px; }
+    #tabs-bar .tab-close:hover { background:rgba(0,0,0,0.1); }
     .viewport { position:absolute; top:0; left:0; right:0; bottom:0; overflow-y:auto; padding:24px; background:#ffffff; }
     .viewport.slide-up { transform: translateY(-20px); opacity: 0; transition: transform 0.25s ease, opacity 0.25s ease; }
     .preview-window { position:absolute; background:#ffffff; border:1px solid var(--border); border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.12); display:flex; flex-direction:column; min-width:300px; min-height:200px; z-index:50; overflow:hidden; transition: box-shadow 0.15s; }
     .preview-window.active { z-index:100; box-shadow:0 16px 48px rgba(0,0,0,0.18); }
-    .preview-window.maximized { top:0 !important; left:0 !important; width:100% !important; height:100% !important; border-radius:0; }
+    .preview-window.maximized { position:fixed; top:0; left:0; width:100vw; height:100vh; border-radius:0; z-index:200; }
     .preview-window-header { height:44px; padding:0 16px; display:flex; align-items:center; justify-content:space-between; cursor:move; user-select:none; background:#f5f5f7; border-bottom:1px solid var(--border); }
+    .preview-window.maximized .preview-window-header { cursor:default; }
     .preview-window-title { font-weight:600; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px; }
     .preview-window-actions { display:flex; align-items:center; gap:6px; }
     .preview-window-actions button { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; background:transparent; color:var(--sub); transition:0.15s; }
@@ -197,6 +205,7 @@
       <button class="refresh-btn" id="refresh-btn" title="刷新" onclick="App.refresh()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
     </div>
   </div>
+  <div id="tabs-bar"></div>
   <div class="content-pane" id="content-pane">
     <div class="viewport" id="main-view"></div>
   </div>
@@ -286,9 +295,10 @@
   let pressTimer = null, pressTargetId = null, longPressActive = false, pressSX = 0, pressSY = 0;
   const isTouch = 'ontouchstart' in window;
 
-  const openWindows = new Map();
+  const openWindows = new Map(); // itemId -> { win, tab, content }
   const contentPane = document.getElementById('content-pane');
-  let windowZIndex = 100;
+  const tabsBar = document.getElementById('tabs-bar');
+  let windowZIndex = 200;
 
   function greet() { const h = new Date().getHours(); return h < 12 ? '上午好' : h < 18 ? '中午好' : '晚上好'; }
   function showToast(msg, isError=false) { const t = document.getElementById('toast'); t.className = isError ? 'error' : ''; t.textContent = msg; t.style.display = 'block'; if(toastTimer) clearTimeout(toastTimer); toastTimer = setTimeout(() => t.style.display = 'none', 2000); }
@@ -418,30 +428,20 @@
   function downloadItem(item) { if(item.type!=='file'||!item.content||item.content.length===0){ showToast('文件內容為空'); return; } const blob=new Blob([item.content]); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=item.name; a.click(); }
   window.downloadItem = downloadItem;
 
+  // ==================== 标签页与窗口管理 ====================
   function createWindow(item) {
     if (openWindows.has(item.id)) {
-      const win = openWindows.get(item.id);
-      win.classList.add('active');
-      win.style.zIndex = ++windowZIndex;
-      if (!win.classList.contains('maximized')) {
-        // 如果窗口没有最大化，重新最大化
-        win.classList.add('maximized');
-        win.dataset.prevWidth = win.style.width;
-        win.dataset.prevHeight = win.style.height;
-        win.dataset.prevLeft = win.style.left;
-        win.dataset.prevTop = win.style.top;
-      }
+      const { win, tab } = openWindows.get(item.id);
+      if (!win.classList.contains('maximized')) maximizeWindow(win, tab);
+      activateWindow(win, tab);
       return;
     }
+
+    // 创建窗口
     const win = document.createElement('div');
-    win.className = 'preview-window active maximized';
+    win.className = 'preview-window';
     win.setAttribute('data-id', item.id);
-    win.style.zIndex = ++windowZIndex;
-    // 先设一个初始尺寸再最大化，以便恢复时有值
-    win.style.width = '600px';
-    win.style.height = '450px';
-    win.style.left = '80px';
-    win.style.top = '60px';
+    win.style.zIndex = windowZIndex++;
     win.innerHTML = `
       <div class="preview-window-header">
         <span class="preview-window-title">${escapeHtml(item.name)}</span>
@@ -458,44 +458,57 @@
       <div class="resize-handle-edge resize-handle-left"></div>
       <div class="resize-handle-edge resize-handle-top"></div>
     `;
-    contentPane.appendChild(win);
-    openWindows.set(item.id, win);
+    document.body.appendChild(win); // 全屏定位时脱离 content-pane，直接放 body
 
-    // 预先保存原始尺寸，以便从最大化恢复
-    win.dataset.prevWidth = '600px';
-    win.dataset.prevHeight = '450px';
-    win.dataset.prevLeft = '80px';
-    win.dataset.prevTop = '60px';
+    // 创建标签
+    const tab = document.createElement('div');
+    tab.className = 'tab active';
+    tab.innerHTML = `<span>${escapeHtml(item.name)}</span><button class="tab-close">×</button>`;
+    tabsBar.appendChild(tab);
 
     const content = win.querySelector('.preview-window-content');
     const closeBtn = win.querySelector('.win-close-btn');
     const maxBtn = win.querySelector('.win-max-btn');
+    const minBtn = win.querySelector('.win-min-btn');
     const header = win.querySelector('.preview-window-header');
 
-    closeBtn.addEventListener('click', () => {
-      openWindows.delete(item.id);
-      win.remove();
-    });
+    const state = { win, tab, content, item, minimized: false, prevRect: null };
+    openWindows.set(item.id, state);
+
+    // 最大化窗口并激活
+    maximizeWindow(win, tab);
+    activateWindow(win, tab);
+    loadPreviewContent(item, win, content);
+
+    // 窗口控制按钮
+    closeBtn.addEventListener('click', () => closeWindow(item.id));
+    tab.querySelector('.tab-close').addEventListener('click', (e) => { e.stopPropagation(); closeWindow(item.id); });
+
     maxBtn.addEventListener('click', () => {
-      win.classList.toggle('maximized');
-      if (win.classList.contains('maximized')) {
-        win.dataset.prevWidth = win.style.width;
-        win.dataset.prevHeight = win.style.height;
-        win.dataset.prevLeft = win.style.left;
-        win.dataset.prevTop = win.style.top;
-      } else {
-        win.style.width = win.dataset.prevWidth || '600px';
-        win.style.height = win.dataset.prevHeight || '450px';
-        win.style.left = win.dataset.prevLeft || '80px';
-        win.style.top = win.dataset.prevTop || '60px';
-      }
-    });
-    win.addEventListener('mousedown', () => {
-      win.style.zIndex = ++windowZIndex;
-      document.querySelectorAll('.preview-window').forEach(w => w.classList.remove('active'));
-      win.classList.add('active');
+      if (win.classList.contains('maximized')) restoreWindow(win, tab);
+      else maximizeWindow(win, tab);
     });
 
+    minBtn.addEventListener('click', () => {
+      minimizeWindow(state);
+    });
+
+    // 点击标签
+    tab.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      if (state.minimized) {
+        state.minimized = false;
+        win.style.display = 'flex';
+        tab.classList.remove('minimized');
+        maximizeWindow(win, tab);
+        activateWindow(win, tab);
+      } else {
+        maximizeWindow(win, tab);
+        activateWindow(win, tab);
+      }
+    });
+
+    // 拖拽标题栏（仅非最大化）
     let dragState = null;
     header.addEventListener('mousedown', (e) => {
       if (e.target.closest('button')) return;
@@ -510,6 +523,7 @@
     });
     document.addEventListener('mouseup', () => { dragState = null; });
 
+    // 调整大小（仅非最大化）
     const resizeEls = win.querySelectorAll('.resize-handle-corner, .resize-handle-edge');
     resizeEls.forEach(el => {
       el.addEventListener('mousedown', (e) => {
@@ -521,25 +535,72 @@
         if (el.classList.contains('resize-handle-corner') || el.classList.contains('resize-handle-bottom')) dirs.push('bottom');
         if (el.classList.contains('resize-handle-left')) dirs.push('left');
         if (el.classList.contains('resize-handle-top')) dirs.push('top');
-        const state = { startX: e.clientX, startY: e.clientY, width: rect.width, height: rect.height, left: rect.left, top: rect.top, dirs };
+        const s = { startX: e.clientX, startY: e.clientY, width: rect.width, height: rect.height, left: rect.left, top: rect.top, dirs };
         function onMove(ev) {
-          let w = state.width, h = state.height, l = state.left, t = state.top;
-          if (state.dirs.includes('right')) w = Math.max(300, state.width + ev.clientX - state.startX);
-          if (state.dirs.includes('bottom')) h = Math.max(200, state.height + ev.clientY - state.startY);
-          if (state.dirs.includes('left')) { w = Math.max(300, state.width - (ev.clientX - state.startX)); l = state.left + (ev.clientX - state.startX); }
-          if (state.dirs.includes('top')) { h = Math.max(200, state.height - (ev.clientY - state.startY)); t = state.top + (ev.clientY - state.startY); }
+          let w = s.width, h = s.height, l = s.left, t = s.top;
+          if (s.dirs.includes('right')) w = Math.max(300, s.width + ev.clientX - s.startX);
+          if (s.dirs.includes('bottom')) h = Math.max(200, s.height + ev.clientY - s.startY);
+          if (s.dirs.includes('left')) { w = Math.max(300, s.width - (ev.clientX - s.startX)); l = s.left + (ev.clientX - s.startX); }
+          if (s.dirs.includes('top')) { h = Math.max(200, s.height - (ev.clientY - s.startY)); t = s.top + (ev.clientY - s.startY); }
           win.style.width = w + 'px';
           win.style.height = h + 'px';
-          if (state.dirs.includes('left')) win.style.left = l + 'px';
-          if (state.dirs.includes('top')) win.style.top = t + 'px';
+          if (s.dirs.includes('left')) win.style.left = l + 'px';
+          if (s.dirs.includes('top')) win.style.top = t + 'px';
         }
         function onUp() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); }
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onUp);
       });
     });
+  }
 
-    loadPreviewContent(item, win, content);
+  function maximizeWindow(win, tab) {
+    win.classList.add('maximized');
+    win.style.top = '0px';
+    win.style.left = '0px';
+    win.style.width = '100vw';
+    win.style.height = '100vh';
+    win.style.position = 'fixed';
+    win.style.borderRadius = '0';
+    if (tab) tab.classList.remove('minimized');
+  }
+
+  function restoreWindow(win, tab) {
+    win.classList.remove('maximized');
+    win.style.position = 'absolute';
+    win.style.borderRadius = '16px';
+    // 恢复到默认尺寸和位置
+    win.style.width = '600px';
+    win.style.height = '450px';
+    win.style.left = '80px';
+    win.style.top = '60px';
+    if (tab) tab.classList.remove('minimized');
+  }
+
+  function activateWindow(win, tab) {
+    win.style.zIndex = ++windowZIndex;
+    win.style.display = 'flex';
+    win.classList.add('active');
+    if (tab) {
+      document.querySelectorAll('#tabs-bar .tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    }
+  }
+
+  function minimizeWindow(state) {
+    const { win, tab } = state;
+    state.minimized = true;
+    win.style.display = 'none';
+    tab.classList.add('minimized');
+  }
+
+  function closeWindow(itemId) {
+    const state = openWindows.get(itemId);
+    if (!state) return;
+    const { win, tab } = state;
+    win.remove();
+    tab.remove();
+    openWindows.delete(itemId);
   }
 
   function loadPreviewContent(item, win, content) {
@@ -601,6 +662,7 @@
     createWindow(item);
   }
 
+  // ==================== 主点击逻辑 ====================
   document.getElementById('main-view').addEventListener('click', function(e) {
     if (curTab === 'home') return;
     if (longPressActive) { longPressActive = false; return; }
@@ -851,7 +913,7 @@
     document.querySelectorAll('.recent-item').forEach(el => { el.addEventListener('click', () => { const name = el.querySelector('span').textContent.trim(); const item = db.find(x => x.name === name && !x.del); if (!item) return; if (item.type === 'file') { App.switchTab('drive'); setTimeout(() => showPreview(item), 100); } else { App.switchTab('drive'); setTimeout(() => { pathStack = [{id:'0', name:'我的硬碟'}]; pathStack.push({id:item.id, name:item.name}); render(); }, 100); } }); });
   }
 
-  // 拖拽逻辑保持原样，以下省略（与上一版完全一致）
+  // 拖拽逻辑
   function clearPressState() { if(pressTimer) clearTimeout(pressTimer); pressTimer = null; pressTargetId = null; longPressActive = false; }
   function handlePressStart(e) {
     const card = e.target.closest('.card-item');
