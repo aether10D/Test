@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AETHER 10D ARCHITECT · 白色胶囊 (标签拖拽排序)</title>
+  <title>AETHER 10D ARCHITECT · 白色胶囊 (窗口拖拽)</title>
   <style>
     :root {
       --bg: #ffffff;
@@ -296,11 +296,11 @@
   let pressTimer = null, pressTargetId = null, longPressActive = false, pressSX = 0, pressSY = 0;
   const isTouch = 'ontouchstart' in window;
 
-  const openWindows = new Map(); // itemId -> { win, tab, content, item }
+  const openWindows = new Map();
   const contentPane = document.getElementById('content-pane');
   const tabsBar = document.getElementById('tabs-bar');
   let windowZIndex = 200;
-  let dragTabElement = null; // 拖拽中的标签
+  let dragTabElement = null;
 
   function greet() { const h = new Date().getHours(); return h < 12 ? '上午好' : h < 18 ? '中午好' : '晚上好'; }
   function showToast(msg, isError=false) { const t = document.getElementById('toast'); t.className = isError ? 'error' : ''; t.textContent = msg; t.style.display = 'block'; if(toastTimer) clearTimeout(toastTimer); toastTimer = setTimeout(() => t.style.display = 'none', 2000); }
@@ -430,7 +430,7 @@
   function downloadItem(item) { if(item.type!=='file'||!item.content||item.content.length===0){ showToast('文件內容為空'); return; } const blob=new Blob([item.content]); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=item.name; a.click(); }
   window.downloadItem = downloadItem;
 
-  // ==================== 标签页与窗口管理 ====================
+  // ==================== 标签页与窗口管理 (带窗口拖拽) ====================
   function createWindow(item) {
     if (openWindows.has(item.id)) {
       const { win, tab } = openWindows.get(item.id);
@@ -439,7 +439,6 @@
       return;
     }
 
-    // 创建窗口
     const win = document.createElement('div');
     win.className = 'preview-window';
     win.setAttribute('data-id', item.id);
@@ -462,10 +461,9 @@
     `;
     document.body.appendChild(win);
 
-    // 创建标签
     const tab = document.createElement('div');
     tab.className = 'tab active';
-    tab.draggable = true; // 使标签可拖拽
+    tab.draggable = true;
     tab.innerHTML = `<span>${escapeHtml(item.name)}</span><button class="tab-close">×</button>`;
     tabsBar.appendChild(tab);
 
@@ -482,7 +480,6 @@
     activateWindow(win, tab);
     loadPreviewContent(item, win, content);
 
-    // 窗口控制按钮
     closeBtn.addEventListener('click', () => closeWindow(item.id));
     tab.querySelector('.tab-close').addEventListener('click', (e) => { e.stopPropagation(); closeWindow(item.id); });
 
@@ -491,11 +488,15 @@
       else maximizeWindow(win);
     });
 
-    minBtn.addEventListener('click', () => {
-      minimizeWindow(state);
+    minBtn.addEventListener('click', () => minimizeWindow(state));
+
+    // 双击标题栏切换最大化
+    header.addEventListener('dblclick', (e) => {
+      if (e.target.closest('button')) return;
+      if (win.classList.contains('maximized')) restoreWindow(win);
+      else maximizeWindow(win);
     });
 
-    // 点击标签
     tab.addEventListener('click', (e) => {
       if (e.target.closest('button')) return;
       if (state.minimized) {
@@ -510,7 +511,7 @@
       }
     });
 
-    // 标签拖拽事件
+    // 标签拖拽
     tab.addEventListener('dragstart', (e) => {
       if (e.target.closest('button')) { e.preventDefault(); return; }
       dragTabElement = tab;
@@ -518,13 +519,12 @@
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', item.id);
     });
-
-    tab.addEventListener('dragend', (e) => {
+    tab.addEventListener('dragend', () => {
       tab.classList.remove('dragging');
       dragTabElement = null;
     });
 
-    // 窗口拖拽与缩放（略，保持原样）
+    // 窗口拖拽 (仅非最大化)
     let dragState = null;
     header.addEventListener('mousedown', (e) => {
       if (e.target.closest('button')) return;
@@ -539,6 +539,7 @@
     });
     document.addEventListener('mouseup', () => { dragState = null; });
 
+    // 窗口调整大小 (仅非最大化)
     const resizeEls = win.querySelectorAll('.resize-handle-corner, .resize-handle-edge');
     resizeEls.forEach(el => {
       el.addEventListener('mousedown', (e) => {
@@ -608,9 +609,8 @@
   function closeWindow(itemId) {
     const state = openWindows.get(itemId);
     if (!state) return;
-    const { win, tab } = state;
-    win.remove();
-    tab.remove();
+    state.win.remove();
+    state.tab.remove();
     openWindows.delete(itemId);
   }
 
@@ -673,7 +673,7 @@
     createWindow(item);
   }
 
-  // 标签栏拖拽排序事件（委托在 tabsBar）
+  // 标签栏拖拽排序
   tabsBar.addEventListener('dragover', (e) => {
     e.preventDefault();
     if (!dragTabElement) return;
@@ -687,7 +687,6 @@
       tabsBar.insertBefore(dragTabElement, target.nextSibling);
     }
   });
-
   tabsBar.addEventListener('drop', (e) => {
     e.preventDefault();
     dragTabElement?.classList.remove('dragging');
@@ -945,7 +944,7 @@
     document.querySelectorAll('.recent-item').forEach(el => { el.addEventListener('click', () => { const name = el.querySelector('span').textContent.trim(); const item = db.find(x => x.name === name && !x.del); if (!item) return; if (item.type === 'file') { App.switchTab('drive'); setTimeout(() => showPreview(item), 100); } else { App.switchTab('drive'); setTimeout(() => { pathStack = [{id:'0', name:'我的硬碟'}]; pathStack.push({id:item.id, name:item.name}); render(); }, 100); } }); });
   }
 
-  // 拖拽逻辑略，保持原样……
+  // 拖拽逻辑
   function clearPressState() { if(pressTimer) clearTimeout(pressTimer); pressTimer = null; pressTargetId = null; longPressActive = false; }
   function handlePressStart(e) {
     const card = e.target.closest('.card-item');
