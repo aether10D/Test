@@ -12,6 +12,7 @@
     #sidebar.collapsed { width: var(--side-min); }
     .brand { height: 90px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-bottom: 1px solid var(--border); user-select: none; }
     .logo-img { width: 56px; height: 56px; border-radius: 16px; object-fit: cover; border: 1px solid var(--border); transition: transform 0.3s; }
+    .logo-img.rotate { transform: rotate(360deg); }
     .sidebar-tools { padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid var(--border); }
     .sidebar-btn { height: 44px; border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 500; padding: 0 16px; white-space: nowrap; background: var(--bg); color: var(--text); transition: 0.2s; }
     .sidebar-btn:hover { background: #f5f5f7; border-color: var(--accent); }
@@ -73,13 +74,16 @@
     .preview-window-content pre { white-space: pre-wrap; word-break: break-word; font-family: monospace; background: #f5f5f7; padding: 16px; border-radius: 16px; width: 100%; font-size: 16px; }
     .preview-window-content textarea { width: 100%; flex: 1; border: 1px solid var(--border); border-radius: 16px; padding: 16px; font-family: monospace; font-size: 16px; resize: vertical; min-height: 200px; }
     .preview-unsupported { color: var(--sub); text-align: center; margin-top: 40px; }
-    .resize-handle-corner { position: absolute; right: 0; bottom: 0; width: 20px; height: 20px; cursor: nwse-resize; background: transparent; }
-    .resize-handle-right, .resize-handle-bottom, .resize-handle-left, .resize-handle-top { position: absolute; background: transparent; }
-    .resize-handle-right { right: -3px; top: 0; bottom: 0; width: 6px; cursor: e-resize; }
-    .resize-handle-bottom { left: 0; right: 0; bottom: -3px; height: 6px; cursor: s-resize; }
-    .resize-handle-left { left: -3px; top: 0; bottom: 0; width: 6px; cursor: w-resize; }
-    .resize-handle-top { top: -3px; left: 0; right: 0; height: 6px; cursor: n-resize; }
-    .resize-handle-corner:hover { background: rgba(0,113,227,0.15); }
+    /* 四个角的拖拽把手 */
+    .resize-handle-nw { position: absolute; top: -3px; left: -3px; width: 20px; height: 20px; cursor: nwse-resize; background: transparent; z-index: 10; }
+    .resize-handle-ne { position: absolute; top: -3px; right: -3px; width: 20px; height: 20px; cursor: nesw-resize; background: transparent; z-index: 10; }
+    .resize-handle-sw { position: absolute; bottom: -3px; left: -3px; width: 20px; height: 20px; cursor: nesw-resize; background: transparent; z-index: 10; }
+    .resize-handle-se { position: absolute; bottom: -3px; right: -3px; width: 20px; height: 20px; cursor: nwse-resize; background: transparent; z-index: 10; }
+    .resize-handle-right { position: absolute; right: -3px; top: 0; bottom: 0; width: 6px; cursor: e-resize; background: transparent; }
+    .resize-handle-bottom { position: absolute; left: 0; right: 0; bottom: -3px; height: 6px; cursor: s-resize; background: transparent; }
+    .resize-handle-left { position: absolute; left: -3px; top: 0; bottom: 0; width: 6px; cursor: w-resize; background: transparent; }
+    .resize-handle-top { position: absolute; top: -3px; left: 0; right: 0; height: 6px; cursor: n-resize; background: transparent; }
+    .resize-handle-nw:hover, .resize-handle-ne:hover, .resize-handle-sw:hover, .resize-handle-se:hover { background: rgba(0,113,227,0.15); }
     .edit-actions-bar { display: none; gap: 8px; align-items: center; margin-top: 12px; }
     .edit-actions-bar button { height: 32px; padding: 0 14px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg); font-size: 13px; cursor: pointer; }
     .edit-actions-bar button:hover { background: #f5f5f7; }
@@ -139,47 +143,27 @@
     .refresh-btn:hover { background: #f5f5f7; border-color: var(--accent); }
     .refresh-btn svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    /* 窗口控制按钮 – 发光二极管效果 + 金属环 */
+    /* 发光二极管效果 + 金属环 */
     .win-controls { display: flex; align-items: center; gap: 10px; padding-left: 8px; z-index: 5; }
     .win-dot {
       width: 20px; height: 20px; border-radius: 50%; position: relative;
       cursor: pointer; flex-shrink: 0;
       transition: background-color 0.2s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
-      /* 金属环 + 内阴影 + 淡淡的外发光 */
-      box-shadow:
-        0 0 0 1px rgba(0,0,0,0.3),           /* 极细深灰金属环 */
-        inset 0 1px 2px rgba(255,255,255,0.15),
-        inset 0 -1px 2px rgba(0,0,0,0.2),
-        0 0 8px rgba(0,0,0,0.1);              /* 基础外发光(环境) */
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.2), 0 0 8px rgba(0,0,0,0.1);
     }
     .win-dot:hover { transform: scale(1.08); }
     .win-dot:active { transform: scale(0.95); transition: transform 0.08s; }
-    /* 红色按钮发光 */
     .win-dot.red { background-color: #ff5f56; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.2), 0 0 10px rgba(255,95,86,0.6); }
     .win-dot.red:hover { background-color: #ff7067; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.2), 0 0 14px rgba(255,95,86,0.8); }
-    /* 黄色按钮发光 */
     .win-dot.yellow { background-color: #ffbd2e; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.2), 0 0 10px rgba(255,189,46,0.6); }
     .win-dot.yellow:hover { background-color: #ffc94d; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.2), 0 0 14px rgba(255,189,46,0.8); }
-    /* 绿色按钮发光 */
     .win-dot.green { background-color: #27c93f; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.2), 0 0 10px rgba(39,201,63,0.6); }
     .win-dot.green:hover { background-color: #33d64b; box-shadow: 0 0 0 1px rgba(0,0,0,0.35), inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.2), 0 0 14px rgba(39,201,63,0.8); }
-    /* 按钮内图标保持原来样式 */
-    .win-dot .icon {
-      position: absolute; top: 50%; left: 50%;
-      opacity: 0; transform: translate(-50%,-50%) scale(0);
-      transition: opacity 0.3s, transform 0.45s cubic-bezier(0.175,0.885,0.32,1.275);
-      pointer-events: none; line-height: 1;
-    }
+    .win-dot .icon { position: absolute; top: 50%; left: 50%; opacity: 0; transform: translate(-50%,-50%) scale(0); transition: opacity 0.3s, transform 0.45s cubic-bezier(0.175,0.885,0.32,1.275); pointer-events: none; line-height: 1; }
     .win-dot:hover .icon { opacity: 1; transform: translate(-50%,-50%) scale(1); }
     .win-dot.red .icon { font-weight: 800; font-size: 12px; color: #4c0002; }
     .win-dot.yellow .icon { font-weight: 800; font-size: 13px; color: #5d3e00; margin-top: -1px; }
-    .win-dot.green .icon-fullscreen {
-      position: absolute; top: 50%; left: 50%;
-      width: 6px; height: 6px; border: 1.5px solid #064d0d; border-radius: 0.5px;
-      transform: translate(-50%,-50%) rotate(45deg) scale(0);
-      opacity: 0; transition: opacity 0.3s, transform 0.45s cubic-bezier(0.175,0.885,0.32,1.275);
-      pointer-events: none;
-    }
+    .win-dot.green .icon-fullscreen { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; border: 1.5px solid #064d0d; border-radius: 0.5px; transform: translate(-50%,-50%) rotate(45deg) scale(0); opacity: 0; transition: opacity 0.3s, transform 0.45s cubic-bezier(0.175,0.885,0.32,1.275); pointer-events: none; }
     .win-dot.green:hover .icon-fullscreen { opacity: 1; transform: translate(-50%,-50%) rotate(45deg) scale(1); }
   </style>
 </head>
@@ -197,7 +181,7 @@
 </div>
 
 <aside id="sidebar">
-  <div class="brand" onclick="App.toggleSidebar()"><img src="IMG_1978.jpeg" class="logo-img" alt="Logo" onerror="this.style.display='none'"></div>
+  <div class="brand" id="brand-logo"><img src="IMG_1978.jpeg" class="logo-img" id="logo-img" alt="Logo" onerror="this.style.display='none'"></div>
   <div class="sidebar-tools">
     <button id="btn-upload" class="sidebar-btn primary">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -431,14 +415,32 @@
   }
   window.downloadItem = downloadItem;
 
-  // ==================== 窗口管理 ====================
+  // ==================== 窗口管理（四角拖拽） ====================
   function createWindow(item) {
     if (openWindows.has(item.id)) { const { win, tab } = openWindows.get(item.id); activateWindow(win, tab); return; }
     const win = document.createElement('div');
     win.className = 'preview-window';
     win.setAttribute('data-id', item.id);
     win.style.zIndex = windowZIndex++;
-    win.innerHTML = `<div class="preview-window-header"><div class="win-controls"><div class="win-dot red" data-action="close" title="關閉"><span class="icon">✕</span></div><div class="win-dot yellow" data-action="minimize" title="最小化"><span class="icon">─</span></div><div class="win-dot green" data-action="fullscreen" title="全螢幕"><span class="icon-fullscreen"></span></div></div><span class="preview-window-title">${escapeHtml(item.name)}</span></div><div class="preview-window-content"></div><div class="resize-handle-corner"></div><div class="resize-handle-edge resize-handle-right"></div><div class="resize-handle-edge resize-handle-bottom"></div><div class="resize-handle-edge resize-handle-left"></div><div class="resize-handle-edge resize-handle-top"></div>`;
+    win.innerHTML = `
+      <div class="preview-window-header">
+        <div class="win-controls">
+          <div class="win-dot red" data-action="close" title="關閉"><span class="icon">✕</span></div>
+          <div class="win-dot yellow" data-action="minimize" title="最小化"><span class="icon">─</span></div>
+          <div class="win-dot green" data-action="fullscreen" title="全螢幕"><span class="icon-fullscreen"></span></div>
+        </div>
+        <span class="preview-window-title">${escapeHtml(item.name)}</span>
+      </div>
+      <div class="preview-window-content"></div>
+      <div class="resize-handle-nw" data-resize-dir="nw"></div>
+      <div class="resize-handle-ne" data-resize-dir="ne"></div>
+      <div class="resize-handle-sw" data-resize-dir="sw"></div>
+      <div class="resize-handle-se" data-resize-dir="se"></div>
+      <div class="resize-handle-right" data-resize-dir="e"></div>
+      <div class="resize-handle-bottom" data-resize-dir="s"></div>
+      <div class="resize-handle-left" data-resize-dir="w"></div>
+      <div class="resize-handle-top" data-resize-dir="n"></div>
+    `;
     document.body.appendChild(win);
     const tab = document.createElement('div');
     tab.className = 'tab active'; tab.draggable = true;
@@ -471,18 +473,61 @@
     });
     tab.addEventListener('dragstart', (e) => { if (e.target.closest('button')) { safePreventDefault(e); return; } dragTabElement = tab; tab.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', item.id); });
     tab.addEventListener('dragend', () => { tab.classList.remove('dragging'); dragTabElement = null; });
+
+    // 窗口拖拽
     let dragState = null;
-    function startDrag(e) { if (e.target.closest('.win-dot') || e.target.closest('button')) return; if (win.classList.contains('maximized')) return; header.setPointerCapture(e.pointerId); dragState = { startX: e.clientX, startY: e.clientY, left: parseInt(win.style.left)||0, top: parseInt(win.style.top)||0 }; safePreventDefault(e); }
+    function startDrag(e) { if (e.target.closest('.win-dot, .resize-handle-nw, .resize-handle-ne, .resize-handle-sw, .resize-handle-se, .resize-handle-right, .resize-handle-bottom, .resize-handle-left, .resize-handle-top') || e.target.closest('button')) return; if (win.classList.contains('maximized')) return; header.setPointerCapture(e.pointerId); dragState = { startX: e.clientX, startY: e.clientY, left: parseInt(win.style.left)||0, top: parseInt(win.style.top)||0 }; safePreventDefault(e); }
     function moveDrag(e) { if (!dragState) return; win.style.left = (dragState.left + e.clientX - dragState.startX) + 'px'; win.style.top = (dragState.top + e.clientY - dragState.startY) + 'px'; }
     function endDrag(e) { dragState = null; header.releasePointerCapture(e.pointerId); }
-    header.addEventListener('pointerdown', startDrag); header.addEventListener('pointermove', moveDrag); header.addEventListener('pointerup', endDrag); header.addEventListener('pointercancel', endDrag);
-    const resizeEls = win.querySelectorAll('.resize-handle-corner, .resize-handle-edge');
+    header.addEventListener('pointerdown', startDrag);
+    header.addEventListener('pointermove', moveDrag);
+    header.addEventListener('pointerup', endDrag);
+    header.addEventListener('pointercancel', endDrag);
+
+    // 四角 + 四边调整大小
+    const resizeEls = win.querySelectorAll('[data-resize-dir]');
     resizeEls.forEach(el => {
       let resizeRaf = null, resizeState = null;
-      function startResize(e) { safeStopPropagation(e); if (win.classList.contains('maximized')) return; el.setPointerCapture(e.pointerId); const rect = win.getBoundingClientRect(); const dirs = []; if (el.classList.contains('resize-handle-corner') || el.classList.contains('resize-handle-right')) dirs.push('right'); if (el.classList.contains('resize-handle-corner') || el.classList.contains('resize-handle-bottom')) dirs.push('bottom'); if (el.classList.contains('resize-handle-left')) dirs.push('left'); if (el.classList.contains('resize-handle-top')) dirs.push('top'); resizeState = { startX: e.clientX, startY: e.clientY, width: rect.width, height: rect.height, left: rect.left, top: rect.top, dirs }; resizeRaf = null; }
-      function moveResize(e) { if (!resizeState) return; if (resizeRaf) return; resizeRaf = requestAnimationFrame(() => { const s = resizeState; let w = s.width, h = s.height, l = s.left, t = s.top; if (s.dirs.includes('right')) w = Math.max(300, s.width + e.clientX - s.startX); if (s.dirs.includes('bottom')) h = Math.max(200, s.height + e.clientY - s.startY); if (s.dirs.includes('left')) { w = Math.max(300, s.width - (e.clientX - s.startX)); l = s.left + (e.clientX - s.startX); } if (s.dirs.includes('top')) { h = Math.max(200, s.height - (e.clientY - s.startY)); t = s.top + (e.clientY - s.startY); } win.style.width = w + 'px'; win.style.height = h + 'px'; if (s.dirs.includes('left')) win.style.left = l + 'px'; if (s.dirs.includes('top')) win.style.top = t + 'px'; resizeRaf = null; }); }
-      function endResize(e) { el.releasePointerCapture(e.pointerId); resizeState = null; if (resizeRaf) { cancelAnimationFrame(resizeRaf); resizeRaf = null; } }
-      el.addEventListener('pointerdown', startResize); el.addEventListener('pointermove', moveResize); el.addEventListener('pointerup', endResize); el.addEventListener('pointercancel', endResize);
+      function startResize(e) {
+        safeStopPropagation(e);
+        if (win.classList.contains('maximized')) return;
+        el.setPointerCapture(e.pointerId);
+        const rect = win.getBoundingClientRect();
+        const dir = el.getAttribute('data-resize-dir');
+        const dirs = [];
+        if (dir.includes('e') || dir === 'se' || dir === 'ne') dirs.push('right');
+        if (dir.includes('w') || dir === 'sw' || dir === 'nw') dirs.push('left');
+        if (dir.includes('s') || dir === 'se' || dir === 'sw') dirs.push('bottom');
+        if (dir.includes('n') || dir === 'ne' || dir === 'nw') dirs.push('top');
+        resizeState = { startX: e.clientX, startY: e.clientY, width: rect.width, height: rect.height, left: rect.left, top: rect.top, dirs };
+        resizeRaf = null;
+      }
+      function moveResize(e) {
+        if (!resizeState) return;
+        if (resizeRaf) return;
+        resizeRaf = requestAnimationFrame(() => {
+          const s = resizeState;
+          let w = s.width, h = s.height, l = s.left, t = s.top;
+          if (s.dirs.includes('right')) w = Math.max(300, s.width + e.clientX - s.startX);
+          if (s.dirs.includes('left')) { w = Math.max(300, s.width - (e.clientX - s.startX)); l = s.left + (e.clientX - s.startX); }
+          if (s.dirs.includes('bottom')) h = Math.max(200, s.height + e.clientY - s.startY);
+          if (s.dirs.includes('top')) { h = Math.max(200, s.height - (e.clientY - s.startY)); t = s.top + (e.clientY - s.startY); }
+          win.style.width = w + 'px';
+          win.style.height = h + 'px';
+          if (s.dirs.includes('left')) win.style.left = l + 'px';
+          if (s.dirs.includes('top')) win.style.top = t + 'px';
+          resizeRaf = null;
+        });
+      }
+      function endResize(e) {
+        el.releasePointerCapture(e.pointerId);
+        resizeState = null;
+        if (resizeRaf) { cancelAnimationFrame(resizeRaf); resizeRaf = null; }
+      }
+      el.addEventListener('pointerdown', startResize);
+      el.addEventListener('pointermove', moveResize);
+      el.addEventListener('pointerup', endResize);
+      el.addEventListener('pointercancel', endResize);
     });
   }
   function maximizeWindow(win) { win.classList.add('maximized'); win.style.top = '0px'; win.style.left = '0px'; win.style.width = '100vw'; win.style.height = '100vh'; win.style.position = 'fixed'; win.style.borderRadius = '0'; }
@@ -684,6 +729,14 @@
       else if (e.data?.type === 'getScore') { iframe.contentWindow.postMessage({ type:'setScore', value: userPoints }, '*'); }
     });
   }
+
+  // 点击logo旋转并折叠侧边栏
+  const logoImg = document.getElementById('logo-img');
+  document.getElementById('brand-logo').addEventListener('click', () => {
+    logoImg.classList.add('rotate');
+    setTimeout(() => logoImg.classList.remove('rotate'), 300);
+    App.toggleSidebar();
+  });
 
   window.App = {
     toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); },
@@ -908,7 +961,8 @@
   document.addEventListener('selectstart', e => { let t = e.target; if (t && !t.closest) t = t.parentElement; if (!t || !t.closest) return; if (!t.closest('input, textarea')) safePreventDefault(e); }, {passive: false});
   window.addEventListener('dragover', e => safePreventDefault(e));
   window.addEventListener('drop', e => safePreventDefault(e));
-  document.body.addEventListener('touchmove', function(e) { if (e.target.closest('.viewport') || e.target.closest('.preview-window-content')) { safePreventDefault(e); } }, { passive: false });
+  // 不再阻止触摸滚动
+  document.body.addEventListener('touchmove', function(e) { /* 允许自然滚动 */ }, { passive: true });
 
   render();
   updateSidebarButtons();
