@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>AETHER 10D · 白色胶囊 完整版</title>
+  <title>AETHER 10D · 白色胶囊 完全版</title>
   <style>
-    :root { --bg: #ffffff; --border: #e8e8ed; --text: #1d1d1f; --sub: #6e6e73; --accent: #0071e3; --accent-light: #e3f0ff; --accent-soft: rgba(0,113,227,0.08); --danger: #d93025; --folder: #f5b800; --side-w: 260px; --side-min: 72px; --radius: 20px; --card-gap: 16px; --card-min: clamp(160px, 24vw, 260px); }
+    :root { --bg:#fff; --border:#e8e8ed; --text:#1d1d1f; --sub:#6e6e73; --accent:#0071e3; --accent-light:#e3f0ff; --accent-soft:rgba(0,113,227,0.08); --danger:#d93025; --folder:#f5b800; --side-w:260px; --side-min:72px; --radius:20px; --card-gap:16px; --card-min:clamp(160px,24vw,260px); }
     * { box-sizing:border-box; margin:0; }
     body { font-family:"Segoe UI","PingFang TC",sans-serif; display:flex; height:100vh; overflow:hidden; color:var(--text); background:var(--bg); touch-action:manipulation; }
     #sidebar { width:var(--side-w); border-right:1px solid var(--border); display:flex; flex-direction:column; transition:width 0.2s; flex-shrink:0; background:var(--bg); }
@@ -65,10 +65,18 @@
     .preview-window { position:absolute; background:var(--bg); border:1px solid var(--border); border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.12); display:flex; flex-direction:column; min-width:300px; min-height:200px; z-index:50; overflow:hidden; }
     .preview-window.active { z-index:100; box-shadow:0 16px 48px rgba(0,0,0,0.18); }
     .preview-window.maximized { position:fixed; top:0; left:0; width:100vw; height:100vh; border-radius:0; z-index:200; }
+    /* 平滑尺寸过渡类 */
+    .preview-window.use-smooth-move {
+      transition: top 0.35s cubic-bezier(0.4,0,0.2,1),
+                  left 0.35s cubic-bezier(0.4,0,0.2,1),
+                  width 0.35s cubic-bezier(0.4,0,0.2,1),
+                  height 0.35s cubic-bezier(0.4,0,0.2,1),
+                  border-radius 0.35s ease;
+    }
     .preview-window-header { height:44px; padding:0 12px; display:flex; align-items:center; user-select:none; background:#f5f5f7; border-bottom:1px solid var(--border); cursor:move; touch-action:none; }
     .preview-window.maximized .preview-window-header { cursor:default; }
     .preview-window-title { font-weight:600; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px; margin-left:12px; flex:1; }
-    .preview-window-content { flex:1; overflow:auto; display:flex; flex-direction:column; align-items:center; }
+    .preview-window-content { flex:1; overflow:auto; display:flex; flex-direction:column; align-items:center; position:relative; }
     .preview-window-content img { max-width:100%; height:auto; border-radius:12px; }
     .preview-window-content video, .preview-window-content audio { max-width:100%; }
     .preview-window-content pre { white-space:pre-wrap; word-break:break-word; font-family:monospace; background:#f5f5f7; padding:16px; border-radius:16px; width:100%; font-size:16px; }
@@ -83,10 +91,9 @@
     .resize-handle-bottom { left:0; right:0; bottom:-3px; height:6px; cursor:s-resize; }
     .resize-handle-left { left:-3px; top:0; bottom:0; width:6px; cursor:w-resize; }
     .resize-handle-top { top:-3px; left:0; right:0; height:6px; cursor:n-resize; }
-    .edit-actions-bar { display:none; gap:8px; align-items:center; margin-top:12px; }
-    .edit-actions-bar button { height:32px; padding:0 14px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); font-size:13px; cursor:pointer; }
-    .edit-actions-bar button:hover { background:#f5f5f7; }
-    .edit-actions-bar .save-btn { background:var(--accent); color:white; border-color:var(--accent); }
+    .edit-float-bar { display:none; position:absolute; bottom:16px; left:50%; transform:translateX(-50%); gap:8px; z-index:20; background:rgba(255,255,255,0.95); padding:8px 16px; border-radius:24px; box-shadow:0 4px 12px rgba(0,0,0,0.15); border:1px solid var(--border); }
+    .edit-float-bar button { height:32px; padding:0 14px; border-radius:16px; border:1px solid var(--border); background:var(--bg); font-size:13px; cursor:pointer; }
+    .edit-float-bar button.save-btn { background:var(--accent); color:white; border-color:var(--accent); }
     .empty-state { text-align:center; color:#9aa0a6; margin-top:100px; font-size:14px; }
     .card-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(var(--card-min),1fr)); gap:var(--card-gap); }
     .card-item { border:1px solid var(--border); border-radius:20px; padding:16px; cursor:pointer; transition:0.2s; background:var(--bg); display:flex; flex-direction:column; position:relative; user-select:none; }
@@ -141,8 +148,7 @@
     .refresh-btn { width:40px; height:40px; border:1px solid var(--border); border-radius:var(--radius); background:var(--bg); cursor:pointer; display:none; align-items:center; justify-content:center; transition:0.15s; }
     .refresh-btn:hover { background:#f5f5f7; border-color:var(--accent); }
     .refresh-btn svg { fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-
-    /* 发光二极管效果 + 金属环 */
+    /* macOS 发光按钮 */
     .win-controls { display:flex; align-items:center; gap:10px; padding-left:8px; z-index:5; }
     .win-dot { width:20px; height:20px; border-radius:50%; position:relative; cursor:pointer; flex-shrink:0; transition:background-color 0.2s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s; box-shadow:0 0 0 1px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.2), 0 0 8px rgba(0,0,0,0.1); }
     .win-dot:hover { transform:scale(1.08); }
@@ -164,11 +170,7 @@
 <body>
 <div id="toast"></div>
 <div class="error-modal" id="error-modal">
-  <div class="error-modal-content">
-    <div class="error-modal-title">發生錯誤</div>
-    <div class="error-modal-body" id="error-modal-body"></div>
-    <div class="error-modal-buttons"><button class="copy-btn" id="error-copy-btn">複製錯誤</button><button id="error-close-btn">關閉</button></div>
-  </div>
+  <div class="error-modal-content"><div class="error-modal-title">發生錯誤</div><div class="error-modal-body" id="error-modal-body"></div><div class="error-modal-buttons"><button class="copy-btn" id="error-copy-btn">複製錯誤</button><button id="error-close-btn">關閉</button></div></div>
 </div>
 
 <aside id="sidebar">
@@ -204,646 +206,626 @@
 </main>
 <input type="file" id="file-up" style="display:none" multiple>
 
-<!-- 老虎机模板占位 -->
+<!-- 老虎机模板 -->
 <script type="text/plain" id="slot-template">
-  <!-- 请将完整的浅色皇家拉霸HTML粘贴在此处 -->
+  <!-- 请将完整的老虎机 HTML 粘贴在这里 -->
 </script>
 
 <script>
 (function(){
-  // ==================== 错误处理 ====================
-  const errorModal = document.getElementById('error-modal');
-  const errorBody = document.getElementById('error-modal-body');
-  let lastError = '';
-  function showErrorModal(msg) { lastError = msg; errorBody.textContent = msg; errorModal.classList.add('show'); }
-  function hideErrorModal() { errorModal.classList.remove('show'); }
-  document.getElementById('error-close-btn').addEventListener('click', hideErrorModal);
-  document.getElementById('error-copy-btn').addEventListener('click', () => {
-    navigator.clipboard?.writeText(lastError).catch(() => {});
-    showToast('錯誤信息已複製');
-  });
-  window.onerror = (msg, src, line) => { showErrorModal(`系統錯誤：${msg}\n來源：${src}\n行：${line}`); return true; };
-  window.addEventListener('unhandledrejection', e => { showErrorModal(`未處理的Promise錯誤：${e.reason}`); e.preventDefault(); });
+  const errorModal=document.getElementById('error-modal');
+  const errorBody=document.getElementById('error-modal-body');
+  let lastError='';
+  function showErrorModal(msg){ lastError=msg; errorBody.textContent=msg; errorModal.classList.add('show'); }
+  function hideErrorModal(){ errorModal.classList.remove('show'); }
+  document.getElementById('error-close-btn').addEventListener('click',hideErrorModal);
+  document.getElementById('error-copy-btn').addEventListener('click',()=>{ navigator.clipboard?.writeText(lastError).catch(()=>{}); showToast('錯誤信息已複製'); });
+  window.onerror=(msg,src,line)=>{ showErrorModal(`系統錯誤：${msg}\n來源：${src}\n行：${line}`); return true; };
+  window.addEventListener('unhandledrejection',e=>{ showErrorModal(`未處理的Promise錯誤：${e.reason}`); e.preventDefault(); });
 
-  // ==================== 工具函数 ====================
-  const escapeHtml = (t) => t ? String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) : '';
-  const uid = (() => { let n=0; return (p) => `${p}-${++n}-${Math.random().toString(36).slice(2,8)}`; })();
-  function makeFolderIcon(cls) {
-    const pre = uid('fld');
-    return `<svg viewBox="0 0 64 64" class="${cls}"><defs><linearGradient id="${pre}g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFF9D7" stop-opacity="0.98"/><stop offset="0.3" stop-color="#FFEC8B" stop-opacity="0.95"/><stop offset="0.7" stop-color="#FFD23F" stop-opacity="0.88"/><stop offset="1" stop-color="#E6A800" stop-opacity="0.8"/></linearGradient><linearGradient id="${pre}g2" x1="0" x2="1" y1="0.5" y2="1"><stop offset="0" stop-color="#FFB84D" stop-opacity="0.25"/><stop offset="1" stop-color="#D98C00" stop-opacity="0.4"/></linearGradient><filter id="${pre}sh"><feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="blur"/><feOffset dx="0" dy="1"/><feFlood flood-color="#B37B00" flood-opacity="0.35"/><feComposite operator="in" in2="blur"/><feComposite operator="over" in2="SourceGraphic"/></filter></defs><path d="M6 20c0-1.1.9-2 2-2h12l3-3h22c1.1 0 2 .9 2 2v24c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V20z" fill="url(#${pre}g1)" filter="url(#${pre}sh)"/><path d="M6 20c0-1.1.9-2 2-2h12l3-3h22c1.1 0 2 .9 2 2v24c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V20z" fill="url(#${pre}g2)" opacity="0.85"/><path d="M11 17h10l3-3h18c1.1 0 2 .9 2 2v2H11v-1z" fill="url(#${pre}g1)"/></svg>`;
-  }
-  const KNOWN = new Set(['jpg','jpeg','png','gif','bmp','tiff','tif','svg','webp','mp4','mov','avi','webm','3gp','mpg','mpeg','wmv','flv','mkv','mp3','wav','ogg','m4a','flac','txt','md','csv','html','css','js','ts','py','java','cpp','c','h','hpp','php','rb','go','swift','sql','ini','cfg','conf','xml','yaml','sh','bat','pdf','doc','docx','xls','xlsx','ppt','pptx','pages','ai','psd','dxf','eps','ps','ttf','xps','zip','rar']);
-  function makeFileIcon(filename, cls) {
-    const ext = (filename.split('.').pop()||'').toLowerCase();
-    const isKnown = KNOWN.has(ext);
-    const displayExt = isKnown ? ext.toUpperCase().slice(0,4) : '?';
-    const stroke = isKnown ? '#5BA4E6' : '#E67E22';
-    const textColor = isKnown ? '#1B3A5C' : '#7B3E00';
-    const bg1 = isKnown ? '#EDF7FF' : '#FFF0E0';
-    const bg2 = isKnown ? '#8DCBFF' : '#FFB347';
-    const pre = uid('file');
-    return `<svg viewBox="0 0 64 64" class="${cls}"><defs><linearGradient id="${pre}g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${bg1}"/><stop offset="1" stop-color="${bg2}"/></linearGradient></defs><path d="M14 8c0-1.1.9-2 2-2h20l10 10v32c0 1.1-.9 2-2 2H16c-1.1 0-2-.9-2-2V8z" fill="url(#${pre}g1)" stroke="${stroke}" stroke-width="1.5"/><text x="32" y="46" text-anchor="middle" font-size="11" font-weight="bold" fill="${textColor}" font-family="sans-serif">${escapeHtml(displayExt)}</text></svg>`;
-  }
-  function getFileIconSmall(f) { return makeFileIcon(f, 'file-glass-icon'); }
-  function getFileIconLarge(f) { return makeFileIcon(f, 'file-glass-icon-large'); }
-  function getFileIconXLarge(f) { return makeFileIcon(f, 'file-glass-icon-xlarge'); }
-  function getFolderIconSmall() { return makeFolderIcon('file-glass-icon'); }
-  function getFolderIconLarge() { return makeFolderIcon('file-glass-icon-large'); }
-  function getFolderIconXLarge() { return makeFolderIcon('file-glass-icon-xlarge'); }
+  const escapeHtml=t=>t?String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])):'';
+  const uid=(()=>{let n=0;return p=>`${p}-${++n}-${Math.random().toString(36).slice(2,8)}`;})();
+  function makeFolderIcon(cls){ const pre=uid('fld'); return `<svg viewBox="0 0 64 64" class="${cls}"><defs><linearGradient id="${pre}g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFF9D7" stop-opacity="0.98"/><stop offset="0.3" stop-color="#FFEC8B" stop-opacity="0.95"/><stop offset="0.7" stop-color="#FFD23F" stop-opacity="0.88"/><stop offset="1" stop-color="#E6A800" stop-opacity="0.8"/></linearGradient><linearGradient id="${pre}g2" x1="0" x2="1" y1="0.5" y2="1"><stop offset="0" stop-color="#FFB84D" stop-opacity="0.25"/><stop offset="1" stop-color="#D98C00" stop-opacity="0.4"/></linearGradient><filter id="${pre}sh"><feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="blur"/><feOffset dx="0" dy="1"/><feFlood flood-color="#B37B00" flood-opacity="0.35"/><feComposite operator="in" in2="blur"/><feComposite operator="over" in2="SourceGraphic"/></filter></defs><path d="M6 20c0-1.1.9-2 2-2h12l3-3h22c1.1 0 2 .9 2 2v24c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V20z" fill="url(#${pre}g1)" filter="url(#${pre}sh)"/><path d="M6 20c0-1.1.9-2 2-2h12l3-3h22c1.1 0 2 .9 2 2v24c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V20z" fill="url(#${pre}g2)" opacity="0.85"/><path d="M11 17h10l3-3h18c1.1 0 2 .9 2 2v2H11v-1z" fill="url(#${pre}g1)"/></svg>`; }
+  const KNOWN=new Set(['jpg','jpeg','png','gif','bmp','tiff','tif','svg','webp','mp4','mov','avi','webm','3gp','mpg','mpeg','wmv','flv','mkv','mp3','wav','ogg','m4a','flac','txt','md','csv','html','css','js','ts','py','java','cpp','c','h','hpp','php','rb','go','swift','sql','ini','cfg','conf','xml','yaml','sh','bat','pdf','doc','docx','xls','xlsx','ppt','pptx','pages','ai','psd','dxf','eps','ps','ttf','xps','zip','rar']);
+  function makeFileIcon(filename,cls){ const ext=(filename.split('.').pop()||'').toLowerCase(); const isKnown=KNOWN.has(ext); const displayExt=isKnown?ext.toUpperCase().slice(0,4):'?'; const stroke=isKnown?'#5BA4E6':'#E67E22'; const textColor=isKnown?'#1B3A5C':'#7B3E00'; const bg1=isKnown?'#EDF7FF':'#FFF0E0'; const bg2=isKnown?'#8DCBFF':'#FFB347'; const pre=uid('file'); return `<svg viewBox="0 0 64 64" class="${cls}"><defs><linearGradient id="${pre}g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${bg1}"/><stop offset="1" stop-color="${bg2}"/></linearGradient></defs><path d="M14 8c0-1.1.9-2 2-2h20l10 10v32c0 1.1-.9 2-2 2H16c-1.1 0-2-.9-2-2V8z" fill="url(#${pre}g1)" stroke="${stroke}" stroke-width="1.5"/><text x="32" y="46" text-anchor="middle" font-size="11" font-weight="bold" fill="${textColor}" font-family="sans-serif">${escapeHtml(displayExt)}</text></svg>`; }
+  function getFileIconSmall(f){return makeFileIcon(f,'file-glass-icon');}
+  function getFileIconLarge(f){return makeFileIcon(f,'file-glass-icon-large');}
+  function getFileIconXLarge(f){return makeFileIcon(f,'file-glass-icon-xlarge');}
+  function getFolderIconSmall(){return makeFolderIcon('file-glass-icon');}
+  function getFolderIconLarge(){return makeFolderIcon('file-glass-icon-large');}
+  function getFolderIconXLarge(){return makeFolderIcon('file-glass-icon-xlarge');}
 
-  const formatSize = (bytes) => { if (!bytes) return '0 B'; const k = 1024, sizes = ['B','KB','MB','GB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]; };
-  const IMG = new Set(['jpg','jpeg','png','gif','bmp','tiff','tif','svg','webp']);
-  const VID = new Set(['mp4','mov','avi','webm','3gp','mpg','mpeg','wmv','flv','mkv']);
-  const AUD = new Set(['mp3','wav','ogg','m4a','flac']);
-  const TXT = new Set(['txt','md','csv','html','css','js','ts','py','java','cpp','c','h','hpp','php','rb','go','swift','sql','ini','cfg','conf','xml','yaml','sh','bat']);
+  const formatSize=b=>{if(!b)return'0 B';const k=1024,s=['B','KB','MB','GB'];const i=Math.floor(Math.log(b)/Math.log(k));return parseFloat((b/Math.pow(k,i)).toFixed(1))+' '+s[i];};
+  const IMG=new Set(['jpg','jpeg','png','gif','bmp','tiff','tif','svg','webp']);
+  const VID=new Set(['mp4','mov','avi','webm','3gp','mpg','mpeg','wmv','flv','mkv']);
+  const AUD=new Set(['mp3','wav','ogg','m4a','flac']);
+  const TXT=new Set(['txt','md','csv','html','css','js','ts','py','java','cpp','c','h','hpp','php','rb','go','swift','sql','ini','cfg','conf','xml','yaml','sh','bat']);
 
-  let db = [
-    {id:'1', name:'座標算法核心', type:'dir', pid:'0', del:false, time:Date.now()-1000000, size:0},
-    {id:'2', name:'10D_Storage_v1.bin', type:'file', pid:'1', del:false, time:Date.now()-800000, size:3, content:new Uint8Array([0,1,2])},
-    {id:'3', name:'開發筆記', type:'dir', pid:'0', del:false, time:Date.now()-500000, size:0},
-    {id:'4', name:'License.txt', type:'file', pid:'0', del:false, time:Date.now(), size:4096, content:new TextEncoder().encode("This is a license file.\n")}
+  let db=[
+    {id:'1',name:'座標算法核心',type:'dir',pid:'0',del:false,time:Date.now()-1000000,size:0},
+    {id:'2',name:'10D_Storage_v1.bin',type:'file',pid:'1',del:false,time:Date.now()-800000,size:3,content:new Uint8Array([0,1,2])},
+    {id:'3',name:'開發筆記',type:'dir',pid:'0',del:false,time:Date.now()-500000,size:0},
+    {id:'4',name:'License.txt',type:'file',pid:'0',del:false,time:Date.now(),size:4096,content:new TextEncoder().encode("This is a license file.\n")}
   ];
-  let curTab = 'home';
-  let pathStack = [{id:'0', name:'首頁'}];
-  let selection = new Set();
-  let clip = { mode:null, ids:[] };
-  let editId = null, searchQuery = '';
-  let toastTimer = null;
-  let isUploading = false, viewMode = 'list';
-  let lastClickId = null, lastClickTime = 0;
-  const DBL_CLICK_MS = 400;
-  let draggingId = null, draggingType = null, dropInProgress = false;
-  let filterCat = null;
-  let signPoints = parseInt(localStorage.getItem('cloud_sign_points') || '0');
-  let signDate = localStorage.getItem('cloud_sign_date') || '';
-  let userName = localStorage.getItem('user_name') || '用户';
-  const thumbCache = new Map();
-  const MAX_THUMB_CACHE = 300;
-  const LONG_PRESS = 600, DRAG_TH = 10;
-  let pressTimer = null, pressTargetId = null, longPressActive = false, pressSX = 0, pressSY = 0;
-  const openWindows = new Map();
-  const contentPane = document.getElementById('content-pane');
-  const tabsBar = document.getElementById('tabs-bar');
-  let windowZIndex = 200;
-  let dragTabElement = null;
+  let curTab='home'; let pathStack=[{id:'0',name:'首頁'}];
+  let selection=new Set(); let clip={mode:null,ids:[]};
+  let editId=null,searchQuery=''; let toastTimer=null;
+  let isUploading=false,viewMode='list';
+  let lastClickId=null,lastClickTime=0; const DBL_CLICK_MS=400;
+  let draggingId=null,draggingType=null,dropInProgress=false;
+  let filterCat=null;
+  let signPoints=parseInt(localStorage.getItem('cloud_sign_points')||'0');
+  let signDate=localStorage.getItem('cloud_sign_date')||'';
+  let userName=localStorage.getItem('user_name')||'用户';
+  const thumbCache=new Map(); const MAX_THUMB_CACHE=300;
+  const LONG_PRESS=600,DRAG_TH=10;
+  let pressTimer=null,pressTargetId=null,longPressActive=false,pressSX=0,pressSY=0;
+  const openWindows=new Map();
+  const contentPane=document.getElementById('content-pane');
+  const tabsBar=document.getElementById('tabs-bar');
+  let windowZIndex=200; let dragTabElement=null;
 
-  function safePreventDefault(e) { try { if (e && typeof e.preventDefault === 'function') e.preventDefault(); } catch(err) {} }
-  function safeStopPropagation(e) { try { if (e && typeof e.stopPropagation === 'function') e.stopPropagation(); } catch(err) {} }
-
-  function greet() { const h = new Date().getHours(); return h < 12 ? '上午好' : h < 18 ? '中午好' : '晚上好'; }
-  function showToast(msg, isError=false) { const t = document.getElementById('toast'); t.className = isError ? 'error' : ''; t.textContent = msg; t.style.display = 'block'; if(toastTimer) clearTimeout(toastTimer); toastTimer = setTimeout(() => t.style.display = 'none', 2000); }
-
-  function generateId() { return crypto.randomUUID ? crypto.randomUUID() : Date.now()+'-'+Math.random().toString(36).substring(2,11); }
-  function isNameAvailable(name, pid, excludeId=null) { return !db.some(x => x.pid===pid && x.name===name && !x.del && x.id!==excludeId); }
-  function getUniqueName(base, pid, type, excludeId=null) {
-    let name = base, ext = '';
-    if (type === 'file') { const dot = base.lastIndexOf('.'); if (dot > 0) { name = base.substring(0, dot); ext = base.substring(dot); } }
-    let candidate = base, counter = 1;
-    while (!isNameAvailable(candidate, pid, excludeId)) {
-      candidate = type === 'file' ? `${name}_副本${counter>1?counter:''}${ext}` : `${base}_副本${counter>1?counter:''}`;
-      counter++;
-    }
+  function safePreventDefault(e){try{if(e&&typeof e.preventDefault==='function')e.preventDefault();}catch(err){}}
+  function safeStopPropagation(e){try{if(e&&typeof e.stopPropagation==='function')e.stopPropagation();}catch(err){}}
+  function greet(){const h=new Date().getHours();return h<12?'上午好':h<18?'中午好':'晚上好';}
+  function showToast(msg,isError=false){const t=document.getElementById('toast');t.className=isError?'error':'';t.textContent=msg;t.style.display='block';if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.display='none',2000);}
+  function generateId(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).substring(2,11);}
+  function isNameAvailable(name,pid,excludeId=null){return!db.some(x=>x.pid===pid&&x.name===name&&!x.del&&x.id!==excludeId);}
+  function getUniqueName(base,pid,type,excludeId=null){
+    let name=base,ext='';
+    if(type==='file'){const dot=base.lastIndexOf('.');if(dot>0){name=base.substring(0,dot);ext=base.substring(dot);}}
+    let candidate=base,counter=1;
+    while(!isNameAvailable(candidate,pid,excludeId)){candidate=type==='file'?`${name}_副本${counter>1?counter:''}${ext}`:`${base}_副本${counter>1?counter:''}`;counter++;}
     return candidate;
   }
-  function isDescendant(aid, did) { if (aid === did) return true; const children = db.filter(x => x.pid === aid && x.type === 'dir'); for (let c of children) if (isDescendant(c.id, did)) return true; return false; }
-  function getTopIds(ids) { return ids.filter(id => { let cur = db.find(x => x.id === id); while (cur && cur.pid !== '0') { if (ids.includes(cur.pid)) return false; cur = db.find(x => x.id === cur.pid); } return true; }); }
-  function markDeletedRecursive(fid) { const folder = db.find(x => x.id === fid); if (!folder || folder.type !== 'dir') return; folder.del = true; db.filter(x => x.pid === fid).forEach(c => { if (c.type === 'dir') markDeletedRecursive(c.id); else c.del = true; }); }
+  function isDescendant(aid,did){if(aid===did)return true;const children=db.filter(x=>x.pid===aid&&x.type==='dir');for(let c of children)if(isDescendant(c.id,did))return true;return false;}
+  function getTopIds(ids){return ids.filter(id=>{let cur=db.find(x=>x.id===id);while(cur&&cur.pid!=='0'){if(ids.includes(cur.pid))return false;cur=db.find(x=>x.id===cur.pid);}return true;});}
+  function markDeletedRecursive(fid){const folder=db.find(x=>x.id===fid);if(!folder||folder.type!=='dir')return;folder.del=true;db.filter(x=>x.pid===fid).forEach(c=>{if(c.type==='dir')markDeletedRecursive(c.id);else c.del=true;});}
 
-  function relocateItem(item, targetPid) {
-    if (item.pid === targetPid) return true;
-    if (item.type === 'dir' && isDescendant(item.id, targetPid)) { showErrorModal('無法移動：目標為來源的子資料夾'); return false; }
-    const newName = getUniqueName(item.name, targetPid, item.type, item.id);
-    if (newName !== item.name) showToast(`已自動更名為「${newName}」`);
-    item.name = newName; item.pid = targetPid; item.time = Date.now();
-    render(); return true;
+  function relocateItem(item,targetPid){
+    if(item.pid===targetPid)return true;
+    if(item.type==='dir'&&isDescendant(item.id,targetPid)){showErrorModal('無法移動：目標為來源的子資料夾');return false;}
+    const newName=getUniqueName(item.name,targetPid,item.type,item.id);
+    if(newName!==item.name)showToast(`已自動更名為「${newName}」`);
+    item.name=newName;item.pid=targetPid;item.time=Date.now();
+    render();return true;
   }
-  function moveFolderRecursive(fid, targetPid) {
-    const folder = db.find(x => x.id === fid); if (!folder || folder.type !== 'dir') return false;
-    if (!relocateItem(folder, targetPid)) return false;
-    db.filter(x => x.pid === fid).forEach(c => {
-      if (c.type === 'dir') moveFolderRecursive(c.id, folder.id);
-      else { const nn = getUniqueName(c.name, folder.id, 'file', c.id); if (nn !== c.name) showToast(`子項更名「${nn}」`); c.name = nn; c.pid = folder.id; c.time = Date.now(); }
+  function moveFolderRecursive(fid,targetPid){
+    const folder=db.find(x=>x.id===fid);if(!folder||folder.type!=='dir')return false;
+    if(!relocateItem(folder,targetPid))return false;
+    db.filter(x=>x.pid===fid).forEach(c=>{
+      if(c.type==='dir')moveFolderRecursive(c.id,folder.id);
+      else{const nn=getUniqueName(c.name,folder.id,'file',c.id);if(nn!==c.name)showToast(`子項更名「${nn}」`);c.name=nn;c.pid=folder.id;c.time=Date.now();}
     });
-    render(); return true;
+    render();return true;
   }
-  function deepCopy(srcId, targetPid) {
-    const src = db.find(x => x.id === srcId); if (!src || src.del) return false;
-    if (src.type === 'dir' && isDescendant(srcId, targetPid)) { showToast('無法複製：目標為來源的子資料夾'); return false; }
-    const newId = generateId(); const uname = getUniqueName(src.name, targetPid, src.type);
-    if (uname !== src.name) showToast(`複製時更名為「${uname}」`);
-    const newItem = {...src, id: newId, pid: targetPid, name: uname, time: Date.now()};
-    if (src.type === 'file' && src.content) newItem.content = src.content.slice();
+  function deepCopy(srcId,targetPid){
+    const src=db.find(x=>x.id===srcId);if(!src||src.del)return false;
+    if(src.type==='dir'&&isDescendant(srcId,targetPid)){showToast('無法複製：目標為來源的子資料夾');return false;}
+    const newId=generateId();const uname=getUniqueName(src.name,targetPid,src.type);
+    if(uname!==src.name)showToast(`複製時更名為「${uname}」`);
+    const newItem={...src,id:newId,pid:targetPid,name:uname,time:Date.now()};
+    if(src.type==='file'&&src.content)newItem.content=src.content.slice();
     db.push(newItem);
-    if (src.type === 'dir') db.filter(x => x.pid === srcId && !x.del).forEach(c => deepCopy(c.id, newId));
-    render(); return true;
+    if(src.type==='dir')db.filter(x=>x.pid===srcId&&!x.del).forEach(c=>deepCopy(c.id,newId));
+    render();return true;
   }
-  function restoreItem(id) {
-    const item = db.find(x => x.id === id); if (!item || !item.del) return false;
-    if (item.pid !== '0') { const parent = db.find(x => x.id === item.pid); if (!parent || parent.del) { showToast(`無法還原「${item.name}」，原資料夾已不存在`); return false; } }
-    const nn = getUniqueName(item.name, item.pid, item.type, item.id);
-    if (nn !== item.name) showToast(`還原時更名為「${nn}」`);
-    item.name = nn; item.del = false; item.time = Date.now();
-    if (item.type === 'dir') db.filter(x => x.pid === item.id && x.del).forEach(c => { c.del = false; c.time = Date.now(); if (c.type === 'dir') restoreItem(c.id); });
-    render(); return true;
+  function restoreItem(id){
+    const item=db.find(x=>x.id===id);if(!item||!item.del)return false;
+    if(item.pid!=='0'){const parent=db.find(x=>x.id===item.pid);if(!parent||parent.del){showToast(`無法還原「${item.name}」，原資料夾已不存在`);return false;}}
+    const nn=getUniqueName(item.name,item.pid,item.type,item.id);
+    if(nn!==item.name)showToast(`還原時更名為「${nn}」`);
+    item.name=nn;item.del=false;item.time=Date.now();
+    if(item.type==='dir')db.filter(x=>x.pid===item.id&&x.del).forEach(c=>{c.del=false;c.time=Date.now();if(c.type==='dir')restoreItem(c.id);});
+    render();return true;
   }
 
-  async function generateThumb(fileItem) {
-    if (!fileItem.content || fileItem.content.length === 0) return null;
-    const ext = fileItem.name.split('.').pop().toLowerCase();
-    const blob = new Blob([fileItem.content]);
-    const maxW = 560, maxH = 400, quality = 0.95;
-    if (IMG.has(ext)) {
-      return new Promise(res => {
-        const img = new Image(); const url = URL.createObjectURL(blob);
-        img.onload = () => { const cvs = document.createElement('canvas'); let w = img.width, h = img.height; if (w > maxW) { h = (maxW / w) * h; w = maxW; } if (h > maxH) { w = (maxH / h) * w; h = maxH; } cvs.width = w; cvs.height = h; cvs.getContext('2d').drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url); res(cvs.toDataURL('image/jpeg', quality)); };
-        img.onerror = () => { URL.revokeObjectURL(url); res(null); };
-        img.src = url;
+  async function generateThumb(fileItem){
+    if(!fileItem.content||fileItem.content.length===0)return null;
+    const ext=fileItem.name.split('.').pop().toLowerCase();
+    const blob=new Blob([fileItem.content]);
+    const maxW=800,maxH=600,quality=0.95;
+    if(IMG.has(ext)){
+      return new Promise(res=>{
+        const img=new Image();const url=URL.createObjectURL(blob);
+        img.onload=()=>{const cvs=document.createElement('canvas');let w=img.width,h=img.height;if(w>maxW){h=(maxW/w)*h;w=maxW;}if(h>maxH){w=(maxH/h)*w;h=maxH;}cvs.width=w;cvs.height=h;cvs.getContext('2d').drawImage(img,0,0,w,h);URL.revokeObjectURL(url);res(cvs.toDataURL('image/jpeg',quality));};
+        img.onerror=()=>{URL.revokeObjectURL(url);res(null);};
+        img.src=url;
       });
     }
-    if (VID.has(ext)) {
-      return new Promise(res => {
-        const video = document.createElement('video');
-        video.preload = 'metadata'; video.muted = true; video.playsInline = true;
-        const url = URL.createObjectURL(blob); video.src = url;
-        video.addEventListener('loadeddata', () => { video.currentTime = 0; });
-        video.addEventListener('seeked', () => {
-          const cvs = document.createElement('canvas');
-          const vw = video.videoWidth, vh = video.videoHeight;
-          let w = vw, h = vh;
-          if (w > maxW) { h = (maxW / w) * h; w = maxW; } if (h > maxH) { w = (maxH / h) * w; h = maxH; }
-          cvs.width = w; cvs.height = h; cvs.getContext('2d').drawImage(video, 0, 0, w, h);
-          URL.revokeObjectURL(url); res(cvs.toDataURL('image/jpeg', quality));
+    if(VID.has(ext)){
+      return new Promise(res=>{
+        const video=document.createElement('video');
+        video.preload='metadata';video.muted=true;video.playsInline=true;video.crossOrigin='anonymous';
+        const url=URL.createObjectURL(blob);video.src=url;
+        video.addEventListener('loadeddata',()=>{video.currentTime=0;});
+        video.addEventListener('seeked',()=>{
+          const cvs=document.createElement('canvas');
+          const vw=video.videoWidth,vh=video.videoHeight;
+          let w=vw,h=vh;if(w>maxW){h=(maxW/w)*h;w=maxW;}if(h>maxH){w=(maxH/h)*w;h=maxH;}
+          cvs.width=w;cvs.height=h;cvs.getContext('2d').drawImage(video,0,0,w,h);
+          URL.revokeObjectURL(url);res(cvs.toDataURL('image/jpeg',quality));
         });
-        video.addEventListener('error', () => { URL.revokeObjectURL(url); res(null); });
-        setTimeout(() => { if (!video.readyState) { URL.revokeObjectURL(url); res(null); } }, 3000);
+        video.addEventListener('error',()=>{URL.revokeObjectURL(url);res(null);});
+        setTimeout(()=>{if(!video.readyState){URL.revokeObjectURL(url);res(null);}},3000);
       });
     }
-    if (ext === 'pdf') return 'pdf:' + URL.createObjectURL(blob);
-    if (TXT.has(ext)) {
-      try {
-        const text = new TextDecoder('utf-8', {fatal: false}).decode(fileItem.content);
-        const lines = text.split('\n').slice(0, 4).join('\n').substring(0, 200);
-        const cvs = document.createElement('canvas'); cvs.width = maxW; cvs.height = maxH; const ctx = cvs.getContext('2d');
-        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, maxW, maxH); ctx.font = '16px monospace'; ctx.fillStyle = '#1d1d1f'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        const lineH = 22; const split = lines.split('\n'); const totalH = split.length * lineH; const startY = (maxH - totalH) / 2 + lineH/2;
-        split.forEach((l, i) => ctx.fillText(l.substring(0, 40), maxW/2, startY + i * lineH));
+    if(ext==='pdf')return'pdf:'+URL.createObjectURL(blob);
+    if(TXT.has(ext)){
+      try{
+        const text=new TextDecoder('utf-8',{fatal:false}).decode(fileItem.content);
+        const lines=text.split('\n').slice(0,4).join('\n').substring(0,200);
+        const cvs=document.createElement('canvas');cvs.width=maxW;cvs.height=maxH;const ctx=cvs.getContext('2d');
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,maxW,maxH);ctx.font='18px monospace';ctx.fillStyle='#1d1d1f';ctx.textAlign='center';ctx.textBaseline='middle';
+        const lineH=24;const split=lines.split('\n');const totalH=split.length*lineH;const startY=(maxH-totalH)/2+lineH/2;
+        split.forEach((l,i)=>ctx.fillText(l.substring(0,40),maxW/2,startY+i*lineH));
         return cvs.toDataURL('image/png');
-      } catch { return null; }
+      }catch{return null;}
     }
     return null;
   }
 
-  function getThumb(item) {
-    if (item.type !== 'file') return null;
-    if (thumbCache.has(item.id)) return thumbCache.get(item.id);
-    if (thumbCache.size >= MAX_THUMB_CACHE) { const firstKey = thumbCache.keys().next().value; thumbCache.delete(firstKey); }
-    thumbCache.set(item.id, 'loading');
-    generateThumb(item).then(r => { thumbCache.set(item.id, r || 'none'); if (viewMode === 'card' && curTab === 'drive' && !filterCat) render(); }).catch(e => { thumbCache.set(item.id, 'none'); });
-    return 'loading';
+  function getThumb(item){
+    if(item.type!=='file')return null;
+    if(thumbCache.has(item.id))return thumbCache.get(item.id);
+    if(thumbCache.size>=MAX_THUMB_CACHE){const firstKey=thumbCache.keys().next().value;thumbCache.delete(firstKey);}
+    thumbCache.set(item.id,'loading');
+    generateThumb(item).then(r=>{thumbCache.set(item.id,r||'none');if(viewMode==='card'&&curTab==='drive'&&!filterCat)render();}).catch(e=>{thumbCache.set(item.id,'none');});
+    return'loading';
   }
 
-  function downloadItem(item) {
-    if(item.type!=='file'||!item.content||item.content.length===0){ showToast('文件內容為空'); return; }
-    const blob = new Blob([item.content]); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = item.name; a.click();
-  }
-  window.downloadItem = downloadItem;
+  function downloadItem(item){if(item.type!=='file'||!item.content||item.content.length===0){showToast('文件內容為空');return;}const blob=new Blob([item.content]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=item.name;a.click();}
+  window.downloadItem=downloadItem;
 
-  // ==================== 窗口管理 ====================
-  function createWindow(item) {
-    if (openWindows.has(item.id)) { const { win, tab } = openWindows.get(item.id); activateWindow(win, tab); return; }
-    const win = document.createElement('div');
-    win.className = 'preview-window';
-    win.setAttribute('data-id', item.id);
-    win.style.zIndex = windowZIndex++;
-    win.innerHTML = `<div class="preview-window-header"><div class="win-controls"><div class="win-dot red" data-action="close" title="關閉"><span class="icon">✕</span></div><div class="win-dot yellow" data-action="minimize" title="最小化"><span class="icon">─</span></div><div class="win-dot green" data-action="fullscreen" title="全螢幕"><span class="icon-fullscreen"></span></div></div><span class="preview-window-title">${escapeHtml(item.name)}</span></div><div class="preview-window-content"></div><div class="resize-handle-nw" data-resize-dir="nw"></div><div class="resize-handle-ne" data-resize-dir="ne"></div><div class="resize-handle-sw" data-resize-dir="sw"></div><div class="resize-handle-se" data-resize-dir="se"></div><div class="resize-handle-right" data-resize-dir="e"></div><div class="resize-handle-bottom" data-resize-dir="s"></div><div class="resize-handle-left" data-resize-dir="w"></div><div class="resize-handle-top" data-resize-dir="n"></div>`;
+  // 窗口管理
+  function createWindow(item){
+    if(openWindows.has(item.id)){const{win,tab}=openWindows.get(item.id);activateWindow(win,tab);return;}
+    const win=document.createElement('div');
+    win.className='preview-window';win.setAttribute('data-id',item.id);win.style.zIndex=windowZIndex++;
+    win.innerHTML=`<div class="preview-window-header"><div class="win-controls"><div class="win-dot red" data-action="close" title="關閉"><span class="icon">✕</span></div><div class="win-dot yellow" data-action="minimize" title="最小化"><span class="icon">─</span></div><div class="win-dot green" data-action="fullscreen" title="全螢幕"><span class="icon-fullscreen"></span></div></div><span class="preview-window-title">${escapeHtml(item.name)}</span></div><div class="preview-window-content"><div class="edit-float-bar"><button class="save-btn">保存</button><button class="cancel-btn">取消</button></div></div><div class="resize-handle-nw" data-resize-dir="nw"></div><div class="resize-handle-ne" data-resize-dir="ne"></div><div class="resize-handle-sw" data-resize-dir="sw"></div><div class="resize-handle-se" data-resize-dir="se"></div><div class="resize-handle-right" data-resize-dir="e"></div><div class="resize-handle-bottom" data-resize-dir="s"></div><div class="resize-handle-left" data-resize-dir="w"></div><div class="resize-handle-top" data-resize-dir="n"></div>`;
     document.body.appendChild(win);
-    const tab = document.createElement('div');
-    tab.className = 'tab active'; tab.draggable = true;
-    tab.innerHTML = `<span>${escapeHtml(item.name)}</span><button class="tab-close">×</button>`;
-    tabsBar.appendChild(tab);
-    const content = win.querySelector('.preview-window-content');
-    const header = win.querySelector('.preview-window-header');
-    const closeBtn = win.querySelector('.win-dot.red');
-    const minBtn = win.querySelector('.win-dot.yellow');
-    const maxBtn = win.querySelector('.win-dot.green');
-    const state = { win, tab, content, item, minimized: false, prevMaximized: true, prevRect: null };
-    openWindows.set(item.id, state);
-    maximizeWindow(win);
-    activateWindow(win, tab);
-    loadPreviewContent(item, win, content);
-    closeBtn.addEventListener('click', () => closeWindow(item.id));
-    tab.querySelector('.tab-close').addEventListener('click', (e) => { safeStopPropagation(e); closeWindow(item.id); });
-    minBtn.addEventListener('click', () => minimizeWindow(state));
-    maxBtn.addEventListener('click', () => { if (win.classList.contains('maximized')) restoreWindow(win); else maximizeWindow(win); });
-    header.addEventListener('dblclick', (e) => { if (e.target.closest('.win-dot')) return; if (win.classList.contains('maximized')) restoreWindow(win); else maximizeWindow(win); });
-    win.addEventListener('pointerdown', (e) => { if (!state.minimized && !e.target.closest('.win-dot')) activateWindow(win, tab); });
-    tab.addEventListener('click', (e) => {
-      if (e.target.closest('button')) return;
-      if (state.minimized) {
-        state.minimized = false; win.style.display = 'flex'; tab.classList.remove('minimized');
-        if (state.prevMaximized) maximizeWindow(win);
-        else { restoreWindow(win); if (state.prevRect) { win.style.width = state.prevRect.width; win.style.height = state.prevRect.height; win.style.left = state.prevRect.left; win.style.top = state.prevRect.top; } }
-        activateWindow(win, tab);
-      } else { activateWindow(win, tab); }
+    const tab=document.createElement('div');tab.className='tab active';tab.draggable=true;tab.innerHTML=`<span>${escapeHtml(item.name)}</span><button class="tab-close">×</button>`;tabsBar.appendChild(tab);
+    const content=win.querySelector('.preview-window-content');
+    const floatBar=content.querySelector('.edit-float-bar');
+    const header=win.querySelector('.preview-window-header');
+    const closeBtn=win.querySelector('.win-dot.red'),minBtn=win.querySelector('.win-dot.yellow'),maxBtn=win.querySelector('.win-dot.green');
+    const state={win,tab,content,item,minimized:false,prevMaximized:true,prevRect:null,closing:false,minimizing:false};
+    openWindows.set(item.id,state);
+    maximizeWindow(win);activateWindow(win,tab);loadPreviewContent(item,win,content,floatBar);
+    closeBtn.addEventListener('click',()=>closeWindow(item.id));
+    tab.querySelector('.tab-close').addEventListener('click',(e)=>{safeStopPropagation(e);closeWindow(item.id);});
+    minBtn.addEventListener('click',()=>minimizeWindow(state));
+    maxBtn.addEventListener('click',()=>{if(win.classList.contains('maximized'))restoreWindow(win);else maximizeWindow(win);});
+    header.addEventListener('dblclick',(e)=>{if(e.target.closest('.win-dot'))return;if(win.classList.contains('maximized'))restoreWindow(win);else maximizeWindow(win);});
+    win.addEventListener('pointerdown',(e)=>{if(!state.minimized&&!e.target.closest('.win-dot'))activateWindow(win,tab);});
+    tab.addEventListener('click',(e)=>{
+      if(e.target.closest('button'))return;
+      if(state.minimized){state.minimized=false;win.style.display='flex';tab.classList.remove('minimized');
+        if(state.prevMaximized)maximizeWindow(win);else{restoreWindow(win);if(state.prevRect){win.style.width=state.prevRect.width;win.style.height=state.prevRect.height;win.style.left=state.prevRect.left;win.style.top=state.prevRect.top;}}
+        activateWindow(win,tab);}else activateWindow(win,tab);
     });
-    tab.addEventListener('dragstart', (e) => { if (e.target.closest('button')) { safePreventDefault(e); return; } dragTabElement = tab; tab.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', item.id); });
-    tab.addEventListener('dragend', () => { tab.classList.remove('dragging'); dragTabElement = null; });
+    tab.addEventListener('dragstart',(e)=>{if(e.target.closest('button')){safePreventDefault(e);return;}dragTabElement=tab;tab.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',item.id);});
+    tab.addEventListener('dragend',()=>{tab.classList.remove('dragging');dragTabElement=null;});
 
-    // 窗口拖拽
-    let dragState = null;
-    function startDrag(e) { if (e.target.closest('.win-dot, [data-resize-dir], button')) return; if (win.classList.contains('maximized')) return; header.setPointerCapture(e.pointerId); dragState = { startX: e.clientX, startY: e.clientY, left: parseInt(win.style.left)||0, top: parseInt(win.style.top)||0 }; safePreventDefault(e); }
-    function moveDrag(e) { if (!dragState) return; win.style.left = (dragState.left + e.clientX - dragState.startX) + 'px'; win.style.top = (dragState.top + e.clientY - dragState.startY) + 'px'; }
-    function endDrag(e) { dragState = null; header.releasePointerCapture(e.pointerId); }
-    header.addEventListener('pointerdown', startDrag);
-    header.addEventListener('pointermove', moveDrag);
-    header.addEventListener('pointerup', endDrag);
-    header.addEventListener('pointercancel', endDrag);
+    let dragState=null;
+    function startDrag(e){if(e.target.closest('.win-dot, [data-resize-dir], button'))return;if(win.classList.contains('maximized'))return;header.setPointerCapture(e.pointerId);win.classList.remove('use-smooth-move');dragState={startX:e.clientX,startY:e.clientY,left:parseInt(win.style.left)||0,top:parseInt(win.style.top)||0};safePreventDefault(e);}
+    function moveDrag(e){if(!dragState)return;win.style.left=(dragState.left+e.clientX-dragState.startX)+'px';win.style.top=(dragState.top+e.clientY-dragState.startY)+'px';}
+    function endDrag(e){dragState=null;header.releasePointerCapture(e.pointerId);}
+    header.addEventListener('pointerdown',startDrag);header.addEventListener('pointermove',moveDrag);header.addEventListener('pointerup',endDrag);header.addEventListener('pointercancel',endDrag);
 
-    // 四角+四边调整大小
-    const resizeEls = win.querySelectorAll('[data-resize-dir]');
-    resizeEls.forEach(el => {
-      let resizeRaf = null, resizeState = null;
-      function startResize(e) { safeStopPropagation(e); if (win.classList.contains('maximized')) return; el.setPointerCapture(e.pointerId); const rect = win.getBoundingClientRect(); const dir = el.getAttribute('data-resize-dir'); const dirs = []; if (dir.includes('e')) dirs.push('right'); if (dir.includes('w')) dirs.push('left'); if (dir.includes('s')) dirs.push('bottom'); if (dir.includes('n')) dirs.push('top'); resizeState = { startX: e.clientX, startY: e.clientY, width: rect.width, height: rect.height, left: rect.left, top: rect.top, dirs }; resizeRaf = null; }
-      function moveResize(e) { if (!resizeState) return; if (resizeRaf) return; resizeRaf = requestAnimationFrame(() => { const s = resizeState; let w = s.width, h = s.height, l = s.left, t = s.top; if (s.dirs.includes('right')) w = Math.max(300, s.width + e.clientX - s.startX); if (s.dirs.includes('left')) { w = Math.max(300, s.width - (e.clientX - s.startX)); l = s.left + (e.clientX - s.startX); } if (s.dirs.includes('bottom')) h = Math.max(200, s.height + e.clientY - s.startY); if (s.dirs.includes('top')) { h = Math.max(200, s.height - (e.clientY - s.startY)); t = s.top + (e.clientY - s.startY); } win.style.width = w + 'px'; win.style.height = h + 'px'; if (s.dirs.includes('left')) win.style.left = l + 'px'; if (s.dirs.includes('top')) win.style.top = t + 'px'; resizeRaf = null; }); }
-      function endResize(e) { el.releasePointerCapture(e.pointerId); resizeState = null; if (resizeRaf) { cancelAnimationFrame(resizeRaf); resizeRaf = null; } }
-      el.addEventListener('pointerdown', startResize);
-      el.addEventListener('pointermove', moveResize);
-      el.addEventListener('pointerup', endResize);
-      el.addEventListener('pointercancel', endResize);
+    const resizeEls=win.querySelectorAll('[data-resize-dir]');
+    resizeEls.forEach(el=>{
+      let resizeRaf=null,resizeState=null;
+      function startResize(e){safeStopPropagation(e);if(win.classList.contains('maximized'))return;el.setPointerCapture(e.pointerId);win.classList.remove('use-smooth-move');const rect=win.getBoundingClientRect();const dir=el.getAttribute('data-resize-dir');const dirs=[];if(dir.includes('e'))dirs.push('right');if(dir.includes('w'))dirs.push('left');if(dir.includes('s'))dirs.push('bottom');if(dir.includes('n'))dirs.push('top');resizeState={startX:e.clientX,startY:e.clientY,width:rect.width,height:rect.height,left:rect.left,top:rect.top,dirs};resizeRaf=null;}
+      function moveResize(e){if(!resizeState)return;if(resizeRaf)return;resizeRaf=requestAnimationFrame(()=>{const s=resizeState;let w=s.width,h=s.height,l=s.left,t=s.top;if(s.dirs.includes('right'))w=Math.max(300,s.width+e.clientX-s.startX);if(s.dirs.includes('left')){w=Math.max(300,s.width-(e.clientX-s.startX));l=s.left+(e.clientX-s.startX);}if(s.dirs.includes('bottom'))h=Math.max(200,s.height+e.clientY-s.startY);if(s.dirs.includes('top')){h=Math.max(200,s.height-(e.clientY-s.startY));t=s.top+(e.clientY-s.startY);}win.style.width=w+'px';win.style.height=h+'px';if(s.dirs.includes('left'))win.style.left=l+'px';if(s.dirs.includes('top'))win.style.top=t+'px';resizeRaf=null;});}
+      function endResize(e){el.releasePointerCapture(e.pointerId);resizeState=null;if(resizeRaf){cancelAnimationFrame(resizeRaf);resizeRaf=null;}}
+      el.addEventListener('pointerdown',startResize);el.addEventListener('pointermove',moveResize);el.addEventListener('pointerup',endResize);el.addEventListener('pointercancel',endResize);
     });
   }
-  function maximizeWindow(win) { win.classList.add('maximized'); win.style.top = '0px'; win.style.left = '0px'; win.style.width = '100vw'; win.style.height = '100vh'; win.style.position = 'fixed'; win.style.borderRadius = '0'; }
-  function restoreWindow(win) { win.classList.remove('maximized'); win.style.position = 'absolute'; win.style.borderRadius = '16px'; win.style.width = '600px'; win.style.height = '450px'; win.style.left = '80px'; win.style.top = '60px'; }
-  function activateWindow(win, tab) { win.style.zIndex = ++windowZIndex; win.style.display = 'flex'; win.classList.add('active'); if (tab) { document.querySelectorAll('#tabs-bar .tab').forEach(t => t.classList.remove('active')); tab.classList.add('active'); } }
-  function minimizeWindow(state) { const { win, tab } = state; state.minimized = true; state.prevMaximized = win.classList.contains('maximized'); state.prevRect = { width: win.style.width, height: win.style.height, left: win.style.left, top: win.style.top }; win.style.display = 'none'; tab.classList.add('minimized'); }
-  function closeWindow(itemId) { const state = openWindows.get(itemId); if (!state) return; state.win.remove(); state.tab.remove(); openWindows.delete(itemId); }
+  function maximizeWindow(win){
+    if(win.classList.contains('maximized')) return;
+    win.classList.add('use-smooth-move');
+    const rect = win.getBoundingClientRect();
+    // 设置全屏样式
+    win.style.top = '0px';
+    win.style.left = '0px';
+    win.style.width = '100vw';
+    win.style.height = '100vh';
+    win.style.position = 'fixed';
+    win.style.borderRadius = '0';
+    win.classList.add('maximized');
+    const onTransitionEnd = (e) => {
+      if (e.target === win && e.propertyName === 'width') {
+        win.removeEventListener('transitionend', onTransitionEnd);
+        win.classList.remove('use-smooth-move');
+      }
+    };
+    win.addEventListener('transitionend', onTransitionEnd);
+  }
+  function restoreWindow(win){
+    if(!win.classList.contains('maximized')) return;
+    win.classList.remove('maximized');
+    win.classList.add('use-smooth-move');
+    win.style.position = 'absolute';
+    win.style.borderRadius = '16px';
+    win.style.width = '600px';
+    win.style.height = '450px';
+    win.style.left = '80px';
+    win.style.top = '60px';
+    const onTransitionEnd = (e) => {
+      if (e.target === win && e.propertyName === 'width') {
+        win.removeEventListener('transitionend', onTransitionEnd);
+        win.classList.remove('use-smooth-move');
+      }
+    };
+    win.addEventListener('transitionend', onTransitionEnd);
+  }
+  function activateWindow(win,tab){win.style.zIndex=++windowZIndex;win.style.display='flex';win.classList.add('active');if(tab){document.querySelectorAll('#tabs-bar .tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');}}
+  function minimizeWindow(state){
+    const{win,tab}=state;
+    if(state.minimizing) return;
+    state.minimizing = true;
+    const animation = win.animate([
+      { transform: 'scale(1)', opacity: 1, offset: 0 },
+      { transform: 'scale(0.95)', opacity: 0, offset: 1 }
+    ], { duration: 250, easing: 'ease-in' });
+    animation.onfinish = () => {
+      state.minimizing = false;
+      state.minimized = true;
+      state.prevMaximized = win.classList.contains('maximized');
+      state.prevRect = { width: win.style.width, height: win.style.height, left: win.style.left, top: win.style.top };
+      win.style.display = 'none';
+      tab.classList.add('minimized');
+    };
+  }
+  function closeWindow(itemId){
+    const state=openWindows.get(itemId);
+    if(!state) return;
+    if(state.closing) return;
+    state.closing = true;
+    const animation = state.win.animate([
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: 'scale(0.8)', opacity: 0 }
+    ], { duration: 200, easing: 'ease-in' });
+    animation.onfinish = () => {
+      state.win.remove();
+      state.tab.remove();
+      openWindows.delete(itemId);
+    };
+  }
 
-  function loadPreviewContent(item, win, content) {
-    content.innerHTML = '';
-    const ext = item.name.split('.').pop().toLowerCase();
-    const blob = new Blob([item.content || new Uint8Array(0)]);
-    const url = URL.createObjectURL(blob);
-    if (VID.has(ext)) {
-      const v = document.createElement('video');
-      v.src = url; v.controls = true; v.style.maxWidth = '100%'; v.style.maxHeight = '100%';
-      content.appendChild(v);
-      v.addEventListener('loadedmetadata', () => {
-        const vw = v.videoWidth, vh = v.videoHeight;
-        if (vw && vh) {
-          const maxW = window.innerWidth * 0.8, maxH = window.innerHeight * 0.8;
-          let w = vw, h = vh;
-          if (w > maxW) { h = (maxW / w) * h; w = maxW; } if (h > maxH) { w = (maxH / h) * w; h = maxH; }
-          if (!win.classList.contains('maximized')) {
-            win.style.width = Math.max(300, w) + 'px'; win.style.height = Math.max(200, h) + 'px';
-            win.style.left = Math.max(0, (window.innerWidth - w) / 2) + 'px'; win.style.top = Math.max(0, (window.innerHeight - h) / 2) + 'px';
-          }
+  function loadPreviewContent(item,win,content,floatBar){
+    content.innerHTML='';content.appendChild(floatBar);
+    const ext=item.name.split('.').pop().toLowerCase();
+    const blob=new Blob([item.content||new Uint8Array(0)]);
+    const url=URL.createObjectURL(blob);
+    if(VID.has(ext)){
+      const v=document.createElement('video');v.src=url;v.controls=true;v.style.maxWidth='100%';v.style.maxHeight='100%';v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');
+      content.insertBefore(v,floatBar);
+      v.addEventListener('loadedmetadata',()=>{
+        const vw=v.videoWidth,vh=v.videoHeight;
+        if(vw&&vh){const maxW=window.innerWidth*0.8,maxH=window.innerHeight*0.8;let w=vw,h=vh;if(w>maxW){h=(maxW/w)*h;w=maxW;}if(h>maxH){w=(maxH/h)*w;h=maxH;}
+          if(!win.classList.contains('maximized')){win.style.width=Math.max(300,w)+'px';win.style.height=Math.max(200,h)+'px';win.style.left=Math.max(0,(window.innerWidth-w)/2)+'px';win.style.top=Math.max(0,(window.innerHeight-h)/2)+'px';}
         }
       });
-    } else if (AUD.has(ext)) {
-      const a = document.createElement('audio'); a.src = url; a.controls = true; a.style.width = '100%'; content.appendChild(a);
-    } else if (IMG.has(ext)) {
-      const img = document.createElement('img'); img.src = url; content.appendChild(img);
-      if (ext !== 'svg') addEditButton(win, content, item, url);
-    } else if (ext === 'pdf') {
-      const e = document.createElement('embed'); e.src = url; e.type = 'application/pdf'; e.style.width = '100%'; e.style.height = '100%'; content.appendChild(e);
-    } else if (TXT.has(ext)) {
-      const reader = new FileReader();
-      reader.onload = () => { const pre = document.createElement('pre'); pre.textContent = reader.result; content.appendChild(pre); addEditButton(win, content, item, null); };
-      reader.readAsText(blob, 'UTF-8');
-    } else {
-      content.innerHTML = `<div class="preview-unsupported">不支援預覽 .${escapeHtml(ext)}</div><button class="t-btn primary" onclick="downloadItem(window._previewItem)" style="margin-top:12px">下載查看</button>`; window._previewItem = item;
+    }else if(AUD.has(ext)){
+      const a=document.createElement('audio');a.src=url;a.controls=true;a.style.width='100%';content.insertBefore(a,floatBar);
+    }else if(IMG.has(ext)){
+      const img=document.createElement('img');img.src=url;content.insertBefore(img,floatBar);
+      if(ext!=='svg')addEditButton(win,content,item,url,floatBar);
+    }else if(ext==='pdf'){
+      const e=document.createElement('embed');e.src=url;e.type='application/pdf';e.style.width='100%';e.style.height='100%';content.insertBefore(e,floatBar);
+    }else if(TXT.has(ext)){
+      const reader=new FileReader();
+      reader.onload=()=>{const pre=document.createElement('pre');pre.textContent=reader.result;content.insertBefore(pre,floatBar);addEditButton(win,content,item,null,floatBar);};
+      reader.readAsText(blob,'UTF-8');
+    }else{
+      content.innerHTML=`<div class="preview-unsupported">不支援預覽 .${escapeHtml(ext)}</div><button class="t-btn primary" onclick="downloadItem(window._previewItem)" style="margin-top:12px">下載查看</button>`;
     }
   }
 
-  function addEditButton(win, content, item, url) {
-    const bar = document.createElement('div'); bar.className = 'edit-actions-bar'; bar.style.display = 'none';
-    bar.innerHTML = '<button class="save-btn">保存</button><button class="cancel-btn">取消</button>';
-    content.appendChild(bar);
-    const editBtn = document.createElement('button');
-    editBtn.className = 't-btn primary'; editBtn.textContent = '编辑'; editBtn.style.marginTop = '0'; editBtn.style.height = '28px'; editBtn.style.fontSize = '12px'; editBtn.style.padding = '0 10px';
-    const header = win.querySelector('.preview-window-header');
-    const titleSpan = header.querySelector('.preview-window-title');
-    titleSpan.insertAdjacentElement('afterend', editBtn); editBtn.style.marginLeft = '8px';
-    let editing = false;
-    editBtn.addEventListener('click', () => {
-      if (editing) return;
-      editing = true;
-      bar.style.display = 'flex'; editBtn.style.display = 'none';
-      const ext = item.name.split('.').pop().toLowerCase();
-      if (IMG.has(ext)) {
-        const img = content.querySelector('img');
-        if (img && url) {
-          const cvs = document.createElement('canvas');
-          cvs.width = img.naturalWidth; cvs.height = img.naturalHeight;
-          cvs.style.maxWidth = '100%'; cvs.style.maxHeight = '100%'; cvs.style.width = 'auto'; cvs.style.height = 'auto';
-          const ctx = cvs.getContext('2d'); ctx.drawImage(img, 0, 0);
-          content.insertBefore(cvs, bar); img.style.display = 'none';
-          let painting = false;
-          function getPos(e) { const rect = cvs.getBoundingClientRect(); return { x: (e.clientX - rect.left) * (cvs.width / rect.width), y: (e.clientY - rect.top) * (cvs.height / rect.height) }; }
-          function startPaint(e) { painting = true; const p = getPos(e.touches ? e.touches[0] : e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); }
-          function movePaint(e) { if (!painting) return; e.preventDefault(); const p = getPos(e.touches ? e.touches[0] : e); ctx.lineTo(p.x, p.y); ctx.strokeStyle = 'red'; ctx.lineWidth = 2; ctx.stroke(); }
-          function endPaint() { painting = false; }
-          cvs.addEventListener('pointerdown', startPaint); cvs.addEventListener('pointermove', movePaint); cvs.addEventListener('pointerup', endPaint);
-          cvs.addEventListener('touchstart', startPaint, {passive: false}); cvs.addEventListener('touchmove', movePaint, {passive: false}); cvs.addEventListener('touchend', endPaint);
+  function addEditButton(win,content,item,url,floatBar){
+    const editBtn=document.createElement('button');
+    editBtn.className='t-btn primary';editBtn.textContent='编辑';editBtn.style.marginTop='0';editBtn.style.height='28px';editBtn.style.fontSize='12px';editBtn.style.padding='0 10px';
+    const header=win.querySelector('.preview-window-header');
+    const titleSpan=header.querySelector('.preview-window-title');
+    titleSpan.insertAdjacentElement('afterend',editBtn);editBtn.style.marginLeft='8px';
+    let editing=false;
+    editBtn.addEventListener('click',()=>{
+      if(editing)return;editing=true;
+      editBtn.style.display='none';floatBar.style.display='flex';
+      const ext=item.name.split('.').pop().toLowerCase();
+      if(IMG.has(ext)){
+        const img=content.querySelector('img');
+        if(img&&url){
+          const cvs=document.createElement('canvas');cvs.width=img.naturalWidth;cvs.height=img.naturalHeight;
+          cvs.style.maxWidth='100%';cvs.style.maxHeight='70vh';
+          const ctx=cvs.getContext('2d');ctx.drawImage(img,0,0);
+          content.insertBefore(cvs,floatBar);img.style.display='none';
+          let painting=false;
+          function getPos(e){const rect=cvs.getBoundingClientRect();return{x:(e.clientX-rect.left)*(cvs.width/rect.width),y:(e.clientY-rect.top)*(cvs.height/rect.height)};}
+          function startPaint(e){painting=true;const p=getPos(e.touches?e.touches[0]:e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
+          function movePaint(e){if(!painting)return;e.preventDefault();const p=getPos(e.touches?e.touches[0]:e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='red';ctx.lineWidth=2;ctx.stroke();}
+          function endPaint(){painting=false;}
+          cvs.addEventListener('pointerdown',startPaint);cvs.addEventListener('pointermove',movePaint);cvs.addEventListener('pointerup',endPaint);
+          cvs.addEventListener('touchstart',startPaint,{passive:false});cvs.addEventListener('touchmove',movePaint,{passive:false});cvs.addEventListener('touchend',endPaint);
         }
-      } else {
-        const pre = content.querySelector('pre');
-        if (pre) { const ta = document.createElement('textarea'); ta.value = pre.textContent; content.insertBefore(ta, bar); pre.style.display = 'none'; }
+      }else{
+        const pre=content.querySelector('pre');
+        if(pre){const ta=document.createElement('textarea');ta.value=pre.textContent;content.insertBefore(ta,floatBar);pre.style.display='none';}
       }
-    });
-    bar.querySelector('.save-btn').addEventListener('click', () => {
-      if (item.name.split('.').pop().match(/^(jpg|jpeg|png|gif|bmp|webp)$/i)) {
-        const cvs = content.querySelector('canvas');
-        if (cvs) cvs.toBlob(bl => { const r = new FileReader(); r.onload = () => { item.content = new Uint8Array(r.result); item.size = item.content.length; item.time = Date.now(); thumbCache.delete(item.id); showToast('已保存'); }; r.readAsArrayBuffer(bl); }, 'image/png');
-      } else {
-        const ta = content.querySelector('textarea');
-        if (ta) { item.content = new TextEncoder().encode(ta.value); item.size = item.content.length; item.time = Date.now(); thumbCache.delete(item.id); showToast('已保存'); }
-      }
-      bar.style.display = 'none'; editBtn.style.display = 'inline-flex'; editing = false;
-      const pre = content.querySelector('pre'), img = content.querySelector('img'), cvs = content.querySelector('canvas');
-      if (pre) pre.style.display = ''; if (img) img.style.display = ''; if (cvs) cvs.remove(); content.querySelector('textarea')?.remove();
-    });
-    bar.querySelector('.cancel-btn').addEventListener('click', () => {
-      bar.style.display = 'none'; editBtn.style.display = 'inline-flex'; editing = false;
-      const pre = content.querySelector('pre'), img = content.querySelector('img'), cvs = content.querySelector('canvas');
-      if (pre) pre.style.display = ''; if (img) img.style.display = ''; if (cvs) cvs.remove(); content.querySelector('textarea')?.remove();
+      floatBar.querySelector('.save-btn').onclick=()=>{
+        if(item.name.split('.').pop().match(/^(jpg|jpeg|png|gif|bmp|webp)$/i)){
+          const cvs=content.querySelector('canvas');if(cvs)cvs.toBlob(bl=>{const r=new FileReader();r.onload=()=>{item.content=new Uint8Array(r.result);item.size=item.content.length;item.time=Date.now();thumbCache.delete(item.id);showToast('已保存');};r.readAsArrayBuffer(bl);},'image/png');
+        }else{
+          const ta=content.querySelector('textarea');if(ta){item.content=new TextEncoder().encode(ta.value);item.size=item.content.length;item.time=Date.now();thumbCache.delete(item.id);showToast('已保存');}
+        }
+        floatBar.style.display='none';editBtn.style.display='inline-flex';editing=false;
+        const pre=content.querySelector('pre'),img=content.querySelector('img'),cvs=content.querySelector('canvas');
+        if(pre)pre.style.display='';if(img)img.style.display='';if(cvs)cvs.remove();content.querySelector('textarea')?.remove();
+      };
+      floatBar.querySelector('.cancel-btn').onclick=()=>{
+        floatBar.style.display='none';editBtn.style.display='inline-flex';editing=false;
+        const pre=content.querySelector('pre'),img=content.querySelector('img'),cvs=content.querySelector('canvas');
+        if(pre)pre.style.display='';if(img)img.style.display='';if(cvs)cvs.remove();content.querySelector('textarea')?.remove();
+      };
     });
   }
 
-  function showPreview(item) { createWindow(item); }
+  function showPreview(item){createWindow(item);}
 
   // 标签栏拖拽
-  tabsBar.addEventListener('dragover', (e) => { safePreventDefault(e); if (!dragTabElement) return; const target = e.target.closest('.tab'); if (!target || target === dragTabElement) return; const rect = target.getBoundingClientRect(); tabsBar.insertBefore(dragTabElement, e.clientX < rect.left + rect.width/2 ? target : target.nextSibling); });
-  tabsBar.addEventListener('drop', (e) => { safePreventDefault(e); dragTabElement?.classList.remove('dragging'); dragTabElement = null; });
+  tabsBar.addEventListener('dragover',(e)=>{safePreventDefault(e);if(!dragTabElement)return;const target=e.target.closest('.tab');if(!target||target===dragTabElement)return;const rect=target.getBoundingClientRect();tabsBar.insertBefore(dragTabElement,e.clientX<rect.left+rect.width/2?target:target.nextSibling);});
+  tabsBar.addEventListener('drop',(e)=>{safePreventDefault(e);dragTabElement?.classList.remove('dragging');dragTabElement=null;});
 
   // 主点击逻辑
-  document.getElementById('main-view').addEventListener('click', function(e) {
-    if (curTab === 'home') return;
-    if (longPressActive) { longPressActive = false; return; }
-    const target = e.target.closest('.row, .card-item');
-    if (!target) { if (editId) { commitEdit(); render(); } if (selection.size > 0) { selection.clear(); syncSel(); updateToolbar(); } lastClickId = null; return; }
-    const id = target.getAttribute('data-id'); if (!id) return;
-    if (e.target.closest('.card-name') || (e.target.closest('.row') && e.target.closest('span'))) { safeStopPropagation(e); if (editId === id) return; if (editId) commitEdit(); editId = id; render(); return; }
-    if (e.target.tagName === 'INPUT') return;
-    if (editId && editId !== id) { commitEdit(); render(); return; }
-    const now = Date.now();
-    if (id === lastClickId && (now - lastClickTime) < DBL_CLICK_MS) {
-      lastClickId = null;
-      const item = db.find(x => x.id === id); if (!item || target.classList.contains('locked')) return;
-      if (curTab === 'trash') { showToast('垃圾桶內項目無法開啟'); return; }
-      if (curTab === 'recent') { if (item.type === 'file') { selection.clear(); syncSel(); updateToolbar(); showPreview(item); } else showToast('最近項目僅供檢視'); return; }
-      if (filterCat) { if (item.type === 'file') showPreview(item); return; }
-      selection.clear(); syncSel(); updateToolbar();
-      if (item.type === 'dir' && curTab === 'drive') { searchInput.value = ''; searchQuery = ''; pathStack.push({id:item.id, name:item.name}); render(); }
-      else if (item.type === 'file') showPreview(item);
+  document.getElementById('main-view').addEventListener('click',function(e){
+    if(curTab==='home')return;
+    if(longPressActive){longPressActive=false;return;}
+    const target=e.target.closest('.row, .card-item');
+    if(!target){if(editId){commitEdit();render();}if(selection.size>0){selection.clear();syncSel();updateToolbar();}lastClickId=null;return;}
+    const id=target.getAttribute('data-id');if(!id)return;
+    if(e.target.closest('.card-name')||(e.target.closest('.row')&&e.target.closest('span'))){safeStopPropagation(e);if(editId===id)return;if(editId)commitEdit();editId=id;render();return;}
+    if(e.target.tagName==='INPUT')return;
+    if(editId&&editId!==id){commitEdit();render();return;}
+    const now=Date.now();
+    if(id===lastClickId&&(now-lastClickTime)<DBL_CLICK_MS){
+      lastClickId=null;
+      const item=db.find(x=>x.id===id);if(!item||target.classList.contains('locked'))return;
+      if(curTab==='trash'){showToast('垃圾桶內項目無法開啟');return;}
+      if(curTab==='recent'){if(item.type==='file'){selection.clear();syncSel();updateToolbar();showPreview(item);}else showToast('最近項目僅供檢視');return;}
+      if(filterCat){if(item.type==='file')showPreview(item);return;}
+      selection.clear();syncSel();updateToolbar();
+      if(item.type==='dir'&&curTab==='drive'){searchInput.value='';searchQuery='';pathStack.push({id:item.id,name:item.name});render();}
+      else if(item.type==='file')showPreview(item);
       return;
     }
-    lastClickId = id; lastClickTime = now;
-    if (selection.has(id)) selection.delete(id); else selection.add(id);
-    syncSel(); updateToolbar();
+    lastClickId=id;lastClickTime=now;
+    if(selection.has(id))selection.delete(id);else selection.add(id);
+    syncSel();updateToolbar();
   });
 
-  function syncSel() { document.querySelectorAll('.row,.card-item').forEach(el => el.classList.remove('selected')); selection.forEach(id => { const r = document.querySelector(`.row[data-id="${id}"]`); if(r) r.classList.add('selected'); const c = document.querySelector(`.card-item[data-id="${id}"]`); if(c) c.classList.add('selected'); }); }
+  function syncSel(){document.querySelectorAll('.row,.card-item').forEach(el=>el.classList.remove('selected'));selection.forEach(id=>{const r=document.querySelector(`.row[data-id="${id}"]`);if(r)r.classList.add('selected');const c=document.querySelector(`.card-item[data-id="${id}"]`);if(c)c.classList.add('selected');});}
 
-  function updateToolbar() {
-    const left = document.getElementById('tool-left'); left.innerHTML = '';
-    const refresh = document.getElementById('refresh-btn'); if(refresh) refresh.style.display = 'none';
-    if (curTab === 'home' || curTab === 'recent') return;
-    if (filterCat) { left.appendChild(btn('返回首頁', () => { filterCat = null; App.switchTab('home'); }, true)); return; }
-    if (selection.size > 0) {
-      if (curTab === 'trash') {
-        left.appendChild(btn('還原', () => { getTopIds([...selection]).forEach(id => restoreItem(id)); selection.clear(); syncSel(); render(); }, true));
-        left.appendChild(btn('永久刪除', () => { getTopIds([...selection]).forEach(id => { const it = db.find(x => x.id === id); if (it) { thumbCache.delete(id); if (it.type === 'dir') { const desc = collectAllDescendantIds(id, true); desc.forEach(did => thumbCache.delete(did)); db = db.filter(x => !desc.includes(x.id) && x.id !== id); } else db = db.filter(x => x.id !== id); } }); selection.clear(); syncSel(); render(); }, false, true));
-      } else if (curTab === 'drive') {
-        left.appendChild(btn('下載', downloadSel, true));
-        if (selection.size === 1) left.appendChild(btn('重新命名', () => { editId = [...selection][0]; render(); }, true));
-        left.appendChild(btn(selection.size===1?'移動':'批量移動', () => { clip={mode:'move',ids:[...selection]}; selection.clear(); syncSel(); render(); }, true));
-        left.appendChild(btn(selection.size===1?'複製':'批量複製', () => { clip={mode:'copy',ids:[...selection]}; selection.clear(); syncSel(); render(); }, true));
-        left.appendChild(btn(selection.size===1?'刪除':'批量刪除', () => { getTopIds([...selection]).forEach(id => { const it = db.find(x => x.id === id); if (it) { thumbCache.delete(id); if (it.type === 'dir') { const desc = collectAllDescendantIds(id, true); desc.forEach(did => thumbCache.delete(did)); markDeletedRecursive(id); } else it.del = true; } }); selection.clear(); syncSel(); render(); }, false, true));
+  function updateToolbar(){
+    const left=document.getElementById('tool-left');left.innerHTML='';
+    const refresh=document.getElementById('refresh-btn');if(refresh)refresh.style.display='none';
+    if(curTab==='home'||curTab==='recent')return;
+    if(filterCat){left.appendChild(btn('返回首頁',()=>{filterCat=null;App.switchTab('home');},true));return;}
+    if(selection.size>0){
+      if(curTab==='trash'){
+        left.appendChild(btn('還原',()=>{getTopIds([...selection]).forEach(id=>restoreItem(id));selection.clear();syncSel();render();},true));
+        left.appendChild(btn('永久刪除',()=>{getTopIds([...selection]).forEach(id=>{const it=db.find(x=>x.id===id);if(it){thumbCache.delete(id);if(it.type==='dir'){const desc=collectAllDescendantIds(id,true);desc.forEach(did=>thumbCache.delete(did));db=db.filter(x=>!desc.includes(x.id)&&x.id!==id);}else db=db.filter(x=>x.id!==id);}});selection.clear();syncSel();render();},false,true));
+      }else if(curTab==='drive'){
+        left.appendChild(btn('下載',downloadSel,true));
+        if(selection.size===1)left.appendChild(btn('重新命名',()=>{editId=[...selection][0];render();},true));
+        left.appendChild(btn(selection.size===1?'移動':'批量移動',()=>{clip={mode:'move',ids:[...selection]};selection.clear();syncSel();render();},true));
+        left.appendChild(btn(selection.size===1?'複製':'批量複製',()=>{clip={mode:'copy',ids:[...selection]};selection.clear();syncSel();render();},true));
+        left.appendChild(btn(selection.size===1?'刪除':'批量刪除',()=>{getTopIds([...selection]).forEach(id=>{const it=db.find(x=>x.id===id);if(it){thumbCache.delete(id);if(it.type==='dir'){const desc=collectAllDescendantIds(id,true);desc.forEach(did=>thumbCache.delete(did));markDeletedRecursive(id);}else it.del=true;}});selection.clear();syncSel();render();},false,true));
       }
-    } else if (clip.ids.length > 0 && curTab === 'drive') {
-      left.appendChild(btn(`貼上 (${clip.ids.length})`, () => { handlePaste(); render(); }, true));
-      left.appendChild(btn('取消', () => { clip = {mode:null,ids:[]}; render(); }));
-    } else if (curTab === 'drive' && !filterCat && selection.size === 0 && clip.ids.length === 0) {
-      if (refresh) refresh.style.display = 'flex';
+    }else if(clip.ids.length>0&&curTab==='drive'){
+      left.appendChild(btn(`貼上 (${clip.ids.length})`,()=>{handlePaste();render();},true));
+      left.appendChild(btn('取消',()=>{clip={mode:null,ids:[]};render();}));
+    }else if(curTab==='drive'&&!filterCat&&selection.size===0&&clip.ids.length===0){
+      if(refresh)refresh.style.display='flex';
     }
   }
 
-  function btn(text, action, primary=false, danger=false) { const b = document.createElement('button'); b.className = 't-btn' + (primary?' primary':'') + (danger?' danger':''); b.textContent = text; b.onclick = action; return b; }
+  function btn(text,action,primary=false,danger=false){const b=document.createElement('button');b.className='t-btn'+(primary?' primary':'')+(danger?' danger':'');b.textContent=text;b.onclick=action;return b;}
 
-  function handlePaste() {
-    if (curTab !== 'drive' || filterCat) { showToast('無法在此視圖貼上'); return; }
-    const targetPid = pathStack[pathStack.length-1].id;
-    const valid = clip.ids.filter(id => { const it = db.find(x => x.id === id); return it && !it.del; });
-    if (!valid.length) { showToast('剪貼簿中的項目已不存在'); clip = {mode:null,ids:[]}; render(); return; }
-    const rootIds = getTopIds(valid);
-    if (clip.mode === 'move') {
-      for (let id of rootIds) { const item = db.find(x => x.id === id); if (item && item.type === 'dir' && isDescendant(id, targetPid)) { showToast('無法移動：目標為來源的子資料夾'); return; } }
-      for (let id of rootIds) { const item = db.find(x => x.id === id); if (item.type === 'dir') moveFolderRecursive(id, targetPid); else relocateItem(item, targetPid); }
+  function handlePaste(){
+    if(curTab!=='drive'||filterCat){showToast('無法在此視圖貼上');return;}
+    const targetPid=pathStack[pathStack.length-1].id;
+    const valid=clip.ids.filter(id=>{const it=db.find(x=>x.id===id);return it&&!it.del;});
+    if(!valid.length){showToast('剪貼簿中的項目已不存在');clip={mode:null,ids:[]};render();return;}
+    const rootIds=getTopIds(valid);
+    if(clip.mode==='move'){
+      for(let id of rootIds){const item=db.find(x=>x.id===id);if(item&&item.type==='dir'&&isDescendant(id,targetPid)){showToast('無法移動：目標為來源的子資料夾');return;}}
+      for(let id of rootIds){const item=db.find(x=>x.id===id);if(item.type==='dir')moveFolderRecursive(id,targetPid);else relocateItem(item,targetPid);}
       showToast(`已移動 ${rootIds.length} 個項目`);
-    } else { let cnt = 0; rootIds.forEach(id => { if (deepCopy(id, targetPid)) cnt++; }); showToast(`已複製 ${cnt} 個項目`); }
-    clip = {mode:null,ids:[]}; selection.clear(); syncSel(); searchInput.value = ''; searchQuery = ''; render();
+    }else{let cnt=0;rootIds.forEach(id=>{if(deepCopy(id,targetPid))cnt++;});showToast(`已複製 ${cnt} 個項目`);}
+    clip={mode:null,ids:[]};selection.clear();syncSel();searchInput.value='';searchQuery='';render();
   }
 
-  function collectAllDescendantIds(fid, incDel=false) { let ids=[], stack=[fid]; while(stack.length){ const pid=stack.pop(); const children=db.filter(x=>x.pid===pid&&(incDel||!x.del)); for(let c of children){ ids.push(c.id); if(c.type==='dir') stack.push(c.id); } } return ids; }
+  function collectAllDescendantIds(fid,incDel=false){let ids=[],stack=[fid];while(stack.length){const pid=stack.pop();const children=db.filter(x=>x.pid===pid&&(incDel||!x.del));for(let c of children){ids.push(c.id);if(c.type==='dir')stack.push(c.id);}}return ids;}
 
-  function downloadSel() { if (!selection.size) return; const topIds = getTopIds([...selection]); const items = topIds.map(id => db.find(x => x.id === id)).filter(it => it && !it.del); if (!items.length) return; if (items.length === 1 && items[0].type === 'file') { downloadItem(items[0]); return; } showToast('已準備下載'); }
+  function downloadSel(){if(!selection.size)return;const topIds=getTopIds([...selection]);const items=topIds.map(id=>db.find(x=>x.id===id)).filter(it=>it&&!it.del);if(!items.length)return;if(items.length===1&&items[0].type==='file'){downloadItem(items[0]);return;}showToast('已準備下載');}
 
-  const searchInput = document.getElementById('search-inp');
-  searchInput.addEventListener('input', () => { searchQuery = searchInput.value.trim(); if (curTab !== 'home') render(); });
-  searchInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      const q = this.value.trim().toLowerCase();
-      if (q === 'slot' || q === '老虎机' || q === '小遊戲') { createGameWindow('slot'); this.value = ''; }
-    }
+  const searchInput=document.getElementById('search-inp');
+  searchInput.addEventListener('input',()=>{searchQuery=searchInput.value.trim();if(curTab!=='home')render();});
+  searchInput.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){const q=this.value.trim().toLowerCase();if(q==='slot'||q==='老虎机'||q==='小遊戲'){createGameWindow('slot');this.value='';}}
   });
 
-  const uploadBtn = document.getElementById('btn-upload');
-  const newFolderBtn = document.getElementById('btn-newfolder');
-  const fileInput = document.getElementById('file-up');
-  uploadBtn.addEventListener('click', () => { if (uploadBtn.classList.contains('disabled')) return; commitEdit(); fileInput.click(); });
-  newFolderBtn.addEventListener('click', () => { if (newFolderBtn.classList.contains('disabled') || filterCat) return; commitEdit(); App.createFolder(); });
-  fileInput.addEventListener('change', function() {
-    if (curTab !== 'drive' || filterCat) { showToast('請在「我的硬碟」上傳'); fileInput.value = ''; return; }
-    if (isUploading) return;
-    const files = fileInput.files; if (!files.length) return;
-    const targetPid = pathStack[pathStack.length-1].id; isUploading = true; updateSidebarButtons(); showToast(`正在上傳 ${files.length} 個文件...`);
-    const proms = []; for (let file of files) proms.push(new Promise(res => { const r = new FileReader(); r.onload = e => res({name:file.name,size:file.size,content:new Uint8Array(e.target.result)}); r.onerror = () => res(null); r.readAsArrayBuffer(file); }));
-    Promise.all(proms).then(results => {
-      let cnt = 0; for (let res of results) { if (!res) continue; const nn = getUniqueName(res.name, targetPid, 'file'); if (nn !== res.name) showToast(`檔案「${res.name}」已更名為「${nn}」`); db.push({id:generateId(),name:nn,type:'file',pid:targetPid,del:false,time:Date.now(),size:res.size,content:res.content}); cnt++; }
-      searchInput.value = ''; searchQuery = ''; render(); showToast(`已上傳 ${cnt} 個文件`); fileInput.value = ''; isUploading = false; updateSidebarButtons();
-    }).catch(err => { showErrorModal('上傳失敗: ' + err); fileInput.value = ''; isUploading = false; updateSidebarButtons(); });
+  const uploadBtn=document.getElementById('btn-upload');const newFolderBtn=document.getElementById('btn-newfolder');const fileInput=document.getElementById('file-up');
+  uploadBtn.addEventListener('click',()=>{if(uploadBtn.classList.contains('disabled'))return;commitEdit();fileInput.click();});
+  newFolderBtn.addEventListener('click',()=>{if(newFolderBtn.classList.contains('disabled')||filterCat)return;commitEdit();App.createFolder();});
+  fileInput.addEventListener('change',function(){
+    if(curTab!=='drive'||filterCat){showToast('請在「我的硬碟」上傳');fileInput.value='';return;}
+    if(isUploading)return;
+    const files=fileInput.files;if(!files.length)return;
+    const targetPid=pathStack[pathStack.length-1].id;isUploading=true;updateSidebarButtons();showToast(`正在上傳 ${files.length} 個文件...`);
+    const proms=[];for(let file of files)proms.push(new Promise(res=>{const r=new FileReader();r.onload=e=>res({name:file.name,size:file.size,content:new Uint8Array(e.target.result)});r.onerror=()=>res(null);r.readAsArrayBuffer(file);}));
+    Promise.all(proms).then(results=>{
+      let cnt=0;for(let res of results){if(!res)continue;const nn=getUniqueName(res.name,targetPid,'file');if(nn!==res.name)showToast(`檔案「${res.name}」已更名為「${nn}」`);db.push({id:generateId(),name:nn,type:'file',pid:targetPid,del:false,time:Date.now(),size:res.size,content:res.content});cnt++;}
+      searchInput.value='';searchQuery='';render();showToast(`已上傳 ${cnt} 個文件`);fileInput.value='';isUploading=false;updateSidebarButtons();
+    }).catch(err=>{showErrorModal('上傳失敗: '+err);fileInput.value='';isUploading=false;updateSidebarButtons();});
   });
 
-  function updateSidebarButtons() {
-    document.getElementById('btn-upload').classList.toggle('disabled', isUploading || curTab !== 'drive' || !!filterCat);
-    document.getElementById('btn-newfolder').classList.toggle('disabled', curTab !== 'drive' || !!filterCat);
+  function updateSidebarButtons(){
+    document.getElementById('btn-upload').classList.toggle('disabled',isUploading||curTab!=='drive'||!!filterCat);
+    document.getElementById('btn-newfolder').classList.toggle('disabled',curTab!=='drive'||!!filterCat);
   }
 
   // 签到积分
-  let userPoints = parseInt(localStorage.getItem('slotPoints')) || 0;
-  const CUTOFF_HOUR = 18;
-  function getDayRandom() { return Math.floor(Math.random() * 6) + 5; }
-  function dailySignIn() {
-    const now = new Date(); const today = now.toDateString();
-    if (localStorage.getItem('lastSignDate') === today) return false;
-    let points = getDayRandom();
-    if (now.getDay() === 0) points += 10;
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (localStorage.getItem('lastSignDate') && localStorage.getItem('lastSignDate') !== yesterday && now.getHours() >= CUTOFF_HOUR) {
-      userPoints = Math.max(0, userPoints - points); localStorage.setItem('slotPoints', userPoints);
-    }
-    userPoints += points; localStorage.setItem('slotPoints', userPoints); localStorage.setItem('lastSignDate', today);
+  let userPoints=parseInt(localStorage.getItem('slotPoints'))||0;
+  const CUTOFF_HOUR=18;
+  function getDayRandom(){return Math.floor(Math.random()*6)+5;}
+  function dailySignIn(){
+    const now=new Date();const today=now.toDateString();
+    if(localStorage.getItem('lastSignDate')===today)return false;
+    let points=getDayRandom();if(now.getDay()===0)points+=10;
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    if(localStorage.getItem('lastSignDate')&&localStorage.getItem('lastSignDate')!==yesterday&&now.getHours()>=CUTOFF_HOUR){userPoints=Math.max(0,userPoints-points);localStorage.setItem('slotPoints',userPoints);}
+    userPoints+=points;localStorage.setItem('slotPoints',userPoints);localStorage.setItem('lastSignDate',today);
     return points;
   }
 
-  function createGameWindow(gameId) {
-    const template = document.getElementById('slot-template')?.textContent; if (!template) return;
-    const name = gameId === 'slot' ? '皇家拉霸' : gameId;
-    const item = { id: `game-${gameId}`, name, type:'file', content:new Uint8Array(), del:false, time:Date.now(), size:0 };
-    if (openWindows.has(item.id)) { activateWindow(openWindows.get(item.id).win, openWindows.get(item.id).tab); return; }
-    createWindow(item);
-    const { win, tab, content } = openWindows.get(item.id);
-    content.style.background = '#f5efe0';
-    const blob = new Blob([template], { type:'text/html' });
-    const iframe = document.createElement('iframe'); iframe.style.width='100%'; iframe.style.height='100%'; iframe.style.border='none';
-    iframe.src = URL.createObjectURL(blob); content.appendChild(iframe);
-    window.addEventListener('message', function slotMsg(e) {
-      if (e.source !== iframe.contentWindow) return;
-      if (e.data?.type === 'updateScore') { userPoints = e.data.value; localStorage.setItem('slotPoints', userPoints); }
-      else if (e.data?.type === 'getScore') { iframe.contentWindow.postMessage({ type:'setScore', value: userPoints }, '*'); }
-    });
+  function createGameWindow(gameId){
+    const template=document.getElementById('slot-template')?.textContent;if(!template)return;
+    const name=gameId==='slot'?'皇家拉霸':gameId;
+    const item={id:`game-${gameId}`,name,type:'file',content:new Uint8Array(),del:false,time:Date.now(),size:0};
+    if(openWindows.has(item.id)){activateWindow(openWindows.get(item.id).win,openWindows.get(item.id).tab);return;}
+    createWindow(item);const{win,tab,content}=openWindows.get(item.id);
+    content.style.background='#f5efe0';
+    const blob=new Blob([template],{type:'text/html'});const iframe=document.createElement('iframe');iframe.style.width='100%';iframe.style.height='100%';iframe.style.border='none';iframe.src=URL.createObjectURL(blob);content.appendChild(iframe);
+    window.addEventListener('message',function slotMsg(e){if(e.source!==iframe.contentWindow)return;if(e.data?.type==='updateScore'){userPoints=e.data.value;localStorage.setItem('slotPoints',userPoints);}else if(e.data?.type==='getScore'){iframe.contentWindow.postMessage({type:'setScore',value:userPoints},'*');}});
   }
 
-  // 点击logo旋转并折叠
-  const logoImg = document.getElementById('logo-img');
-  document.getElementById('brand-logo').addEventListener('click', () => {
-    logoImg.classList.add('rotate');
-    setTimeout(() => logoImg.classList.remove('rotate'), 300);
-    App.toggleSidebar();
-  });
+  const logoImg=document.getElementById('logo-img');
+  document.getElementById('brand-logo').addEventListener('click',()=>{logoImg.classList.add('rotate');setTimeout(()=>logoImg.classList.remove('rotate'),300);App.toggleSidebar();});
 
-  window.App = {
-    toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); },
-    switchTab(tab) {
-      if (isUploading) { showToast('上傳中，請稍後再切換'); return; }
-      commitEdit(); curTab = tab; clip = {mode:null,ids:[]}; if (tab !== 'drive') filterCat = null;
-      pathStack = [{id:'0', name: tab==='home'?'首頁':tab==='drive'?'我的硬碟':tab==='recent'?'最近項目':'垃圾桶'}];
-      selection.clear(); syncSel(); searchInput.value = ''; searchQuery = ''; editId = null; lastClickId = null; clearPressState();
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.id === `menu-${tab}`));
-      updateSidebarButtons(); document.getElementById('view-toggle').style.display = (tab === 'drive' && !filterCat) ? 'flex' : 'none';
+  window.App={
+    toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');},
+    switchTab(tab){
+      if(isUploading){showToast('上傳中，請稍後再切換');return;}
+      commitEdit();curTab=tab;clip={mode:null,ids:[]};if(tab!=='drive')filterCat=null;
+      pathStack=[{id:'0',name:tab==='home'?'首頁':tab==='drive'?'我的硬碟':tab==='recent'?'最近項目':'垃圾桶'}];
+      selection.clear();syncSel();searchInput.value='';searchQuery='';editId=null;lastClickId=null;clearPressState();
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.toggle('active',i.id===`menu-${tab}`));
+      updateSidebarButtons();document.getElementById('view-toggle').style.display=(tab==='drive'&&!filterCat)?'flex':'none';
       render();
     },
-    goPath(idx) { if (curTab !== 'drive' || isUploading || filterCat) return; commitEdit(); pathStack = pathStack.slice(0, idx+1); selection.clear(); syncSel(); editId = null; searchInput.value = ''; searchQuery = ''; lastClickId = null; clearPressState(); render(); },
-    createFolder() { if (curTab !== 'drive' || filterCat) return; const targetPid = pathStack[pathStack.length-1].id; const nn = getUniqueName('未命名資料夾',targetPid,'dir'); db.push({id:generateId(),name:nn,type:'dir',pid:targetPid,del:false,time:Date.now(),size:0}); editId = db[db.length-1].id; render(); },
-    setView(mode) { if (filterCat) return; viewMode = mode; document.getElementById('view-list').classList.toggle('active', mode==='list'); document.getElementById('view-card').classList.toggle('active', mode==='card'); render(); },
-    refresh() { const vp = document.getElementById('main-view'); vp.classList.add('slide-up'); setTimeout(() => { render(); vp.classList.remove('slide-up'); }, 250); }
+    goPath(idx){if(curTab!=='drive'||isUploading||filterCat)return;commitEdit();pathStack=pathStack.slice(0,idx+1);selection.clear();syncSel();editId=null;searchInput.value='';searchQuery='';lastClickId=null;clearPressState();render();},
+    createFolder(){if(curTab!=='drive'||filterCat)return;const targetPid=pathStack[pathStack.length-1].id;const nn=getUniqueName('未命名資料夾',targetPid,'dir');db.push({id:generateId(),name:nn,type:'dir',pid:targetPid,del:false,time:Date.now(),size:0});editId=db[db.length-1].id;render();},
+    setView(mode){if(filterCat)return;viewMode=mode;document.getElementById('view-list').classList.toggle('active',mode==='list');document.getElementById('view-card').classList.toggle('active',mode==='card');render();},
+    refresh(){const vp=document.getElementById('main-view');vp.classList.add('slide-up');setTimeout(()=>{render();vp.classList.remove('slide-up');},250);}
   };
 
-  function commitEdit() {
-    if (!editId) return;
-    const inp = document.getElementById('inp-edit');
-    const target = db.find(x => x.id === editId);
-    if (target && inp) { let nn = inp.value.trim(); if (nn && nn !== target.name) { const un = getUniqueName(nn, target.pid, target.type, target.id); if (un !== nn) showToast(`重新命名時自動更名為「${un}」`); target.name = un; target.time = Date.now(); } }
-    editId = null; if (searchQuery) { searchInput.value = ''; searchQuery = ''; }
+  function commitEdit(){
+    if(!editId)return;
+    const inp=document.getElementById('inp-edit');
+    const target=db.find(x=>x.id===editId);
+    if(target&&inp){let nn=inp.value.trim();if(nn&&nn!==target.name){const un=getUniqueName(nn,target.pid,target.type,target.id);if(un!==nn)showToast(`重新命名時自動更名為「${un}」`);target.name=un;target.time=Date.now();}}
+    editId=null;if(searchQuery){searchInput.value='';searchQuery='';}
   }
 
-  function makeSvgCalendar() { return `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`; }
-  function adaptiveFontSize(name) { const len = name.length; if (len <= 6) return '14px'; if (len <= 12) return '13px'; if (len <= 20) return '12px'; return '11px'; }
+  function makeSvgCalendar(){return `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;}
+  function adaptiveFontSize(name){const len=name.length;if(len<=6)return'14px';if(len<=12)return'13px';if(len<=20)return'12px';return'11px';}
 
-  function render() {
-    if (curTab === 'home') { renderHome(); updateToolbar(); return; }
-    lastClickId = null;
-    const bc = document.getElementById('breadcrumb');
-    if (filterCat) {
-      const catNames = {image:'圖片', video:'視頻', audio:'音頻', document:'文件'};
-      bc.innerHTML = `<span onclick="App.switchTab('home')" style="cursor:pointer">← 返回首頁</span> / <span style="font-weight:500;color:var(--text)">${catNames[filterCat]}</span>`;
-      const exts = filterCat === 'image' ? IMG : filterCat === 'video' ? VID : filterCat === 'audio' ? AUD : new Set(['pdf','doc','docx','txt','md','csv','xls','xlsx','ppt','pptx']);
-      let items = db.filter(x => x.type === 'file' && !x.del && exts.has(x.name.split('.').pop().toLowerCase()));
-      if (searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      items.sort((a,b) => b.time - a.time);
-      const v = document.getElementById('main-view'); v.innerHTML = '';
-      const grid = document.createElement('div'); grid.className = 'card-grid';
-      items.forEach(item => { const card = document.createElement('div'); card.className = 'card-item'; card.setAttribute('data-id', item.id); card.innerHTML = `<div class="card-preview">${getFileIconLarge(item.name)}</div><div class="card-name" style="font-size:${adaptiveFontSize(item.name)}">${escapeHtml(item.name)}</div>`; grid.appendChild(card); });
-      v.appendChild(grid); if (!items.length) v.appendChild(elem('div','empty-state', searchQuery?'找不到匹配文件':'暫無此類檔案'));
-      syncSel(); updateToolbar(); return;
+  function render(){
+    if(curTab==='home'){renderHome();updateToolbar();return;}
+    lastClickId=null;
+    const bc=document.getElementById('breadcrumb');
+    if(filterCat){
+      const catNames={image:'圖片',video:'視頻',audio:'音頻',document:'文件'};
+      bc.innerHTML=`<span onclick="App.switchTab('home')" style="cursor:pointer">← 返回首頁</span> / <span style="font-weight:500;color:var(--text)">${catNames[filterCat]}</span>`;
+      const exts=filterCat==='image'?IMG:filterCat==='video'?VID:filterCat==='audio'?AUD:new Set(['pdf','doc','docx','txt','md','csv','xls','xlsx','ppt','pptx']);
+      let items=db.filter(x=>x.type==='file'&&!x.del&&exts.has(x.name.split('.').pop().toLowerCase()));
+      if(searchQuery)items=items.filter(x=>x.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      items.sort((a,b)=>b.time-a.time);
+      const v=document.getElementById('main-view');v.innerHTML='';
+      const grid=document.createElement('div');grid.className='card-grid';
+      items.forEach(item=>{const card=document.createElement('div');card.className='card-item';card.setAttribute('data-id',item.id);card.innerHTML=`<div class="card-preview">${getFileIconLarge(item.name)}</div><div class="card-name" style="font-size:${adaptiveFontSize(item.name)}">${escapeHtml(item.name)}</div>`;grid.appendChild(card);});
+      v.appendChild(grid);if(!items.length)v.appendChild(elem('div','empty-state',searchQuery?'找不到匹配文件':'暫無此類檔案'));
+      syncSel();updateToolbar();return;
     }
-    bc.innerHTML = curTab === 'drive' ? pathStack.map((p,i) => `<span onclick="App.goPath(${i})">${escapeHtml(p.name)}</span>`).join(' / ') : `<span style="font-weight:500;color:var(--text);cursor:default">${escapeHtml(pathStack[0].name)}</span>`;
-    const v = document.getElementById('main-view'); v.innerHTML = '';
-    const curPid = pathStack[pathStack.length-1].id;
-    let items = [];
-    if (curTab === 'recent') {
-      items = db.filter(x => x.type === 'file' && !x.del).sort((a,b) => b.time - a.time).slice(0,30);
-      if (searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      const grid = document.createElement('div'); grid.className = 'card-grid';
-      items.forEach(item => { const card = document.createElement('div'); card.className = 'card-item'; card.setAttribute('data-id', item.id); card.innerHTML = `<div class="card-preview">${getFileIconLarge(item.name)}</div><div class="card-name" style="font-size:${adaptiveFontSize(item.name)}">${escapeHtml(item.name)}</div>`; grid.appendChild(card); });
-      v.appendChild(grid); if (!items.length) v.appendChild(elem('div','empty-state','暫無最近項目'));
-    } else if (curTab === 'drive') {
-      items = db.filter(x => x.pid === curPid && !x.del);
-      if (searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      items.sort((a,b) => b.time - a.time);
-      if (viewMode === 'list') {
-        const list = document.createElement('div'); list.innerHTML = '<div class="list-header"><span>名稱</span><span>建立時間</span><span>大小</span></div>';
-        items.forEach(item => {
-          const row = document.createElement('div'); row.className = 'row'; row.setAttribute('data-id', item.id);
-          const nameBlock = editId === item.id ? `<input class="inline-input" id="inp-edit" value="${escapeHtml(item.name)}">` : `<span>${escapeHtml(item.name)}</span>`;
-          const timeStr = new Date(item.time).toLocaleString('zh-TW', {hour12:false}); const sizeStr = item.type === 'dir' ? '-' : formatSize(item.size);
-          row.innerHTML = `<div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?getFolderIconSmall():getFileIconSmall(item.name)}${nameBlock}</div><div>${escapeHtml(timeStr)}</div><div>${escapeHtml(sizeStr)}</div>`;
+    bc.innerHTML=curTab==='drive'?pathStack.map((p,i)=>`<span onclick="App.goPath(${i})">${escapeHtml(p.name)}</span>`).join(' / '):`<span style="font-weight:500;color:var(--text);cursor:default">${escapeHtml(pathStack[0].name)}</span>`;
+    const v=document.getElementById('main-view');v.innerHTML='';
+    const curPid=pathStack[pathStack.length-1].id;
+    let items=[];
+    if(curTab==='recent'){
+      items=db.filter(x=>x.type==='file'&&!x.del).sort((a,b)=>b.time-a.time).slice(0,30);
+      if(searchQuery)items=items.filter(x=>x.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      const grid=document.createElement('div');grid.className='card-grid';
+      items.forEach(item=>{const card=document.createElement('div');card.className='card-item';card.setAttribute('data-id',item.id);card.innerHTML=`<div class="card-preview">${getFileIconLarge(item.name)}</div><div class="card-name" style="font-size:${adaptiveFontSize(item.name)}">${escapeHtml(item.name)}</div>`;grid.appendChild(card);});
+      v.appendChild(grid);if(!items.length)v.appendChild(elem('div','empty-state','暫無最近項目'));
+    }else if(curTab==='drive'){
+      items=db.filter(x=>x.pid===curPid&&!x.del);
+      if(searchQuery)items=items.filter(x=>x.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      items.sort((a,b)=>b.time-a.time);
+      if(viewMode==='list'){
+        const list=document.createElement('div');list.innerHTML='<div class="list-header"><span>名稱</span><span>建立時間</span><span>大小</span></div>';
+        items.forEach(item=>{
+          const row=document.createElement('div');row.className='row';row.setAttribute('data-id',item.id);
+          const nameBlock=editId===item.id?`<input class="inline-input" id="inp-edit" value="${escapeHtml(item.name)}">`:`<span>${escapeHtml(item.name)}</span>`;
+          const timeStr=new Date(item.time).toLocaleString('zh-TW',{hour12:false});const sizeStr=item.type==='dir'?'-':formatSize(item.size);
+          row.innerHTML=`<div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?getFolderIconSmall():getFileIconSmall(item.name)}${nameBlock}</div><div>${escapeHtml(timeStr)}</div><div>${escapeHtml(sizeStr)}</div>`;
           list.appendChild(row);
         });
         v.appendChild(list);
-      } else {
-        const grid = document.createElement('div'); grid.className = 'card-grid';
-        items.forEach(item => {
-          const card = document.createElement('div'); card.className = 'card-item'; card.setAttribute('data-id', item.id);
-          if (item.type === 'dir') card.classList.add('folder-item');
-          card.draggable = true; card.addEventListener('dragend', endDrag);
-          if (item.type === 'dir') { card.addEventListener('dragover', e => safePreventDefault(e)); card.addEventListener('drop', () => {}); }
-          let previewHtml = '';
-          if (item.type === 'dir') { previewHtml = `<div class="card-preview folder-preview">${getFolderIconLarge()}</div>`; }
-          else {
-            const thumb = getThumb(item);
-            if (thumb === 'loading') previewHtml = `<div class="card-preview">${getFileIconLarge(item.name)}</div>`;
-            else if (thumb && typeof thumb === 'string' && thumb.startsWith('pdf:')) previewHtml = `<div class="card-preview"><embed src="${thumb.substring(4)}" type="application/pdf" style="width:500%;height:500%;transform:scale(0.2);transform-origin:top left"></div>`;
-            else if (thumb && thumb !== 'none') previewHtml = `<div class="card-preview"><img src="${thumb}" alt="preview"></div>`;
-            else previewHtml = `<div class="card-preview">${getFileIconLarge(item.name)}</div>`;
+      }else{
+        const grid=document.createElement('div');grid.className='card-grid';
+        items.forEach(item=>{
+          const card=document.createElement('div');card.className='card-item';card.setAttribute('data-id',item.id);
+          if(item.type==='dir')card.classList.add('folder-item');
+          card.draggable=true;card.addEventListener('dragend',endDrag);
+          if(item.type==='dir'){card.addEventListener('dragover',e=>safePreventDefault(e));card.addEventListener('drop',()=>{});}
+          let previewHtml='';
+          if(item.type==='dir'){previewHtml=`<div class="card-preview folder-preview">${getFolderIconLarge()}</div>`;}
+          else{
+            const thumb=getThumb(item);
+            if(thumb==='loading')previewHtml=`<div class="card-preview">${getFileIconLarge(item.name)}</div>`;
+            else if(thumb&&typeof thumb==='string'&&thumb.startsWith('pdf:'))previewHtml=`<div class="card-preview"><embed src="${thumb.substring(4)}" type="application/pdf" style="width:500%;height:500%;transform:scale(0.2);transform-origin:top left"></div>`;
+            else if(thumb&&thumb!=='none')previewHtml=`<div class="card-preview"><img src="${thumb}" alt="preview"></div>`;
+            else previewHtml=`<div class="card-preview">${getFileIconLarge(item.name)}</div>`;
           }
-          const nameBlock = editId === item.id ? `<input class="inline-input" id="inp-edit" value="${escapeHtml(item.name)}" style="font-size:${adaptiveFontSize(item.name)}">` : `<div class="card-name" style="font-size:${adaptiveFontSize(item.name)}">${escapeHtml(item.name)}</div>`;
-          card.innerHTML = previewHtml + nameBlock; grid.appendChild(card);
+          const nameBlock=editId===item.id?`<input class="inline-input" id="inp-edit" value="${escapeHtml(item.name)}" style="font-size:${adaptiveFontSize(item.name)}">`:`<div class="card-name" style="font-size:${adaptiveFontSize(item.name)}">${escapeHtml(item.name)}</div>`;
+          card.innerHTML=previewHtml+nameBlock;grid.appendChild(card);
         });
         v.appendChild(grid);
       }
-      if (!items.length) v.appendChild(elem('div','empty-state', searchQuery?'找不到匹配項目':'此處空空如也'));
-    } else if (curTab === 'trash') {
-      items = db.filter(x => x.del); if (searchQuery) items = items.filter(x => x.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      items.sort((a,b) => b.time - a.time);
-      const list = document.createElement('div'); list.innerHTML = '<div class="list-header"><span>名稱</span><span>原始時間</span><span>大小</span></div>';
-      items.forEach(item => {
-        const row = document.createElement('div'); row.className = 'row'; row.setAttribute('data-id', item.id);
-        const timeStr = new Date(item.time).toLocaleString('zh-TW', {hour12:false}); const sizeStr = item.type === 'dir' ? '-' : formatSize(item.size);
-        row.innerHTML = `<div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?getFolderIconSmall():getFileIconSmall(item.name)}<span>${escapeHtml(item.name)}</span></div><div>${escapeHtml(timeStr)}</div><div>${escapeHtml(sizeStr)}</div>`;
+      if(!items.length)v.appendChild(elem('div','empty-state',searchQuery?'找不到匹配項目':'此處空空如也'));
+    }else if(curTab==='trash'){
+      items=db.filter(x=>x.del);if(searchQuery)items=items.filter(x=>x.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      items.sort((a,b)=>b.time-a.time);
+      const list=document.createElement('div');list.innerHTML='<div class="list-header"><span>名稱</span><span>原始時間</span><span>大小</span></div>';
+      items.forEach(item=>{
+        const row=document.createElement('div');row.className='row';row.setAttribute('data-id',item.id);
+        const timeStr=new Date(item.time).toLocaleString('zh-TW',{hour12:false});const sizeStr=item.type==='dir'?'-':formatSize(item.size);
+        row.innerHTML=`<div style="display:flex;align-items:center;gap:12px">${item.type==='dir'?getFolderIconSmall():getFileIconSmall(item.name)}<span>${escapeHtml(item.name)}</span></div><div>${escapeHtml(timeStr)}</div><div>${escapeHtml(sizeStr)}</div>`;
         list.appendChild(row);
       });
       v.appendChild(list);
     }
-    syncSel(); updateToolbar(); updateSidebarButtons();
+    syncSel();updateToolbar();updateSidebarButtons();
   }
 
-  function elem(tag, cls, text) { const el = document.createElement(tag); el.className = cls; if (text) el.textContent = text; return el; }
+  function elem(tag,cls,text){const el=document.createElement(tag);el.className=cls;if(text)el.textContent=text;return el;}
 
-  function renderHome() {
-    const v = document.getElementById('main-view');
-    document.getElementById('breadcrumb').innerHTML = '<span style="font-weight:500;cursor:default">首頁</span>';
-    const now = new Date(); const day = now.getDate(); const month = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'][now.getMonth()];
-    const todayStr = now.toDateString(); let signedToday = (localStorage.getItem('lastSignDate') === todayStr);
-    const allFiles = db.filter(x => x.type === 'file' && !x.del);
-    const imgCount = allFiles.filter(f => IMG.has(f.name.split('.').pop())).length;
-    const vidCount = allFiles.filter(f => VID.has(f.name.split('.').pop())).length;
-    const audCount = allFiles.filter(f => AUD.has(f.name.split('.').pop())).length;
-    const docCount = allFiles.filter(f => TXT.has(f.name.split('.').pop())).length;
-    const recentFiles = allFiles.sort((a,b) => b.time - a.time).slice(0,5);
-    const recentItems = db.filter(x => !x.del).sort((a,b) => b.time - a.time).slice(0,5);
-    let html = `<div class="home-container"><h2 style="font-size:24px;font-weight:600;margin-bottom:4px">${greet()}，${escapeHtml(userName)}</h2><p style="color:var(--sub);margin-bottom:20px">欢迎回来</p>
+  function renderHome(){
+    const v=document.getElementById('main-view');
+    document.getElementById('breadcrumb').innerHTML='<span style="font-weight:500;cursor:default">首頁</span>';
+    const now=new Date();const day=now.getDate();const month=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'][now.getMonth()];
+    const todayStr=now.toDateString();let signedToday=(localStorage.getItem('lastSignDate')===todayStr);
+    const allFiles=db.filter(x=>x.type==='file'&&!x.del);
+    const imgCount=allFiles.filter(f=>IMG.has(f.name.split('.').pop())).length;
+    const vidCount=allFiles.filter(f=>VID.has(f.name.split('.').pop())).length;
+    const audCount=allFiles.filter(f=>AUD.has(f.name.split('.').pop())).length;
+    const docCount=allFiles.filter(f=>TXT.has(f.name.split('.').pop())).length;
+    const recentFiles=allFiles.sort((a,b)=>b.time-a.time).slice(0,5);
+    const recentItems=db.filter(x=>!x.del).sort((a,b)=>b.time-a.time).slice(0,5);
+    let html=`<div class="home-container"><h2 style="font-size:24px;font-weight:600;margin-bottom:4px">${greet()}，${escapeHtml(userName)}</h2><p style="color:var(--sub);margin-bottom:20px">欢迎回来</p>
       <div class="home-grid" style="margin-bottom:20px"><div class="home-card"><div class="home-card-header"><div class="home-card-icon" style="background:var(--accent-light)">${makeSvgCalendar()}</div><div><div class="home-card-title">签到积分</div><div class="home-card-sub">${day} / ${month}</div></div></div><div style="font-size:28px;font-weight:700">${signPoints} <span style="font-size:14px;color:var(--sub)">积分</span></div><button id="doSignBtn" class="t-btn primary" style="width:100%" ${signedToday?'disabled':''}>${signedToday?'今日已签到':'立即签到'}</button></div></div>
       <h3 style="font-size:18px;font-weight:600;margin-bottom:12px">文件分类</h3>
       <div class="category-grid">
@@ -853,100 +835,95 @@
         <div class="category-card" data-filter="document"><svg viewBox="0 0 64 64"><path d="M20 8h18l10 10v36a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z"/><polyline points="20 8 38 8 48 18 48 56"/><line x1="28" y1="28" x2="40" y2="28"/></svg><div class="cat-label">文档</div><div class="tag">${docCount} 个</div></div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
-        <div class="home-card"><h3 style="font-size:16px;font-weight:600">最近看过</h3>${recentFiles.map(f => `<div class="recent-item">${getFileIconSmall(f.name)}<span style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.name)}</span></div>`).join('')||'<div class="empty-state">暂无最近文件</div>'}</div>
-        <div class="home-card"><h3 style="font-size:16px;font-weight:600">最近保存</h3>${recentItems.map(i => `<div class="recent-item">${i.type==='dir'?getFolderIconSmall():getFileIconSmall(i.name)}<span style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${escapeHtml(i.name)}</span></div>`).join('')||'<div class="empty-state">暂无记录</div>'}</div>
+        <div class="home-card"><h3 style="font-size:16px;font-weight:600">最近看过</h3>${recentFiles.map(f=>`<div class="recent-item">${getFileIconSmall(f.name)}<span style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.name)}</span></div>`).join('')||'<div class="empty-state">暂无最近文件</div>'}</div>
+        <div class="home-card"><h3 style="font-size:16px;font-weight:600">最近保存</h3>${recentItems.map(i=>`<div class="recent-item">${i.type==='dir'?getFolderIconSmall():getFileIconSmall(i.name)}<span style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${escapeHtml(i.name)}</span></div>`).join('')||'<div class="empty-state">暂无记录</div>'}</div>
       </div></div>`;
-    v.innerHTML = html;
-    document.getElementById('doSignBtn')?.addEventListener('click', () => { if (signedToday) return; const pts = dailySignIn(); signPoints = parseInt(localStorage.getItem('slotPoints')); renderHome(); showToast(`签到成功！获得 ${pts} 积分`); });
-    document.querySelectorAll('.category-card').forEach(card => { card.addEventListener('click', () => { const filter = card.getAttribute('data-filter'); if (filter) { filterCat = filter; curTab = 'drive'; pathStack = [{id:'0', name: filter==='image'?'圖片':filter==='video'?'視頻':filter==='audio'?'音頻':'文件'}]; selection.clear(); searchQuery = ''; searchInput.value = ''; editId = null; clearPressState(); document.querySelectorAll('.nav-item').forEach(i => i.classList.toggle('active', i.id === 'menu-drive')); document.getElementById('view-toggle').style.display = 'none'; if (viewMode !== 'card') { viewMode = 'card'; document.getElementById('view-list').classList.remove('active'); document.getElementById('view-card').classList.add('active'); } updateSidebarButtons(); render(); } }); });
+    v.innerHTML=html;
+    document.getElementById('doSignBtn')?.addEventListener('click',()=>{if(signedToday)return;const pts=dailySignIn();signPoints=parseInt(localStorage.getItem('slotPoints'));renderHome();showToast(`签到成功！获得 ${pts} 积分`);});
+    document.querySelectorAll('.category-card').forEach(card=>{card.addEventListener('click',()=>{const filter=card.getAttribute('data-filter');if(filter){filterCat=filter;curTab='drive';pathStack=[{id:'0',name:filter==='image'?'圖片':filter==='video'?'視頻':filter==='audio'?'音頻':'文件'}];selection.clear();searchQuery='';searchInput.value='';editId=null;clearPressState();document.querySelectorAll('.nav-item').forEach(i=>i.classList.toggle('active',i.id==='menu-drive'));document.getElementById('view-toggle').style.display='none';if(viewMode!=='card'){viewMode='card';document.getElementById('view-list').classList.remove('active');document.getElementById('view-card').classList.add('active');}updateSidebarButtons();render();}});});
   }
 
-  // 拖拽相关
-  function clearPressState() { if(pressTimer) clearTimeout(pressTimer); pressTimer = null; pressTargetId = null; longPressActive = false; }
-  function handlePressStart(e) {
-    const card = e.target.closest('.card-item');
-    if (!card || curTab !== 'drive' || viewMode !== 'card') return;
-    if (e.target.closest('.card-name, .inline-input')) return;
-    const id = card.getAttribute('data-id'); if (!id) return;
-    const item = db.find(x => x.id === id); if (!item || (item.type !== 'file' && item.type !== 'dir')) return;
-    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-    const cy = e.touches ? e.touches[0].clientY : e.clientY;
-    pressSX = cx; pressSY = cy; pressTargetId = id; longPressActive = false;
-    clearTimeout(pressTimer);
-    pressTimer = setTimeout(() => { if (pressTargetId === id) longPressActive = true; pressTimer = null; }, LONG_PRESS);
+  function clearPressState(){if(pressTimer)clearTimeout(pressTimer);pressTimer=null;pressTargetId=null;longPressActive=false;}
+  function handlePressStart(e){
+    const card=e.target.closest('.card-item');
+    if(!card||curTab!=='drive'||viewMode!=='card')return;
+    if(e.target.closest('.card-name, .inline-input'))return;
+    const id=card.getAttribute('data-id');if(!id)return;
+    const item=db.find(x=>x.id===id);if(!item||(item.type!=='file'&&item.type!=='dir'))return;
+    const cx=e.touches?e.touches[0].clientX:e.clientX,cy=e.touches?e.touches[0].clientY:e.clientY;
+    pressSX=cx;pressSY=cy;pressTargetId=id;longPressActive=false;
+    clearTimeout(pressTimer);pressTimer=setTimeout(()=>{if(pressTargetId===id)longPressActive=true;pressTimer=null;},LONG_PRESS);
   }
-  function handlePressMove(e) {
-    if (!pressTargetId) return;
-    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-    const cy = e.touches ? e.touches[0].clientY : e.clientY;
-    if (Math.abs(cx - pressSX) > DRAG_TH || Math.abs(cy - pressSY) > DRAG_TH) clearPressState();
+  function handlePressMove(e){
+    if(!pressTargetId)return;
+    const cx=e.touches?e.touches[0].clientX:e.clientX,cy=e.touches?e.touches[0].clientY:e.clientY;
+    if(Math.abs(cx-pressSX)>DRAG_TH||Math.abs(cy-pressSY)>DRAG_TH)clearPressState();
   }
-  function handlePressEnd(e) { clearPressState(); }
+  function handlePressEnd(e){clearPressState();}
 
-  document.addEventListener('mousedown', handlePressStart);
-  document.addEventListener('touchstart', handlePressStart, {passive: false});
-  document.addEventListener('mousemove', handlePressMove);
-  document.addEventListener('touchmove', handlePressMove, {passive: false});
-  document.addEventListener('mouseup', handlePressEnd);
-  document.addEventListener('touchend', handlePressEnd);
+  document.addEventListener('mousedown',handlePressStart);
+  document.addEventListener('touchstart',handlePressStart,{passive:false});
+  document.addEventListener('mousemove',handlePressMove);
+  document.addEventListener('touchmove',handlePressMove,{passive:false});
+  document.addEventListener('mouseup',handlePressEnd);
+  document.addEventListener('touchend',handlePressEnd);
 
-  document.addEventListener('dragstart', function(e) {
-    const card = e.target.closest('.card-item');
-    if (!card) return;
-    if (!longPressActive || pressTargetId !== card.getAttribute('data-id')) { safePreventDefault(e); return false; }
+  document.addEventListener('dragstart',function(e){
+    const card=e.target.closest('.card-item');
+    if(!card)return;
+    if(!longPressActive||pressTargetId!==card.getAttribute('data-id')){safePreventDefault(e);return false;}
     startDrag(e);
   });
-  function startDrag(e) {
-    const card = e.target.closest('.card-item');
-    if (!card || curTab !== 'drive' || viewMode !== 'card') return;
-    const id = card.getAttribute('data-id');
-    const item = db.find(x => x.id === id);
-    if (!item || (item.type !== 'file' && item.type !== 'dir')) return;
-    draggingId = id; draggingType = item.type;
-    card.style.transition = 'transform 0.3s, opacity 0.3s'; card.style.transform = 'scale(0.95)'; card.style.opacity = '0.7'; card.classList.add('locked');
-    e.dataTransfer.setData('text/plain', id); e.dataTransfer.effectAllowed = 'move';
+  function startDrag(e){
+    const card=e.target.closest('.card-item');
+    if(!card||curTab!=='drive'||viewMode!=='card')return;
+    const id=card.getAttribute('data-id');const item=db.find(x=>x.id===id);
+    if(!item||(item.type!=='file'&&item.type!=='dir'))return;
+    draggingId=id;draggingType=item.type;
+    card.style.transition='transform 0.3s, opacity 0.3s';card.style.transform='scale(0.95)';card.style.opacity='0.7';card.classList.add('locked');
+    e.dataTransfer.setData('text/plain',id);e.dataTransfer.effectAllowed='move';
   }
-  function endDrag(e) {
-    if (dropInProgress) return;
-    const hadDrag = draggingId !== null;
-    const card = document.querySelector(`.card-item[data-id="${draggingId}"]`);
-    if (card) { card.style.transition = ''; card.style.transform = ''; card.style.opacity = ''; card.classList.remove('locked'); }
-    document.querySelectorAll('.drag-active').forEach(f => f.classList.remove('drag-active'));
-    draggingId = null; draggingType = null; clearPressState();
-    if (hadDrag) render();
+  function endDrag(e){
+    if(dropInProgress)return;
+    const hadDrag=draggingId!==null;
+    const card=document.querySelector(`.card-item[data-id="${draggingId}"]`);
+    if(card){card.style.transition='';card.style.transform='';card.style.opacity='';card.classList.remove('locked');}
+    document.querySelectorAll('.drag-active').forEach(f=>f.classList.remove('drag-active'));
+    draggingId=null;draggingType=null;clearPressState();
+    if(hadDrag)render();
   }
-  document.addEventListener('dragend', endDrag);
-  document.addEventListener('dragover', e => { safePreventDefault(e); const fc = e.target.closest('.folder-item'); if (fc && !fc.classList.contains('drag-active')) { fc.classList.add('drag-active'); e.dataTransfer.dropEffect = 'move'; } });
-  document.addEventListener('dragleave', e => { const fc = e.target.closest('.folder-item'); if (fc && !fc.contains(e.relatedTarget)) fc.classList.remove('drag-active'); });
-  document.addEventListener('drop', function(e) {
+  document.addEventListener('dragend',endDrag);
+  document.addEventListener('dragover',e=>{safePreventDefault(e);const fc=e.target.closest('.folder-item');if(fc&&!fc.classList.contains('drag-active')){fc.classList.add('drag-active');e.dataTransfer.dropEffect='move';}});
+  document.addEventListener('dragleave',e=>{const fc=e.target.closest('.folder-item');if(fc&&!fc.contains(e.relatedTarget))fc.classList.remove('drag-active');});
+  document.addEventListener('drop',function(e){
     safePreventDefault(e);
-    const fc = e.target.closest('.folder-item'); if (!fc || !draggingId) return;
-    const folderId = fc.getAttribute('data-id'); if (!folderId || folderId === draggingId) return;
-    const src = db.find(x => x.id === draggingId); if (!src) return;
-    if (src.pid === folderId) { showToast('項目已在該資料夾中'); return; }
-    if (src.type === 'dir' && isDescendant(draggingId, folderId)) { showErrorModal('無法移動：目標為來源的子資料夾'); return; }
+    const fc=e.target.closest('.folder-item');if(!fc||!draggingId)return;
+    const folderId=fc.getAttribute('data-id');if(!folderId||folderId===draggingId)return;
+    const src=db.find(x=>x.id===draggingId);if(!src)return;
+    if(src.pid===folderId){showToast('項目已在該資料夾中');return;}
+    if(src.type==='dir'&&isDescendant(draggingId,folderId)){showErrorModal('無法移動：目標為來源的子資料夾');return;}
     fc.classList.remove('drag-active');
-    const sourceCard = document.querySelector(`.card-item[data-id="${draggingId}"]`); if (!sourceCard) return;
-    dropInProgress = true; sourceCard.style.transition = '';
-    const sr = sourceCard.getBoundingClientRect(); const tr = fc.getBoundingClientRect();
+    const sourceCard=document.querySelector(`.card-item[data-id="${draggingId}"]`);if(!sourceCard)return;
+    dropInProgress=true;sourceCard.style.transition='';
+    const sr=sourceCard.getBoundingClientRect(),tr=fc.getBoundingClientRect();
     sourceCard.classList.add('inhale');
-    sourceCard.style.transform = `translate(${tr.left+tr.width/2-sr.left-sr.width/2}px, ${tr.top+tr.height/2-sr.top-sr.height/2}px) scale(0.08)`;
-    sourceCard.style.opacity = '0';
-    setTimeout(() => { fc.classList.add('jelly-anim'); setTimeout(() => fc.classList.remove('jelly-anim'), 500); }, 200);
-    const reset = () => {
-      sourceCard.removeEventListener('transitionend', reset);
-      sourceCard.classList.remove('inhale','locked'); sourceCard.style.transform = ''; sourceCard.style.opacity = ''; dropInProgress = false;
-      try { if (draggingType === 'file') { relocateItem(src, folderId); showToast(`已將 ${src.name} 移入資料夾`); } else { moveFolderRecursive(draggingId, folderId); showToast(`已將資料夾「${src.name}」移入`); } } catch (err) { showErrorModal('移動失敗: ' + err.message); }
-      draggingId = null; draggingType = null; clearPressState(); render();
+    sourceCard.style.transform=`translate(${tr.left+tr.width/2-sr.left-sr.width/2}px, ${tr.top+tr.height/2-sr.top-sr.height/2}px) scale(0.08)`;
+    sourceCard.style.opacity='0';
+    setTimeout(()=>{fc.classList.add('jelly-anim');setTimeout(()=>fc.classList.remove('jelly-anim'),500);},200);
+    const reset=()=>{
+      sourceCard.removeEventListener('transitionend',reset);
+      sourceCard.classList.remove('inhale','locked');sourceCard.style.transform='';sourceCard.style.opacity='';dropInProgress=false;
+      try{if(draggingType==='file'){relocateItem(src,folderId);showToast(`已將 ${src.name} 移入資料夾`);}else{moveFolderRecursive(draggingId,folderId);showToast(`已將資料夾「${src.name}」移入`);}}catch(err){showErrorModal('移動失敗: '+err.message);}
+      draggingId=null;draggingType=null;clearPressState();render();
     };
-    sourceCard.addEventListener('transitionend', function handler(e) { if (e.propertyName === 'transform' || e.propertyName === 'opacity') { sourceCard.removeEventListener('transitionend', handler); reset(); } });
-    setTimeout(() => { if (dropInProgress && sourceCard.style.transform.includes('scale')) reset(); }, 900);
+    sourceCard.addEventListener('transitionend',function handler(e){if(e.propertyName==='transform'||e.propertyName==='opacity'){sourceCard.removeEventListener('transitionend',handler);reset();}});
+    setTimeout(()=>{if(dropInProgress&&sourceCard.style.transform.includes('scale'))reset();},900);
   });
 
-  document.addEventListener('selectstart', e => { let t = e.target; if (t && !t.closest) t = t.parentElement; if (!t || !t.closest) return; if (!t.closest('input, textarea')) safePreventDefault(e); }, {passive: false});
-  window.addEventListener('dragover', e => safePreventDefault(e));
-  window.addEventListener('drop', e => safePreventDefault(e));
-  document.body.addEventListener('touchmove', function(e) {}, { passive: true });
+  document.addEventListener('selectstart',e=>{let t=e.target;if(t&&!t.closest)t=t.parentElement;if(!t||!t.closest)return;if(!t.closest('input, textarea'))safePreventDefault(e);},{passive:false});
+  window.addEventListener('dragover',e=>safePreventDefault(e));
+  window.addEventListener('drop',e=>safePreventDefault(e));
+  document.body.addEventListener('touchmove',function(e){},{passive:true});
 
   render();
   updateSidebarButtons();
