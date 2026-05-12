@@ -65,7 +65,6 @@
     .preview-window { position:absolute; background:var(--bg); border:1px solid var(--border); border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,0.12); display:flex; flex-direction:column; min-width:300px; min-height:200px; z-index:50; overflow:hidden; }
     .preview-window.active { z-index:100; box-shadow:0 16px 48px rgba(0,0,0,0.18); }
     .preview-window.maximized { position:fixed; top:0; left:0; width:100vw; height:100vh; border-radius:0; z-index:200; }
-    /* 平滑尺寸过渡类 */
     .preview-window.use-smooth-move {
       transition: top 0.35s cubic-bezier(0.4,0,0.2,1),
                   left 0.35s cubic-bezier(0.4,0,0.2,1),
@@ -206,9 +205,8 @@
 </main>
 <input type="file" id="file-up" style="display:none" multiple>
 
-<!-- 老虎机模板 -->
 <script type="text/plain" id="slot-template">
-  <!-- 请将完整的老虎机 HTML 粘贴在这里 -->
+  <!-- 老虎机 HTML 模板 -->
 </script>
 
 <script>
@@ -377,12 +375,39 @@
   function downloadItem(item){if(item.type!=='file'||!item.content||item.content.length===0){showToast('文件內容為空');return;}const blob=new Blob([item.content]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=item.name;a.click();}
   window.downloadItem=downloadItem;
 
+  // 窗口动画：弹出显示
+  function animateWindowAppear(win, callback) {
+    win.style.opacity = '0';
+    win.style.transform = 'scale(0.92)';
+    win.style.transition = 'none';
+    win.offsetHeight; // 强制回流
+    win.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease';
+    win.style.transform = 'scale(1)';
+    win.style.opacity = '1';
+    const onTransitionEnd = (e) => {
+      if (e.target === win && e.propertyName === 'transform') {
+        win.removeEventListener('transitionend', onTransitionEnd);
+        win.style.transition = '';
+        win.style.transform = '';
+        if (callback) callback();
+      }
+    };
+    win.addEventListener('transitionend', onTransitionEnd);
+  }
+
   // 窗口管理
   function createWindow(item){
     if(openWindows.has(item.id)){const{win,tab}=openWindows.get(item.id);activateWindow(win,tab);return;}
     const win=document.createElement('div');
     win.className='preview-window';win.setAttribute('data-id',item.id);win.style.zIndex=windowZIndex++;
     win.innerHTML=`<div class="preview-window-header"><div class="win-controls"><div class="win-dot red" data-action="close" title="關閉"><span class="icon">✕</span></div><div class="win-dot yellow" data-action="minimize" title="最小化"><span class="icon">─</span></div><div class="win-dot green" data-action="fullscreen" title="全螢幕"><span class="icon-fullscreen"></span></div></div><span class="preview-window-title">${escapeHtml(item.name)}</span></div><div class="preview-window-content"><div class="edit-float-bar"><button class="save-btn">保存</button><button class="cancel-btn">取消</button></div></div><div class="resize-handle-nw" data-resize-dir="nw"></div><div class="resize-handle-ne" data-resize-dir="ne"></div><div class="resize-handle-sw" data-resize-dir="sw"></div><div class="resize-handle-se" data-resize-dir="se"></div><div class="resize-handle-right" data-resize-dir="e"></div><div class="resize-handle-bottom" data-resize-dir="s"></div><div class="resize-handle-left" data-resize-dir="w"></div><div class="resize-handle-top" data-resize-dir="n"></div>`;
+    // 初始居中位置
+    const initW = 500, initH = 360;
+    win.style.position = 'absolute';
+    win.style.width = initW + 'px';
+    win.style.height = initH + 'px';
+    win.style.left = ((window.innerWidth - initW) / 2) + 'px';
+    win.style.top = ((window.innerHeight - initH) / 2) + 'px';
     document.body.appendChild(win);
     const tab=document.createElement('div');tab.className='tab active';tab.draggable=true;tab.innerHTML=`<span>${escapeHtml(item.name)}</span><button class="tab-close">×</button>`;tabsBar.appendChild(tab);
     const content=win.querySelector('.preview-window-content');
@@ -391,7 +416,12 @@
     const closeBtn=win.querySelector('.win-dot.red'),minBtn=win.querySelector('.win-dot.yellow'),maxBtn=win.querySelector('.win-dot.green');
     const state={win,tab,content,item,minimized:false,prevMaximized:true,prevRect:null,closing:false,minimizing:false};
     openWindows.set(item.id,state);
-    maximizeWindow(win);activateWindow(win,tab);loadPreviewContent(item,win,content,floatBar);
+    loadPreviewContent(item,win,content,floatBar);
+    // 播放弹出动画，完成后最大化
+    animateWindowAppear(win, () => {
+      maximizeWindow(win);
+      activateWindow(win, tab);
+    });
     closeBtn.addEventListener('click',()=>closeWindow(item.id));
     tab.querySelector('.tab-close').addEventListener('click',(e)=>{safeStopPropagation(e);closeWindow(item.id);});
     minBtn.addEventListener('click',()=>minimizeWindow(state));
@@ -400,9 +430,23 @@
     win.addEventListener('pointerdown',(e)=>{if(!state.minimized&&!e.target.closest('.win-dot'))activateWindow(win,tab);});
     tab.addEventListener('click',(e)=>{
       if(e.target.closest('button'))return;
-      if(state.minimized){state.minimized=false;win.style.display='flex';tab.classList.remove('minimized');
-        if(state.prevMaximized)maximizeWindow(win);else{restoreWindow(win);if(state.prevRect){win.style.width=state.prevRect.width;win.style.height=state.prevRect.height;win.style.left=state.prevRect.left;win.style.top=state.prevRect.top;}}
-        activateWindow(win,tab);}else activateWindow(win,tab);
+      if(state.minimized){
+        state.minimized=false;
+        win.style.display='flex';
+        tab.classList.remove('minimized');
+        if(state.prevRect){
+          win.style.width = state.prevRect.width;
+          win.style.height = state.prevRect.height;
+          win.style.left = state.prevRect.left;
+          win.style.top = state.prevRect.top;
+        }
+        animateWindowAppear(win, () => {
+          if(state.prevMaximized) maximizeWindow(win);
+          else activateWindow(win,tab);
+        });
+      } else {
+        activateWindow(win,tab);
+      }
     });
     tab.addEventListener('dragstart',(e)=>{if(e.target.closest('button')){safePreventDefault(e);return;}dragTabElement=tab;tab.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',item.id);});
     tab.addEventListener('dragend',()=>{tab.classList.remove('dragging');dragTabElement=null;});
@@ -425,8 +469,6 @@
   function maximizeWindow(win){
     if(win.classList.contains('maximized')) return;
     win.classList.add('use-smooth-move');
-    const rect = win.getBoundingClientRect();
-    // 设置全屏样式
     win.style.top = '0px';
     win.style.left = '0px';
     win.style.width = '100vw';
@@ -465,6 +507,18 @@
     const{win,tab}=state;
     if(state.minimizing) return;
     state.minimizing = true;
+    const isMax = win.classList.contains('maximized');
+    if (isMax) {
+      // 先还原到默认小窗口大小
+      win.classList.remove('maximized');
+      win.style.position = 'absolute';
+      win.style.borderRadius = '16px';
+      const defW = 600, defH = 450;
+      win.style.width = defW + 'px';
+      win.style.height = defH + 'px';
+      win.style.left = ((window.innerWidth - defW) / 2) + 'px';
+      win.style.top = ((window.innerHeight - defH) / 2) + 'px';
+    }
     const animation = win.animate([
       { transform: 'scale(1)', opacity: 1, offset: 0 },
       { transform: 'scale(0.95)', opacity: 0, offset: 1 }
@@ -472,7 +526,7 @@
     animation.onfinish = () => {
       state.minimizing = false;
       state.minimized = true;
-      state.prevMaximized = win.classList.contains('maximized');
+      state.prevMaximized = isMax;
       state.prevRect = { width: win.style.width, height: win.style.height, left: win.style.left, top: win.style.top };
       win.style.display = 'none';
       tab.classList.add('minimized');
