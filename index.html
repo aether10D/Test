@@ -72,7 +72,7 @@
                   height 0.35s cubic-bezier(0.4,0,0.2,1),
                   border-radius 0.35s ease;
     }
-    .preview-window-header { height:44px; padding:0 12px; display:flex; align-items:center; user-select:none; background:#f5f5f7; border-bottom:1px solid var(--border); cursor:move; touch-action:none; }
+    .preview-window-header { height:44px; padding:0 12px; display:flex; align-items:center; user-select:none; background:#f5f5f7; border-bottom:1px solid var(--border); cursor:default; touch-action:none; }
     .preview-window.maximized .preview-window-header { cursor:default; }
     .preview-window-title { font-weight:600; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px; margin-left:12px; flex:1; }
     .preview-window-content { flex:1; overflow:auto; display:flex; flex-direction:column; align-items:center; position:relative; }
@@ -375,12 +375,12 @@
   function downloadItem(item){if(item.type!=='file'||!item.content||item.content.length===0){showToast('文件內容為空');return;}const blob=new Blob([item.content]);const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=item.name;a.click();}
   window.downloadItem=downloadItem;
 
-  // 窗口动画：弹出显示
+  // 窗口弹出动画
   function animateWindowAppear(win, callback) {
     win.style.opacity = '0';
     win.style.transform = 'scale(0.92)';
     win.style.transition = 'none';
-    win.offsetHeight; // 强制回流
+    win.offsetHeight;
     win.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease';
     win.style.transform = 'scale(1)';
     win.style.opacity = '1';
@@ -395,13 +395,12 @@
     win.addEventListener('transitionend', onTransitionEnd);
   }
 
-  // 窗口管理
+  // 窗口管理（已加入长按拖动）
   function createWindow(item){
     if(openWindows.has(item.id)){const{win,tab}=openWindows.get(item.id);activateWindow(win,tab);return;}
     const win=document.createElement('div');
     win.className='preview-window';win.setAttribute('data-id',item.id);win.style.zIndex=windowZIndex++;
     win.innerHTML=`<div class="preview-window-header"><div class="win-controls"><div class="win-dot red" data-action="close" title="關閉"><span class="icon">✕</span></div><div class="win-dot yellow" data-action="minimize" title="最小化"><span class="icon">─</span></div><div class="win-dot green" data-action="fullscreen" title="全螢幕"><span class="icon-fullscreen"></span></div></div><span class="preview-window-title">${escapeHtml(item.name)}</span></div><div class="preview-window-content"><div class="edit-float-bar"><button class="save-btn">保存</button><button class="cancel-btn">取消</button></div></div><div class="resize-handle-nw" data-resize-dir="nw"></div><div class="resize-handle-ne" data-resize-dir="ne"></div><div class="resize-handle-sw" data-resize-dir="sw"></div><div class="resize-handle-se" data-resize-dir="se"></div><div class="resize-handle-right" data-resize-dir="e"></div><div class="resize-handle-bottom" data-resize-dir="s"></div><div class="resize-handle-left" data-resize-dir="w"></div><div class="resize-handle-top" data-resize-dir="n"></div>`;
-    // 初始居中位置
     const initW = 500, initH = 360;
     win.style.position = 'absolute';
     win.style.width = initW + 'px';
@@ -417,7 +416,6 @@
     const state={win,tab,content,item,minimized:false,prevMaximized:true,prevRect:null,closing:false,minimizing:false};
     openWindows.set(item.id,state);
     loadPreviewContent(item,win,content,floatBar);
-    // 播放弹出动画，完成后最大化
     animateWindowAppear(win, () => {
       maximizeWindow(win);
       activateWindow(win, tab);
@@ -451,12 +449,59 @@
     tab.addEventListener('dragstart',(e)=>{if(e.target.closest('button')){safePreventDefault(e);return;}dragTabElement=tab;tab.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',item.id);});
     tab.addEventListener('dragend',()=>{tab.classList.remove('dragging');dragTabElement=null;});
 
+    // 长按拖动窗口逻辑
     let dragState=null;
-    function startDrag(e){if(e.target.closest('.win-dot, [data-resize-dir], button'))return;if(win.classList.contains('maximized'))return;header.setPointerCapture(e.pointerId);win.classList.remove('use-smooth-move');dragState={startX:e.clientX,startY:e.clientY,left:parseInt(win.style.left)||0,top:parseInt(win.style.top)||0};safePreventDefault(e);}
-    function moveDrag(e){if(!dragState)return;win.style.left=(dragState.left+e.clientX-dragState.startX)+'px';win.style.top=(dragState.top+e.clientY-dragState.startY)+'px';}
-    function endDrag(e){dragState=null;header.releasePointerCapture(e.pointerId);}
-    header.addEventListener('pointerdown',startDrag);header.addEventListener('pointermove',moveDrag);header.addEventListener('pointerup',endDrag);header.addEventListener('pointercancel',endDrag);
+    let holdTimer=null;
+    let holdStartX, holdStartY;
+    const HOLD_TIME = 400; // 长按阈值（毫秒）
+    function clearHold() {
+      if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+    }
+    function onHeadDown(e) {
+      // 排除按钮区域
+      if (e.target.closest('.win-dot, [data-resize-dir], button')) return;
+      if (win.classList.contains('maximized')) return;
+      holdStartX = e.clientX; holdStartY = e.clientY;
+      clearHold();
+      holdTimer = setTimeout(() => {
+        holdTimer = null;
+        // 进入拖动模式
+        header.setPointerCapture(e.pointerId);
+        win.classList.remove('use-smooth-move');
+        dragState = {
+          startX: e.clientX,
+          startY: e.clientY,
+          left: parseInt(win.style.left) || 0,
+          top: parseInt(win.style.top) || 0
+        };
+        safePreventDefault(e);
+      }, HOLD_TIME);
+    }
+    function onHeadMove(e) {
+      if (holdTimer) {
+        // 如果移动距离超过阈值，取消长按定时器（认为不是长按）
+        if (Math.abs(e.clientX - holdStartX) > 5 || Math.abs(e.clientY - holdStartY) > 5) {
+          clearHold();
+        }
+        return;
+      }
+      if (!dragState) return;
+      win.style.left = (dragState.left + e.clientX - dragState.startX) + 'px';
+      win.style.top = (dragState.top + e.clientY - dragState.startY) + 'px';
+    }
+    function onHeadUp(e) {
+      clearHold();
+      if (dragState) {
+        dragState = null;
+        if (header.hasPointerCapture(e.pointerId)) header.releasePointerCapture(e.pointerId);
+      }
+    }
+    header.addEventListener('pointerdown', onHeadDown);
+    header.addEventListener('pointermove', onHeadMove);
+    header.addEventListener('pointerup', onHeadUp);
+    header.addEventListener('pointercancel', onHeadUp);
 
+    // 边缘调整大小
     const resizeEls=win.querySelectorAll('[data-resize-dir]');
     resizeEls.forEach(el=>{
       let resizeRaf=null,resizeState=null;
@@ -509,7 +554,6 @@
     state.minimizing = true;
     const isMax = win.classList.contains('maximized');
     if (isMax) {
-      // 先还原到默认小窗口大小
       win.classList.remove('maximized');
       win.style.position = 'absolute';
       win.style.borderRadius = '16px';
