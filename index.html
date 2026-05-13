@@ -98,8 +98,8 @@
     .preview-window-content { flex:1; overflow:auto; display:flex; flex-direction:column; align-items:center; position:relative; }
     .preview-window-content img { max-width:100%; height:auto; border-radius:12px; }
     .preview-window-content video, .preview-window-content audio { max-width:100%; }
-    .preview-window-content pre { white-space:pre-wrap; word-break:break-word; font-family:monospace; background:#f5f5f7; padding:16px; border-radius:16px; width:100%; font-size:16px; }
-    .preview-window-content textarea { width:100%; flex:1; border:1px solid var(--border); border-radius:16px; padding:16px; font-family:monospace; font-size:16px; resize:vertical; min-height:200px; }
+    .preview-window-content pre { white-space:pre-wrap; word-break:break-word; font-family:monospace; background:#fff; padding:16px; border-radius:12px; width:100%; font-size:16px; border:1px solid var(--border); }
+    .preview-window-content textarea { width:100%; flex:1; border:1px solid var(--border); border-radius:12px; padding:16px; font-family:monospace; font-size:16px; resize:vertical; min-height:200px; background:#fff; }
     .preview-unsupported { color:var(--sub); text-align:center; margin-top:40px; }
     .resize-handle-nw,.resize-handle-ne,.resize-handle-sw,.resize-handle-se,.resize-handle-right,.resize-handle-bottom,.resize-handle-left,.resize-handle-top { position:absolute; background:transparent; z-index:10; }
     .resize-handle-nw { top:-3px; left:-3px; width:20px; height:20px; cursor:nwse-resize; }
@@ -270,7 +270,7 @@
   const uid=(()=>{let n=0;return p=>`${p}-${++n}-${Math.random().toString(36).slice(2,8)}`;})();
   function makeFolderIcon(cls){ const pre=uid('fld'); return `<svg viewBox="0 0 64 64" class="${cls}"><defs><linearGradient id="${pre}g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FFF9D7" stop-opacity="0.98"/><stop offset="0.3" stop-color="#FFEC8B" stop-opacity="0.95"/><stop offset="0.7" stop-color="#FFD23F" stop-opacity="0.88"/><stop offset="1" stop-color="#E6A800" stop-opacity="0.8"/></linearGradient><linearGradient id="${pre}g2" x1="0" x2="1" y1="0.5" y2="1"><stop offset="0" stop-color="#FFB84D" stop-opacity="0.25"/><stop offset="1" stop-color="#D98C00" stop-opacity="0.4"/></linearGradient><filter id="${pre}sh"><feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="blur"/><feOffset dx="0" dy="1"/><feFlood flood-color="#B37B00" flood-opacity="0.35"/><feComposite operator="in" in2="blur"/><feComposite operator="over" in2="SourceGraphic"/></filter></defs><path d="M6 20c0-1.1.9-2 2-2h12l3-3h22c1.1 0 2 .9 2 2v24c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V20z" fill="url(#${pre}g1)" filter="url(#${pre}sh)"/><path d="M6 20c0-1.1.9-2 2-2h12l3-3h22c1.1 0 2 .9 2 2v24c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V20z" fill="url(#${pre}g2)" opacity="0.85"/><path d="M11 17h10l3-3h18c1.1 0 2 .9 2 2v2H11v-1z" fill="url(#${pre}g1)"/></svg>`; }
   const KNOWN=new Set(['jpg','jpeg','png','gif','bmp','tiff','tif','svg','webp','mp4','mov','avi','webm','3gp','mpg','mpeg','wmv','flv','mkv','mp3','wav','ogg','m4a','flac','txt','md','csv','html','css','js','ts','py','java','cpp','c','h','hpp','php','rb','go','swift','sql','ini','cfg','conf','xml','yaml','sh','bat','pdf','doc','docx','xls','xlsx','ppt','pptx','pages','ai','psd','dxf','eps','ps','ttf','xps','zip','rar']);
-  function makeFileIcon(filename,cls){ const ext=(filename.split('.').pop()||'').toLowerCase(); const isKnown=KNOWN.has(ext); const displayExt=isKnown?ext.toUpperCase().slice(0,4):'?'; const stroke=isKnown?'#5BA4E6':'#E67E22'; const textColor=isKnown?'#1B3A5C':'#7B3E00'; const bg1=isKnown?'#EDF7FF':'#FFF0E0'; const bg2=isKnown?'#8DCBFF':'#FFB347'; const pre=uid('file'); return `<svg viewBox="0 0 64 64" class="${cls}"><defs><linearGradient id="${pre}g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${bg1}"/><stop offset="1" stop-color="${bg2}"/></linearGradient></defs><path d="M14 8c0-1.1.9-2 2-2h20l10 10v32c0 1.1-.9 2-2 2H16c-1.1 0-2-.9-2-2V8z" fill="url(#${pre}g1)" stroke="${stroke}" stroke-width="1.5"/><text x="32" y="46" text-anchor="middle" font-size="11" font-weight="bold" fill="${textColor}" font-family="sans-serif">${escapeHtml(displayExt)}</text></svg>`; }
+  function makeFileIcon(filename,cls){ const ext=(filename.split('.').pop()||'').toLowerCase(); const isKnown=KNOWN.has(ext); const displayExt=isKnown?ext.toUpperCase().slice(0,4):'?'; const textColor=isKnown?'#0071e3':'#E67E22'; const bg1=isKnown?'#EDF7FF':'#FFF0E0'; const bg2=isKnown?'#8DCBFF':'#FFB347'; const pre=uid('file'); return `<svg viewBox="0 0 64 64" class="${cls}"><defs><linearGradient id="${pre}g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${bg1}"/><stop offset="1" stop-color="${bg2}"/></linearGradient></defs><path d="M14 8c0-1.1.9-2 2-2h20l10 10v32c0 1.1-.9 2-2 2H16c-1.1 0-2-.9-2-2V8z" fill="url(#${pre}g1)" stroke="#5BA4E6" stroke-width="1.5"/><text x="32" y="44" text-anchor="middle" font-size="9" font-weight="bold" fill="${textColor}" font-family="sans-serif">${escapeHtml(displayExt)}</text></svg>`; }
   function getFileIconSmall(f){return makeFileIcon(f,'file-glass-icon');}
   function getFileIconLarge(f){return makeFileIcon(f,'file-glass-icon-large');}
   function getFileIconXLarge(f){return makeFileIcon(f,'file-glass-icon-xlarge');}
@@ -411,13 +411,11 @@
             res(cvs.toDataURL('image/jpeg',quality));
           } catch(e) { cleanup(); res(null); }
         };
-        // 使用 loadedmetadata 后设置 currentTime，确保 seeked 触发
         video.addEventListener('loadedmetadata', () => {
           if (video.readyState >= 1) video.currentTime = 0.1;
         });
         video.addEventListener('seeked', captureFrame, { once: true });
         video.addEventListener('error', () => { if(timeout)clearTimeout(timeout); cleanup(); res(null); });
-        // 超时兜底
         setTimeout(() => { if(timeout) { clearTimeout(timeout); cleanup(); res(null); } }, 5000);
       });
     }
@@ -854,7 +852,7 @@
     toggleSidebar(){document.getElementById('sidebar').classList.toggle('collapsed');},
     switchTab(tab){
       if(isUploading){showToast('上傳中，請稍後再切換');return;}
-      commitEdit();curTab=tab;clip={mode:null,ids:[]};if(tab!=='drive')filterCat=null;
+      commitEdit();curTab=tab;clip={mode:null,ids:[]};filterCat=null;
       pathStack=[{id:'0',name:tab==='home'?'首頁':tab==='drive'?'我的硬碟':tab==='recent'?'最近項目':'垃圾桶'}];
       selection.clear();syncSel();searchInput.value='';searchQuery='';editId=null;lastClickId=null;clearPressState();
       document.querySelectorAll('.nav-item').forEach(i=>i.classList.toggle('active',i.id===`menu-${tab}`));
